@@ -74,4 +74,4 @@ This version saves on the current browser and device. Clearing browser storage r
 
 ## CI
 
-GitHub Actions installs from the lockfile and runs type checking, lint, tests, a production build, and a formatting check on pushes and pull requests. Dependencies and generated build output are excluded from Git.
+The ready-to-enable workflow is in `docs/ci.yml`. Move it to `.github/workflows/ci.yml` using a GitHub login with workflow write permission to enable automated checks on pushes and pull requests. It installs from the lockfile and runs type checking, lint, tests, a production build, and a formatting check. The current publishing login cannot write workflow files; all checks were run locally. Dependencies and generated build output are excluded from Git.
