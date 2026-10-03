@@ -1,13 +1,9 @@
-import { HashRouter, Route, Routes, useLocation } from 'react-router-dom';
+import { HashRouter, Route, Routes } from 'react-router-dom';
 import type { PropsWithChildren } from 'react';
 import { UIProvider } from '@/context/UIProvider';
 import { AuthProvider } from '@/context/AuthProvider';
 import { WorkspaceSession } from './WorkspaceSession';
 import { PublicReader } from '@/features/reader/PublicReader';
-function RouteUIProvider({ children }: PropsWithChildren) {
-  const { pathname } = useLocation();
-  return <UIProvider key={pathname}>{children}</UIProvider>;
-}
 export function AppProviders({ children }: PropsWithChildren) {
   return (
     <HashRouter>
@@ -18,9 +14,9 @@ export function AppProviders({ children }: PropsWithChildren) {
           <Route
             path="*"
             element={
-              <RouteUIProvider>
+              <UIProvider>
                 <WorkspaceSession>{children}</WorkspaceSession>
-              </RouteUIProvider>
+              </UIProvider>
             }
           />
         </Routes>

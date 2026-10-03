@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type PropsWithChildren } from 'react';
+import { useLocation } from 'react-router-dom';
 import { UIContext, type WorkspaceDialog } from './ui-context';
 export function UIProvider({ children }: PropsWithChildren) {
   const [sidebarOpen, setSidebarOpen] = useState(false),
@@ -6,6 +7,15 @@ export function UIProvider({ children }: PropsWithChildren) {
       () => localStorage.getItem('folio.sidebar-collapsed') === 'true',
     ),
     [dialog, setDialog] = useState<WorkspaceDialog | null>(null);
+  // Moving to another screen closes dialogs and the mobile sidebar. This stays a
+  // state reset: remounting the provider would rebuild the whole app on every click.
+  const { pathname } = useLocation();
+  const [shownPath, setShownPath] = useState(pathname);
+  if (shownPath !== pathname) {
+    setShownPath(pathname);
+    setDialog(null);
+    setSidebarOpen(false);
+  }
   useEffect(() => {
     localStorage.setItem('folio.sidebar-collapsed', String(sidebarCollapsed));
   }, [sidebarCollapsed]);
