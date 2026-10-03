@@ -6,7 +6,7 @@ import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
 export function AppLayout() {
   const { workspace, saveError } = useWorkspace(),
-    { sidebarOpen, focusMode } = useUI(),
+    { sidebarOpen, sidebarCollapsed, focusMode } = useUI(),
     narrow = useMediaQuery('(max-width:760px)');
   const noteRoute = useMatch('/card/:noteId'),
     boardRoute = useMatch('/board/:boardId');
@@ -17,9 +17,13 @@ export function AppLayout() {
   const writing = Boolean(noteRoute);
   return (
     <div
-      className={`app ${writing ? 'writing-view' : 'board-workspace'} ${focusMode ? 'focus-mode' : ''}`}
+      className={`app ${writing ? 'writing-view' : 'board-workspace'} ${focusMode ? 'focus-mode' : ''} ${sidebarCollapsed && !narrow ? 'sidebar-collapsed' : ''}`}
     >
-      <Sidebar board={board} inert={!sidebarOpen && narrow} />
+      <Sidebar
+        board={board}
+        inert={!sidebarOpen && narrow}
+        collapsed={sidebarCollapsed && !narrow}
+      />
       <main className="main">
         <Topbar board={board} writing={writing} />
         {saveError && (

@@ -3,7 +3,15 @@ import { BookOpen, ChevronDown, Feather, LayoutGrid, Plus } from 'lucide-react';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useUI } from '@/hooks/useUI';
 import type { Board } from '@/features/workspace/types';
-export function Sidebar({ board, inert }: { board: Board; inert: boolean }) {
+export function Sidebar({
+  board,
+  inert,
+  collapsed,
+}: {
+  board: Board;
+  inert: boolean;
+  collapsed: boolean;
+}) {
   const { workspace } = useWorkspace(),
     { sidebarOpen, setSidebarOpen, openDialog } = useUI(),
     navigate = useNavigate();
@@ -20,7 +28,11 @@ export function Sidebar({ board, inert }: { board: Board; inert: boolean }) {
           onClick={() => setSidebarOpen(false)}
         />
       )}
-      <aside inert={inert} className={`sidebar ${sidebarOpen ? 'is-open' : ''}`}>
+      <aside
+        id="app-sidebar"
+        inert={inert || collapsed}
+        className={`sidebar ${sidebarOpen ? 'is-open' : ''} ${collapsed ? 'is-collapsed' : ''}`}
+      >
         <button className="brand" onClick={() => go(workspace.boards[0].id)}>
           <span className="brand-mark">
             <Feather size={22} />
@@ -52,7 +64,7 @@ export function Sidebar({ board, inert }: { board: Board; inert: boolean }) {
               onClick={() => go(b.id)}
             >
               <span className="board-dot" style={{ background: b.color }} />
-              {b.title}
+              <span className="board-nav-label">{b.title}</span>
             </button>
           ))}
         </nav>

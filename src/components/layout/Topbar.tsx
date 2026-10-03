@@ -1,15 +1,34 @@
-import { ChevronRight, Feather, LayoutGrid, Menu } from 'lucide-react';
+import {
+  ChevronRight,
+  Feather,
+  LayoutGrid,
+  Menu,
+  PanelLeftClose,
+  PanelLeftOpen,
+} from 'lucide-react';
 import { useUI } from '@/hooks/useUI';
 import type { Board } from '@/features/workspace/types';
 export function Topbar({ board, writing }: { board: Board; writing: boolean }) {
-  const { setSidebarOpen } = useUI();
+  const { sidebarOpen, setSidebarOpen, sidebarCollapsed, setSidebarCollapsed } = useUI();
   return (
     <header className="topbar">
       <div className="breadcrumb">
         <button
+          className="sidebar-toggle icon-button"
+          onClick={() => setSidebarCollapsed((collapsed) => !collapsed)}
+          aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-expanded={!sidebarCollapsed}
+          aria-controls="app-sidebar"
+          title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {sidebarCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+        </button>
+        <button
           className="mobile-menu icon-button"
           onClick={() => setSidebarOpen((value) => !value)}
-          aria-label="Open navigation"
+          aria-label={sidebarOpen ? 'Close navigation' : 'Open navigation'}
+          aria-expanded={sidebarOpen}
+          aria-controls="app-sidebar"
         >
           <Menu size={20} />
         </button>

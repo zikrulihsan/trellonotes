@@ -2,8 +2,14 @@ import { useCallback, useEffect, useMemo, useState, type PropsWithChildren } fro
 import { UIContext, type WorkspaceDialog } from './ui-context';
 export function UIProvider({ children }: PropsWithChildren) {
   const [sidebarOpen, setSidebarOpen] = useState(false),
+    [sidebarCollapsed, setSidebarCollapsed] = useState(
+      () => localStorage.getItem('folio.sidebar-collapsed') === 'true',
+    ),
     [focusMode, setFocusMode] = useState(false),
     [dialog, setDialog] = useState<WorkspaceDialog | null>(null);
+  useEffect(() => {
+    localStorage.setItem('folio.sidebar-collapsed', String(sidebarCollapsed));
+  }, [sidebarCollapsed]);
   useEffect(() => {
     const escape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -24,13 +30,15 @@ export function UIProvider({ children }: PropsWithChildren) {
     () => ({
       sidebarOpen,
       setSidebarOpen,
+      sidebarCollapsed,
+      setSidebarCollapsed,
       focusMode,
       setFocusMode,
       dialog,
       openDialog,
       closeDialog,
     }),
-    [sidebarOpen, focusMode, dialog, openDialog, closeDialog],
+    [sidebarOpen, sidebarCollapsed, focusMode, dialog, openDialog, closeDialog],
   );
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>;
 }
