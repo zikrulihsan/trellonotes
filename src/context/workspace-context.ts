@@ -15,5 +15,7 @@ export interface WorkspaceActions {
 export const WorkspaceStateContext = createContext<{
   workspace: Workspace;
   saveError: boolean;
+  syncStatus: 'local' | 'loading' | 'syncing' | 'synced' | 'error';
+  cloudEnabled: boolean;
 } | null>(null);
 export const WorkspaceActionsContext = createContext<WorkspaceActions | null>(null);

@@ -15,7 +15,7 @@ export function WritingEditor({ card, board }: { card: Note; board: Board }) {
     [savedEdit, setSavedEdit] = useState(card.updatedAt),
     [link, setLink] = useState<string | null>(null);
   const { updateNote: update, moveNote } = useWorkspaceActions(),
-    { saveError } = useWorkspace(),
+    { saveError, syncStatus } = useWorkspace(),
     navigate = useNavigate();
   const editor = useEditor({
     extensions: [
@@ -71,6 +71,7 @@ export function WritingEditor({ card, board }: { card: Note; board: Board }) {
         onBack={() => navigate(`/board/${board.id}`)}
         saving={saving}
         saveError={saveError}
+        syncStatus={syncStatus}
       />
       <EditorToolbar
         editor={editor}

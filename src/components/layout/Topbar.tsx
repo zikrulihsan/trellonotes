@@ -8,8 +8,10 @@ import {
 } from 'lucide-react';
 import { useUI } from '@/hooks/useUI';
 import type { Board } from '@/features/workspace/types';
+import { useWorkspace } from '@/hooks/useWorkspace';
 export function Topbar({ board, writing }: { board: Board; writing: boolean }) {
   const { sidebarOpen, setSidebarOpen, sidebarCollapsed, setSidebarCollapsed } = useUI();
+  const { cloudEnabled, syncStatus } = useWorkspace();
   return (
     <header className="topbar">
       <div className="breadcrumb">
@@ -47,7 +49,14 @@ export function Topbar({ board, writing }: { board: Board; writing: boolean }) {
         <span className="small-logo">
           <Feather size={14} />
         </span>
-        folio<span className="topbar-local">Saved on this device</span>
+        folio
+        <span className="topbar-local">
+          {cloudEnabled
+            ? syncStatus === 'error'
+              ? 'Sync paused'
+              : 'Synced with SweGrowth'
+            : 'Saved on this device'}
+        </span>
       </span>
     </header>
   );

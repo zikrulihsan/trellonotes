@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, ChevronDown, Feather, LayoutGrid, Plus } from 'lucide-react';
 import { useWorkspace } from '@/hooks/useWorkspace';
+import { useAuth } from '@/context/auth-context';
 import { useUI } from '@/hooks/useUI';
 import type { Board } from '@/features/workspace/types';
 export function Sidebar({
@@ -12,7 +13,8 @@ export function Sidebar({
   inert: boolean;
   collapsed: boolean;
 }) {
-  const { workspace } = useWorkspace(),
+  const { workspace, cloudEnabled, syncStatus } = useWorkspace(),
+    { user, signOut } = useAuth(),
     { sidebarOpen, setSidebarOpen, openDialog } = useUI(),
     navigate = useNavigate();
   function go(id: string) {
@@ -83,9 +85,26 @@ export function Sidebar({
         <div className="sidebar-footer">
           <span className="profile-avatar">S</span>
           <div>
-            My workspace<small>Saved on this device</small>
+            {user?.email ?? 'My workspace'}
+            <small>
+              {cloudEnabled
+                ? syncStatus === 'error'
+                  ? 'Sync paused'
+                  : 'SweGrowth sync'
+                : 'Saved on this device'}
+            </small>
           </div>
-          <span className="local-pill">Local</span>
+          {cloudEnabled ? (
+            <button
+              className="local-pill signout-pill"
+              onClick={() => void signOut()}
+              title="Sign out"
+            >
+              Sign out
+            </button>
+          ) : (
+            <span className="local-pill">Local</span>
+          )}
         </div>
       </aside>
     </>

@@ -1,5 +1,6 @@
 import type { Board, BoardList, Note, NotePatch, Workspace } from './types';
 export type WorkspaceAction =
+  | { type: 'workspace/replace'; workspace: Workspace }
   | { type: 'board/create'; board: Board }
   | { type: 'board/rename'; boardId: string; title: string }
   | { type: 'board/delete'; boardId: string }
@@ -13,6 +14,8 @@ export type WorkspaceAction =
 
 export function workspaceReducer(state: Workspace, action: WorkspaceAction): Workspace {
   switch (action.type) {
+    case 'workspace/replace':
+      return action.workspace;
     case 'board/create':
       return action.board.title.trim() && !state.boards.some((b) => b.id === action.board.id)
         ? { ...state, boards: [...state.boards, action.board] }

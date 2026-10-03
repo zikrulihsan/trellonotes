@@ -8,6 +8,7 @@ A Trello-style board whose cards open into full-page free-writing notes. Soft gr
 - **React 19** — function components and feature-based composition.
 - **React Router** — board and note routes using `HashRouter`, suitable for static hosting.
 - **React Context + useReducer** — typed workspace actions, shared UI state, and predictable updates.
+- **Supabase Auth + Postgres** — email magic-link sign-in and per-user workspace synchronization protected by row-level security.
 - **Tiptap** — rich text, headings, lists, links, quotes, undo, and redo.
 - **CSS + Lucide** — feature styles and accessible icon controls.
 - **Vitest + Testing Library** — reducer, persistence, context, and writing-helper tests.
@@ -19,6 +20,13 @@ Use Node 22 LTS (`nvm use`) and npm. Node 20.19+ is also supported.
 
 ```sh
 npm ci
+```
+
+For cloud sync, copy `.env.example` to `.env.local` and add the SweGrowth project's URL and publishable key. The app can still run without these values using browser storage only.
+
+In Supabase Auth settings, allow the local callback URLs `http://localhost:5173/**` and `http://127.0.0.1:5173/**`. Add the deployed app origin there when publishing. Magic-link emails return to the app origin.
+
+```sh
 npm run dev
 ```
 
@@ -64,9 +72,9 @@ The editor is lazy-loaded. Browser back/forward works without server route confi
 
 ## Saving and existing notes
 
-The workspace is saved in `localStorage` under the existing `folio.workspace.v1` key, so this refactor preserves notes already saved by the previous app. The persisted `cards` field is retained for compatibility; the TypeScript domain calls each item a `Note`.
+The workspace is saved in `localStorage` under the existing `folio.workspace.v1` key, so this refactor preserves notes already saved by the previous app. After signing in, the app loads the account's workspace from Supabase. If no cloud workspace exists yet, the current browser workspace is uploaded on first sync. The persisted `cards` field is retained for compatibility; the TypeScript domain calls each item a `Note`.
 
-This version saves on the current browser and device. Clearing browser storage removes that device’s notes. There is no server database, user account system, or cross-device synchronization. Save failures are displayed while the in-memory workspace remains editable. The storage adapter can be replaced by a backend without changing the board components.
+Cloud data uses the dedicated `public.trellonotes_workspaces` table. RLS restricts each row to its authenticated owner; the migration is in `supabase/migrations`. Local browser storage remains a fallback copy. Cloud sync failures are shown while editing remains available.
 
 ## Background asset
 

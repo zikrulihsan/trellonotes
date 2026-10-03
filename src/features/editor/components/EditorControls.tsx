@@ -7,11 +7,13 @@ export function EditorControls({
   onBack,
   saving,
   saveError,
+  syncStatus,
 }: {
   note: Note;
   onBack: () => void;
   saving: boolean;
   saveError: boolean;
+  syncStatus: 'local' | 'loading' | 'syncing' | 'synced' | 'error';
 }) {
   const { focusMode, setFocusMode } = useUI();
   return (
@@ -23,13 +25,19 @@ export function EditorControls({
       <div className="writing-controls-right">
         <span role="status" className={`save-status ${saveError ? 'save-failed' : ''}`}>
           {saveError ? (
-            'Changes not saved'
+            syncStatus === 'error' ? (
+              'Cloud sync paused · saved on this device'
+            ) : (
+              'Changes not saved'
+            )
           ) : saving ? (
             'Saving…'
+          ) : syncStatus === 'loading' || syncStatus === 'syncing' ? (
+            'Syncing…'
           ) : (
             <>
               <Check size={14} />
-              Saved to this device
+              {syncStatus === 'synced' ? 'Synced with SweGrowth' : 'Saved on this device'}
             </>
           )}
         </span>

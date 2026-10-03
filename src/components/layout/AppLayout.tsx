@@ -5,7 +5,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
 export function AppLayout() {
-  const { workspace, saveError } = useWorkspace(),
+  const { workspace, saveError, cloudEnabled, syncStatus } = useWorkspace(),
     { sidebarOpen, sidebarCollapsed, focusMode } = useUI(),
     narrow = useMediaQuery('(max-width:760px)');
   const noteRoute = useMatch('/card/:noteId'),
@@ -28,8 +28,9 @@ export function AppLayout() {
         <Topbar board={board} writing={writing} />
         {saveError && (
           <div className="storage-warning" role="alert">
-            Your browser could not save these changes. Keep this page open and free up browser
-            storage.
+            {cloudEnabled && syncStatus === 'error'
+              ? 'Cloud sync could not reach SweGrowth. Your latest changes are still saved on this device.'
+              : 'Your browser could not save these changes. Keep this page open and free up browser storage.'}
           </div>
         )}
         <Outlet />
