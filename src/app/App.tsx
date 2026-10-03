@@ -6,6 +6,7 @@ import { BoardPage } from '@/features/boards/BoardPage';
 import { WorkspaceDialogs } from '@/features/workspace/WorkspaceDialogs';
 import { useBoardTools } from '@/integrations/useBoardTools';
 import { PagesPage } from '@/features/pages/PagesPage';
+import { boardPath } from '@/lib/app-paths';
 const EditorPage = lazy(() => import('@/features/editor/EditorPage'));
 const PageEditorPage = lazy(() => import('@/features/pages/PageEditorPage'));
 export function App() {
@@ -15,10 +16,24 @@ export function App() {
     <>
       <Routes>
         <Route element={<AppLayout />}>
-          <Route index element={<Navigate to={`/board/${workspace.boards[0].id}`} replace />} />
-          <Route path="board/:boardId" element={<BoardPage />} />
+          <Route index element={<Navigate to={boardPath(workspace.boards[0])} replace />} />
+          <Route path="board/:boardRef" element={<BoardPage />} />
           <Route
-            path="card/:noteId"
+            path="initiative/:noteRef"
+            element={
+              <Suspense
+                fallback={
+                  <div className="editor-placeholder" role="status">
+                    Opening your page…
+                  </div>
+                }
+              >
+                <EditorPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="card/:noteRef"
             element={
               <Suspense
                 fallback={
@@ -33,7 +48,7 @@ export function App() {
           />
           <Route path="pages" element={<PagesPage />} />
           <Route
-            path="page/:pageId"
+            path="page/:pageRef"
             element={
               <Suspense
                 fallback={
@@ -46,7 +61,7 @@ export function App() {
               </Suspense>
             }
           />
-          <Route path="*" element={<Navigate to={`/board/${workspace.boards[0].id}`} replace />} />
+          <Route path="*" element={<Navigate to={boardPath(workspace.boards[0])} replace />} />
         </Route>
       </Routes>
       <WorkspaceDialogs />

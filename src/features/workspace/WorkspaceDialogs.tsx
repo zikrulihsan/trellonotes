@@ -5,6 +5,7 @@ import { useWorkspace, useWorkspaceActions } from '@/hooks/useWorkspace';
 import type { WorkspaceDialog } from '@/context/ui-context';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
+import { boardPath, initiativePath } from '@/lib/app-paths';
 import { LabelManager } from './LabelManager';
 export function WorkspaceDialogs() {
   const { dialog, closeDialog } = useUI();
@@ -41,14 +42,14 @@ function DialogForm({
     if (!value.trim()) return;
     switch (request.kind) {
       case 'create-board':
-        navigate(`/board/${actions.createBoard(value)}`);
+        navigate(boardPath({ id: actions.createBoard(value), title: value }));
         break;
       case 'create-list':
         actions.createList(request.boardId, value);
         break;
       case 'create-note': {
         const note = actions.createNote(request.boardId, request.listId, value);
-        if (write) navigate(`/card/${note.id}`);
+        if (write) navigate(initiativePath(note));
         break;
       }
       case 'rename-board':
@@ -66,7 +67,9 @@ function DialogForm({
     switch (request.kind) {
       case 'delete-note':
         actions.deleteNote(request.noteId);
-        navigate(`/board/${request.boardId}`);
+        navigate(
+          boardPath(workspace.boards.find((b) => b.id === request.boardId) ?? workspace.boards[0]),
+        );
         break;
       case 'delete-list':
         actions.deleteList(request.boardId, request.listId);
@@ -75,7 +78,7 @@ function DialogForm({
         const next = workspace.boards.find((b) => b.id !== request.boardId);
         if (!next) return;
         actions.deleteBoard(request.boardId);
-        navigate(`/board/${next.id}`);
+        navigate(boardPath(next));
         break;
       }
       default:

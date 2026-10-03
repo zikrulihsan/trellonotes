@@ -359,3 +359,56 @@
     width: min(300px, calc(100vw - 32px));
   }
 }
+
+/* Public address on the Pages screen */
+.public-address {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: 13px;
+  color: #8a8593;
+}
+.public-address a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #6a46c8;
+  text-decoration: none;
+  font-weight: 500;
+}
+.public-address a:hover {
+  text-decoration: underline;
+}
+.public-address-muted {
+  color: #b5adbf;
+}
+.public-address-change {
+  font-size: 13px;
+  color: #8a8593;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.public-address label {
+  color: #8a8593;
+}
+.public-address input {
+  width: 180px;
+  padding: 7px 9px;
+  border: 1px solid #dedbe5;
+  border-radius: 6px;
+  font-size: 14px;
+}
+.public-address .button {
+  min-height: 34px;
+  padding: 6px 12px;
+}
+.public-address p {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 12px;
+}
+.public-address-error {
+  color: #be4c5c;
+}

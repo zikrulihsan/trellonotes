@@ -6,6 +6,7 @@ import { useUI } from '@/hooks/useUI';
 import { useDropdown } from '@/hooks/useDropdown';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { wordCount } from '@/lib/text';
+import { initiativePath } from '@/lib/app-paths';
 import { editedLabel, labelColorValue, noteLabel } from '@/lib/note-metadata';
 import { useBoardDrag } from '../useBoardDrag';
 export function NoteCard({ note, board }: { note: Note; board: Board }) {
@@ -35,7 +36,7 @@ export function NoteCard({ note, board }: { note: Note; board: Board }) {
     >
       <button
         className="card-open"
-        onClick={() => navigate(`/card/${note.id}`)}
+        onClick={() => navigate(initiativePath(note))}
         aria-label={`Open ${note.title || 'Untitled'}`}
       >
         <div className="card-body">

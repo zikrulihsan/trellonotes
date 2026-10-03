@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, Route, Routes, useParams } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Feather } from 'lucide-react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import { supabase } from '@/lib/supabase/client';
@@ -7,9 +7,10 @@ import { plainText } from '@/lib/text';
 import {
   getPublishedPage,
   listPublishedPages,
-  publicWritingPath,
-  type PublishedPage,
+  writerPath,
+  type PublicAuthor,
 } from '@/lib/supabase/published-pages';
+import { getProfile } from '@/lib/supabase/profiles';
 import { writingExtensions } from '@/features/editor/extensions';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -44,15 +45,55 @@ function usePublicData<T>(load: () => Promise<T>, deps: unknown[]): Load<T> {
   return state.key === key ? state : { status: 'loading' };
 }
 
+type Address = { handle: string; slug?: string } | { userId: string; slug?: string };
+
+function parseAddress(pathname: string): Address | null {
+  let parts: string[];
+  try {
+    parts = pathname.split('/').filter(Boolean).map(decodeURIComponent);
+  } catch {
+    return null;
+  }
+  if (parts[0]?.startsWith('@')) return { handle: parts[0].slice(1), slug: parts[1] };
+  if (parts[0] === 'read' && UUID.test(parts[1] ?? '')) return { userId: parts[1], slug: parts[2] };
+  return null;
+}
+
+type Author = PublicAuthor & { name: string | null };
+/** `redirect` is set when an older account-id link now has a handle address. */
+type Resolved = { author: Author; redirect?: string } | null;
+
+async function resolveAuthor(address: Address): Promise<Resolved> {
+  if (!supabase) return null;
+  const profile = await getProfile(
+    supabase,
+    'handle' in address ? { handle: address.handle } : { userId: address.userId },
+  );
+  if (!profile)
+    return 'handle' in address
+      ? null
+      : { author: { userId: address.userId, handle: null, name: null } };
+  const author = { userId: profile.user_id, handle: profile.handle, name: profile.display_name };
+  return 'handle' in address ? { author } : { author, redirect: writerPath(author, address.slug) };
+}
+
 /** Public pages anyone can open without signing in. */
 export function PublicReader() {
+  const { pathname } = useLocation();
+  const address = parseAddress(pathname);
+  const result = usePublicData(
+    () => (address ? resolveAuthor(address) : Promise.resolve(null)),
+    [pathname],
+  );
+  let body;
+  if (result.status !== 'ready') body = <Status result={result} />;
+  else if (!result.data || !address) body = <NotFound />;
+  else if (result.data.redirect) body = <Navigate to={result.data.redirect} replace />;
+  else if (address.slug) body = <ArticlePage author={result.data.author} slug={address.slug} />;
+  else body = <AuthorPage author={result.data.author} />;
   return (
     <div className="reader">
-      <Routes>
-        <Route path=":authorId" element={<AuthorPage />} />
-        <Route path=":authorId/:slug" element={<ArticlePage />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      {body}
       <footer className="reader-footer">
         <Feather size={13} />
         Written with folio
@@ -61,31 +102,28 @@ export function PublicReader() {
   );
 }
 
-function AuthorPage() {
-  const { authorId = '' } = useParams();
+function AuthorPage({ author }: { author: Author }) {
   const result = usePublicData(
-    () =>
-      supabase && UUID.test(authorId)
-        ? listPublishedPages(supabase, authorId)
-        : Promise.resolve([] as PublishedPage[]),
-    [authorId],
+    () => (supabase ? listPublishedPages(supabase, author.userId) : Promise.resolve([])),
+    [author.userId],
   );
-  const author = result.status === 'ready' ? result.data[0]?.author_name : null;
+  const name =
+    author.name ?? (result.status === 'ready' ? result.data[0]?.author_name : null) ?? null;
   useEffect(() => {
-    document.title = author ? `Writing by ${author}` : 'Writing';
-  }, [author]);
+    document.title = name ? `Writing by ${name}` : 'Writing';
+  }, [name]);
   if (result.status !== 'ready') return <Status result={result} />;
   return (
     <main className="reader-column">
       <header className="reader-header">
-        <p className="eyebrow">WRITING</p>
-        <h1>{author ? `Writing by ${author}` : 'Writing'}</h1>
+        <p className="eyebrow">{author.handle ? `@${author.handle}` : 'WRITING'}</p>
+        <h1>{name ? `Writing by ${name}` : 'Writing'}</h1>
       </header>
       {result.data.length ? (
         <ul className="reader-list">
           {result.data.map((page) => (
             <li key={page.id}>
-              <Link to={publicWritingPath(authorId, page.slug)}>
+              <Link to={writerPath(author, page.slug)}>
                 <time dateTime={page.published_at}>{longDate(page.published_at)}</time>
                 <h2>{page.title}</h2>
                 <p>{plainText(page.content).slice(0, 220)}</p>
@@ -100,14 +138,10 @@ function AuthorPage() {
   );
 }
 
-function ArticlePage() {
-  const { authorId = '', slug = '' } = useParams();
+function ArticlePage({ author, slug }: { author: Author; slug: string }) {
   const result = usePublicData(
-    () =>
-      supabase && UUID.test(authorId)
-        ? getPublishedPage(supabase, authorId, slug)
-        : Promise.resolve(null),
-    [authorId, slug],
+    () => (supabase ? getPublishedPage(supabase, author.userId, slug) : Promise.resolve(null)),
+    [author.userId, slug],
   );
   const page = result.status === 'ready' ? result.data : null;
   useEffect(() => {
@@ -115,17 +149,18 @@ function ArticlePage() {
   }, [page]);
   if (result.status !== 'ready') return <Status result={result} />;
   if (!page) return <NotFound />;
+  const name = author.name ?? page.author_name;
   return (
     <main className="reader-column">
-      <Link className="reader-back" to={publicWritingPath(authorId)}>
+      <Link className="reader-back" to={writerPath(author)}>
         <ArrowLeft size={15} />
-        {page.author_name ? `More from ${page.author_name}` : 'More writing'}
+        {name ? `More from ${name}` : 'More writing'}
       </Link>
       <article>
         <header className="reader-header">
           <h1>{page.title}</h1>
           <p className="reader-byline">
-            {page.author_name && <span>{page.author_name} · </span>}
+            {name && <span>{name} · </span>}
             <time dateTime={page.published_at}>{longDate(page.published_at)}</time>
           </p>
         </header>

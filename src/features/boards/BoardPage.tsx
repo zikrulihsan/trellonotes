@@ -2,15 +2,18 @@ import { Navigate, useParams } from 'react-router-dom';
 import { GripVertical, Plus } from 'lucide-react';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useUI } from '@/hooks/useUI';
+import { boardPath, findByRef } from '@/lib/app-paths';
 import { BoardDragProvider } from './BoardDragProvider';
 import { BoardHeader } from './components/BoardHeader';
 import { BoardColumn } from './components/BoardColumn';
 export function BoardPage() {
-  const { boardId } = useParams(),
+  const { boardRef } = useParams(),
     { workspace } = useWorkspace(),
     { openDialog } = useUI();
-  const board = workspace.boards.find((board) => board.id === boardId);
-  if (!board) return <Navigate to={`/board/${workspace.boards[0].id}`} replace />;
+  const board = findByRef(workspace.boards, boardRef);
+  if (!board) return <Navigate to={boardPath(workspace.boards[0])} replace />;
+  // Keep the address bar on the short, current-title link.
+  if (boardPath(board) !== `/board/${boardRef}`) return <Navigate to={boardPath(board)} replace />;
   return (
     <>
       <BoardHeader board={board} />

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Check, Copy, ExternalLink, EyeOff, MoreHorizontal, Trash2 } from 'lucide-react';
 import { useWorkspace, useWorkspaceActions } from '@/hooks/useWorkspace';
@@ -9,17 +9,24 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { supabase } from '@/lib/supabase/client';
 import { editedLabel } from '@/lib/note-metadata';
-import { publicWritingUrl, publishPage, unpublishPage } from '@/lib/supabase/published-pages';
+import { publishPage, unpublishPage, writerUrl } from '@/lib/supabase/published-pages';
+import { findByRef, pagePath } from '@/lib/app-paths';
+import { useProfile } from './useProfile';
 import type { Page } from '@/features/workspace/types';
 import { WritingSurface } from '@/features/editor/WritingSurface';
 import { publishState } from './publish-state';
 
 export default function PageEditorPage() {
-  const { pageId } = useParams(),
+  const { pageRef } = useParams(),
     { workspace } = useWorkspace(),
     { updatePage } = useWorkspaceActions(),
     navigate = useNavigate();
-  const page = workspace.pages?.find((page) => page.id === pageId);
+  const page = findByRef(workspace.pages ?? [], pageRef);
+  const canonical = page && pagePath(page);
+  useEffect(() => {
+    // Keep the address bar on the short, current-title link.
+    if (canonical && canonical !== `/page/${pageRef}`) navigate(canonical, { replace: true });
+  }, [canonical, pageRef, navigate]);
   if (!page)
     return (
       <div className="editor-placeholder">
@@ -41,15 +48,10 @@ export default function PageEditorPage() {
   );
 }
 
-function authorName(user: ReturnType<typeof useAuth>['user']): string | null {
-  // Shown publicly as the byline, so never fall back to the email address.
-  const name: unknown = user?.user_metadata.full_name ?? user?.user_metadata.name;
-  return typeof name === 'string' && name.trim() ? name.trim() : null;
-}
-
 function PublishButton({ page }: { page: Page }) {
   const { setPagePublished } = useWorkspaceActions(),
-    { user } = useAuth();
+    { user } = useAuth(),
+    { ensure, displayName } = useProfile();
   const [busy, setBusy] = useState(false),
     [error, setError] = useState('');
   const state = publishState(page);
@@ -58,7 +60,9 @@ function PublishButton({ page }: { page: Page }) {
     setBusy(true);
     setError('');
     try {
-      setPagePublished(page.id, await publishPage(supabase, page, authorName(user)));
+      // The first publish also picks the writer's public address (/@handle).
+      await ensure();
+      setPagePublished(page.id, await publishPage(supabase, page, displayName));
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'Could not publish this page.');
     } finally {
@@ -105,13 +109,13 @@ function PublishButton({ page }: { page: Page }) {
 
 function PageOptions({ page }: { page: Page }) {
   const { setPagePublished, deletePage } = useWorkspaceActions(),
-    { user } = useAuth(),
+    { author } = useProfile(),
     navigate = useNavigate(),
     menu = useDropdown();
   const [copied, setCopied] = useState(false),
     [confirming, setConfirming] = useState(false),
     [error, setError] = useState('');
-  const url = user && page.published ? publicWritingUrl(user.id, page.published.slug) : null;
+  const url = author && page.published ? writerUrl(author, page.published.slug) : null;
   async function unpublish() {
     if (!supabase) return;
     setError('');

@@ -1,26 +1,28 @@
-import { HashRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, useLocation } from 'react-router-dom';
 import type { PropsWithChildren } from 'react';
 import { UIProvider } from '@/context/UIProvider';
 import { AuthProvider } from '@/context/AuthProvider';
 import { WorkspaceSession } from './WorkspaceSession';
 import { PublicReader } from '@/features/reader/PublicReader';
+import { isPublicPath } from '@/lib/app-paths';
+
+/** Published writing (/@handle/…) is public; everything else is the signed-in app. */
+function AppOrReader({ children }: PropsWithChildren) {
+  const { pathname } = useLocation();
+  if (isPublicPath(pathname)) return <PublicReader />;
+  return (
+    <UIProvider>
+      <WorkspaceSession>{children}</WorkspaceSession>
+    </UIProvider>
+  );
+}
+
 export function AppProviders({ children }: PropsWithChildren) {
   return (
-    <HashRouter>
+    <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          {/* Published writing is public: readers need no account. */}
-          <Route path="read/*" element={<PublicReader />} />
-          <Route
-            path="*"
-            element={
-              <UIProvider>
-                <WorkspaceSession>{children}</WorkspaceSession>
-              </UIProvider>
-            }
-          />
-        </Routes>
+        <AppOrReader>{children}</AppOrReader>
       </AuthProvider>
-    </HashRouter>
+    </BrowserRouter>
   );
 }

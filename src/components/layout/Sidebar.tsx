@@ -5,6 +5,7 @@ import { useWorkspace, useWorkspaceActions } from '@/hooks/useWorkspace';
 import { useAuth } from '@/context/auth-context';
 import { useUI } from '@/hooks/useUI';
 import type { Board } from '@/features/workspace/types';
+import { boardPath } from '@/lib/app-paths';
 export function Sidebar({
   board,
   section,
@@ -38,8 +39,8 @@ export function Sidebar({
       setSigningOut(false);
     }
   }
-  function go(id: string) {
-    navigate(`/board/${id}`);
+  function go(target: Board) {
+    navigate(boardPath(target));
     setSidebarOpen(false);
   }
   function goPages() {
@@ -60,7 +61,7 @@ export function Sidebar({
         inert={inert || collapsed}
         className={`sidebar ${sidebarOpen ? 'is-open' : ''} ${collapsed ? 'is-collapsed' : ''}`}
       >
-        <button className="brand" onClick={() => go(workspace.boards[0].id)}>
+        <button className="brand" onClick={() => go(workspace.boards[0])}>
           <span className="brand-mark">
             <Feather size={22} />
           </span>
@@ -75,7 +76,7 @@ export function Sidebar({
         </div>
         <button
           className={`side-link ${section === 'boards' ? 'active' : ''}`}
-          onClick={() => go(board.id)}
+          onClick={() => go(board)}
         >
           <LayoutGrid size={18} />
           My boards<span className="side-count">{workspace.boards.length}</span>
@@ -99,7 +100,7 @@ export function Sidebar({
             <button
               className={`board-nav ${section === 'boards' && b.id === board.id ? 'selected' : ''}`}
               key={b.id}
-              onClick={() => go(b.id)}
+              onClick={() => go(b)}
             >
               <span className="board-dot" style={{ background: b.color }} />
               <span className="board-nav-label">{b.title}</span>

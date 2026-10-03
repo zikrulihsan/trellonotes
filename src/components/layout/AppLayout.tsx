@@ -2,20 +2,24 @@ import { Outlet, useMatch } from 'react-router-dom';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useUI } from '@/hooks/useUI';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { findByRef } from '@/lib/app-paths';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
 export function AppLayout() {
   const { workspace, saveError, cloudEnabled, syncStatus } = useWorkspace(),
     { sidebarOpen, sidebarCollapsed } = useUI(),
     narrow = useMediaQuery('(max-width:760px)');
-  const noteRoute = useMatch('/card/:noteId'),
-    pageRoute = useMatch('/page/:pageId'),
+  const initiativeRoute = useMatch('/initiative/:ref'),
+    legacyNoteRoute = useMatch('/card/:ref'),
+    noteRoute = initiativeRoute ?? legacyNoteRoute,
+    pageRoute = useMatch('/page/:ref'),
     pagesRoute = useMatch('/pages'),
-    boardRoute = useMatch('/board/:boardId');
-  const note = workspace.cards.find((note) => note.id === noteRoute?.params.noteId);
+    boardRoute = useMatch('/board/:ref');
+  const note = findByRef(workspace.cards, noteRoute?.params.ref);
   const board =
-    workspace.boards.find((board) => board.id === (note?.boardId ?? boardRoute?.params.boardId)) ??
-    workspace.boards[0];
+    (note
+      ? workspace.boards.find((board) => board.id === note.boardId)
+      : findByRef(workspace.boards, boardRoute?.params.ref)) ?? workspace.boards[0];
   const writing = Boolean(noteRoute || pageRoute);
   return (
     <div

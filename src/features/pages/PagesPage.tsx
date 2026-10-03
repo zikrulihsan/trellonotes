@@ -1,20 +1,19 @@
 import { useNavigate } from 'react-router-dom';
-import { ExternalLink, FileText, Plus } from 'lucide-react';
+import { FileText, Plus } from 'lucide-react';
 import { useWorkspace, useWorkspaceActions } from '@/hooks/useWorkspace';
-import { useAuth } from '@/context/auth-context';
 import { Button } from '@/components/ui/Button';
 import { editedLabel } from '@/lib/note-metadata';
 import { plainText } from '@/lib/text';
-import { publicWritingPath } from '@/lib/supabase/published-pages';
+import { pagePath } from '@/lib/app-paths';
+import { PublicAddress } from './PublicAddress';
 import { PageStatus } from './PageStatus';
 
 export function PagesPage() {
   const { workspace, cloudEnabled } = useWorkspace(),
     { createPage } = useWorkspaceActions(),
-    { user } = useAuth(),
     navigate = useNavigate();
   const pages = [...(workspace.pages ?? [])].sort((a, b) => b.updatedAt - a.updatedAt);
-  const newPage = () => navigate(`/page/${createPage()}`);
+  const newPage = () => navigate(pagePath({ id: createPage(), title: '' }));
   return (
     <div className="pages-view">
       <section className="board-header">
@@ -22,19 +21,9 @@ export function PagesPage() {
           <div className="eyebrow">PAGES</div>
           <h1>Your writing</h1>
           <p>Write longer pieces here, then publish them to your public writing page.</p>
+          {cloudEnabled && <PublicAddress />}
         </div>
         <div className="board-actions">
-          {cloudEnabled && user && (
-            <a
-              className="button"
-              href={`#${publicWritingPath(user.id)}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <ExternalLink size={16} />
-              Public page
-            </a>
-          )}
           <Button variant="primary" onClick={newPage}>
             <Plus size={17} />
             New page
@@ -47,7 +36,7 @@ export function PagesPage() {
             const excerpt = plainText(page.content).slice(0, 180);
             return (
               <li key={page.id}>
-                <button className="page-row" onClick={() => navigate(`/page/${page.id}`)}>
+                <button className="page-row" onClick={() => navigate(pagePath(page))}>
                   <span className="page-row-title">{page.title || 'Untitled'}</span>
                   {excerpt && <span className="page-row-excerpt">{excerpt}</span>}
                   <span className="page-row-meta">

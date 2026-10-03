@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { Editor } from '@tiptap/react';
 import { writingExtensions } from './extensions';
 import { findSlashQuery, formatDate, matchSlashCommands } from './slash-commands';
-import { slugify } from '@/lib/supabase/published-pages';
+import { slugify } from '@/lib/slug';
 
 let editor: Editor | null = null;
 afterEach(() => editor?.destroy());
@@ -54,6 +54,6 @@ describe('page links', () => {
   it('makes readable, URL-safe slugs', () => {
     expect(slugify('Catatan Minggu Ini: Rilis 2.0!')).toBe('catatan-minggu-ini-rilis-2-0');
     expect(slugify('Café déjà vu')).toBe('cafe-deja-vu');
-    expect(slugify('???')).toBe('untitled');
+    expect(slugify('???')).toBe('');
   });
 });

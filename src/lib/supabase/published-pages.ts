@@ -1,5 +1,6 @@
 import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js';
 import type { Page } from '@/features/workspace/types';
+import { slugify } from '@/lib/slug';
 
 const TABLE = 'trellonotes_published_pages';
 
@@ -13,25 +14,20 @@ export interface PublishedPage {
   updated_at: string;
 }
 
-/** "Catatan Minggu Ini: Rilis 2.0!" → "catatan-minggu-ini-rilis-2-0" */
-export function slugify(title: string): string {
-  const slug = title
-    .normalize('NFKD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 60)
-    .replace(/-+$/, '');
-  return slug || 'untitled';
+/** Who public pages belong to: the handle when one is set, else the account id (older links). */
+export interface PublicAuthor {
+  userId: string;
+  handle: string | null;
 }
 
-export function publicWritingPath(authorId: string, slug?: string): string {
-  return `/read/${authorId}${slug ? `/${slug}` : ''}`;
+/** "/@zikrul/catatan-rilis", or "/read/<account id>/catatan-rilis" without a handle. */
+export function writerPath(author: PublicAuthor, slug?: string): string {
+  const base = author.handle ? `/@${author.handle}` : `/read/${author.userId}`;
+  return slug ? `${base}/${slug}` : base;
 }
 
-export function publicWritingUrl(authorId: string, slug?: string): string {
-  return `${window.location.origin}${window.location.pathname}#${publicWritingPath(authorId, slug)}`;
+export function writerUrl(author: PublicAuthor, slug?: string): string {
+  return `${window.location.origin}${writerPath(author, slug)}`;
 }
 
 /** Turns database errors into messages a writer can act on. */
@@ -52,7 +48,7 @@ export async function publishPage(
   page: Page,
   authorName: string | null,
 ): Promise<NonNullable<Page['published']>> {
-  const base = page.published?.slug ?? slugify(page.title);
+  const base = page.published?.slug ?? (slugify(page.title) || 'untitled');
   for (let attempt = 1; attempt <= 20; attempt++) {
     const slug = attempt === 1 ? base : `${base}-${attempt}`;
     const { error } = await client.from(TABLE).upsert(
