@@ -101,7 +101,7 @@ export function BoardColumn({
         onClick={() => openDialog({ kind: 'create-note', boardId: board.id, listId: list.id })}
       >
         <Plus size={17} />
-        Add a card
+        Add initiative
       </button>
     </section>
   );

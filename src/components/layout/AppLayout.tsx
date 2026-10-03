@@ -9,12 +9,14 @@ export function AppLayout() {
     { sidebarOpen, sidebarCollapsed } = useUI(),
     narrow = useMediaQuery('(max-width:760px)');
   const noteRoute = useMatch('/card/:noteId'),
+    pageRoute = useMatch('/page/:pageId'),
+    pagesRoute = useMatch('/pages'),
     boardRoute = useMatch('/board/:boardId');
   const note = workspace.cards.find((note) => note.id === noteRoute?.params.noteId);
   const board =
     workspace.boards.find((board) => board.id === (note?.boardId ?? boardRoute?.params.boardId)) ??
     workspace.boards[0];
-  const writing = Boolean(noteRoute);
+  const writing = Boolean(noteRoute || pageRoute);
   return (
     <div
       className={`app ${writing ? 'writing-view' : 'board-workspace'} ${sidebarCollapsed && !narrow ? 'sidebar-collapsed' : ''}`}
@@ -23,12 +25,13 @@ export function AppLayout() {
       {!writing && (
         <Sidebar
           board={board}
+          section={pagesRoute ? 'pages' : 'boards'}
           inert={!sidebarOpen && narrow}
           collapsed={sidebarCollapsed && !narrow}
         />
       )}
       <main className="main">
-        {!writing && <Topbar board={board} />}
+        {!writing && <Topbar board={pagesRoute ? null : board} />}
         {saveError && (
           <div className="storage-warning" role="alert">
             {cloudEnabled && syncStatus === 'error'

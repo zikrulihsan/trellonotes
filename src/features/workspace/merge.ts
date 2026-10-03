@@ -1,5 +1,5 @@
 import { isWorkspace } from '@/lib/storage';
-import type { Board, Note, Workspace } from './types';
+import type { Board, Label, Note, Page, Workspace } from './types';
 
 type Entity = { id: string };
 
@@ -123,6 +123,19 @@ export function mergeWorkspaces(
       .find((item) => item.id === card.listId);
     if (list) boards[index] = { ...boards[index], lists: [...boards[index].lists, list] };
   }
-  const merged = { boards, cards };
+  const merged: Workspace = { boards, cards };
+  if (local.labels || remote.labels)
+    merged.labels = mergeById<Label>(
+      base?.labels,
+      local.labels ?? [],
+      remote.labels ?? [],
+      (b, l, r) => mergeFields(b, l, r, true),
+    );
+  if (local.pages || remote.pages)
+    merged.pages = mergeById<Page>(base?.pages, local.pages ?? [], remote.pages ?? [], (b, l, r) =>
+      mergeFields(b, l, r, l.updatedAt >= r.updatedAt, {
+        updatedAt: (_b, lu, ru) => Math.max(lu as number, ru as number),
+      }),
+    );
   return isWorkspace(merged) ? merged : local;
 }

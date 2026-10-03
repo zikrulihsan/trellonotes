@@ -1,6 +1,7 @@
 import {
   ChevronRight,
   Feather,
+  FileText,
   LayoutGrid,
   Menu,
   PanelLeftClose,
@@ -9,7 +10,8 @@ import {
 import { useUI } from '@/hooks/useUI';
 import type { Board } from '@/features/workspace/types';
 import { useWorkspace } from '@/hooks/useWorkspace';
-export function Topbar({ board }: { board: Board }) {
+/** `board` is null on the Pages screen. */
+export function Topbar({ board }: { board: Board | null }) {
   const { sidebarOpen, setSidebarOpen, sidebarCollapsed, setSidebarCollapsed } = useUI();
   const { cloudEnabled, syncStatus } = useWorkspace();
   return (
@@ -34,10 +36,19 @@ export function Topbar({ board }: { board: Board }) {
         >
           <Menu size={20} />
         </button>
-        <LayoutGrid size={16} />
-        <button onClick={() => setSidebarOpen(true)}>My boards</button>
-        <ChevronRight size={14} />
-        <span>{board.title}</span>
+        {board ? (
+          <>
+            <LayoutGrid size={16} />
+            <button onClick={() => setSidebarOpen(true)}>My boards</button>
+            <ChevronRight size={14} />
+            <span>{board.title}</span>
+          </>
+        ) : (
+          <>
+            <FileText size={16} />
+            <span>Pages</span>
+          </>
+        )}
       </div>
       <span className="topbar-hint">
         <span className="small-logo">

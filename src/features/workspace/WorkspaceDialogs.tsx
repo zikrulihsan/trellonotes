@@ -5,20 +5,28 @@ import { useWorkspace, useWorkspaceActions } from '@/hooks/useWorkspace';
 import type { WorkspaceDialog } from '@/context/ui-context';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
+import { LabelManager } from './LabelManager';
 export function WorkspaceDialogs() {
   const { dialog, closeDialog } = useUI();
-  return dialog ? (
-    <DialogForm key={JSON.stringify(dialog)} request={dialog} onClose={closeDialog} />
-  ) : null;
+  if (!dialog) return null;
+  if (dialog.kind === 'manage-labels') return <LabelManager onClose={closeDialog} />;
+  return <DialogForm key={JSON.stringify(dialog)} request={dialog} onClose={closeDialog} />;
 }
-function DialogForm({ request, onClose }: { request: WorkspaceDialog; onClose: () => void }) {
+function DialogForm({
+  request,
+  onClose,
+}: {
+  request: Exclude<WorkspaceDialog, { kind: 'manage-labels' }>;
+  onClose: () => void;
+}) {
   const [value, setValue] = useState('title' in request ? request.title : '');
   const actions = useWorkspaceActions(),
     { workspace } = useWorkspace(),
     navigate = useNavigate();
   const deleting = request.kind.startsWith('delete'),
     renaming = request.kind.startsWith('rename');
-  const noun = request.kind.split('-')[1];
+  const kindNoun = request.kind.split('-')[1];
+  const noun = kindNoun === 'note' ? 'initiative' : kindNoun;
   const title = deleting
     ? `Delete ${noun}?`
     : renaming
@@ -27,8 +35,8 @@ function DialogForm({ request, onClose }: { request: WorkspaceDialog; onClose: (
         ? 'A new space for your ideas'
         : request.kind === 'create-list'
           ? 'Add a list'
-          : 'Start with an idea';
-  function submit(event: FormEvent) {
+          : 'New initiative';
+  function submit(event: FormEvent, write = true) {
     event.preventDefault();
     if (!value.trim()) return;
     switch (request.kind) {
@@ -40,7 +48,7 @@ function DialogForm({ request, onClose }: { request: WorkspaceDialog; onClose: (
         break;
       case 'create-note': {
         const note = actions.createNote(request.boardId, request.listId, value);
-        navigate(`/card/${note.id}`);
+        if (write) navigate(`/card/${note.id}`);
         break;
       }
       case 'rename-board':
@@ -80,7 +88,7 @@ function DialogForm({ request, onClose }: { request: WorkspaceDialog; onClose: (
       {deleting ? (
         <>
           <p>
-            “{value}”{request.kind !== 'delete-note' ? ' and all its cards' : ''} will be
+            “{value}”{request.kind !== 'delete-note' ? ' and all its initiatives' : ''} will be
             permanently deleted from this device.
           </p>
           <div className="modal-actions">
@@ -93,20 +101,25 @@ function DialogForm({ request, onClose }: { request: WorkspaceDialog; onClose: (
       ) : (
         <form onSubmit={submit}>
           <label htmlFor="workspace-name">
-            {request.kind === 'create-note' ? 'Card title' : 'Name'}
+            {request.kind === 'create-note' ? 'Initiative name' : 'Name'}
           </label>
           <input
             id="workspace-name"
             autoFocus
             maxLength={150}
             placeholder={
-              request.kind === 'create-note' ? 'What’s on your mind?' : 'Give it a name…'
+              request.kind === 'create-note' ? 'What are you working on?' : 'Give it a name…'
             }
             value={value}
             onChange={(e) => setValue(e.target.value)}
           />
           <div className="modal-actions">
             <Button onClick={onClose}>Cancel</Button>
+            {request.kind === 'create-note' && (
+              <Button onClick={(event) => submit(event, false)} disabled={!value.trim()}>
+                Add initiative
+              </Button>
+            )}
             <Button type="submit" variant="primary" disabled={!value.trim()}>
               {renaming
                 ? 'Save name'

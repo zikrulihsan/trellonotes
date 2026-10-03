@@ -9,10 +9,11 @@ export function BoardHeader({ board }: { board: Board }) {
   const { workspace } = useWorkspace(),
     { openDialog } = useUI(),
     menu = useDropdown();
+  const initiatives = workspace.cards.filter((note) => note.boardId === board.id).length;
   return (
     <section className="board-header">
       <div>
-        <div className="eyebrow">WRITING BOARD</div>
+        <div className="eyebrow">INITIATIVE BOARD</div>
         <h1>
           {board.title}
           <span className="title-dot" />
@@ -21,7 +22,7 @@ export function BoardHeader({ board }: { board: Board }) {
       <div className="board-actions">
         <span className="card-total">
           <FileText size={16} />
-          {workspace.cards.filter((note) => note.boardId === board.id).length} notes
+          {initiatives} {initiatives === 1 ? 'initiative' : 'initiatives'}
         </span>
         <Button
           variant="primary"
@@ -31,7 +32,7 @@ export function BoardHeader({ board }: { board: Board }) {
           disabled={!board.lists.length}
         >
           <Plus size={17} />
-          New note
+          New initiative
         </Button>
         <div className="menu-anchor" data-menu-id={menu.id}>
           <button

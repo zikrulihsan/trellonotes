@@ -1,19 +1,20 @@
-import { Check, MoreHorizontal, Trash2, X } from 'lucide-react';
+import { MoreHorizontal, Tags, Trash2 } from 'lucide-react';
 import type { Board, Note } from '@/features/workspace/types';
-import { useWorkspaceActions } from '@/hooks/useWorkspace';
+import { useWorkspace, useWorkspaceActions } from '@/hooks/useWorkspace';
 import { useUI } from '@/hooks/useUI';
 import { useDropdown } from '@/hooks/useDropdown';
 import { Dropdown } from '@/components/ui/Dropdown';
-import { editedLabel, LABEL_COLORS, labelColor } from '@/lib/note-metadata';
+import { editedLabel } from '@/lib/note-metadata';
 export function NoteOptions({ note, board }: { note: Note; board: Board }) {
   const { updateNote, moveNote } = useWorkspaceActions(),
+    { workspace } = useWorkspace(),
     { openDialog } = useUI(),
     menu = useDropdown();
   return (
     <div className="menu-anchor" data-menu-id={menu.id}>
       <button
         className="icon-button"
-        aria-label="Note options"
+        aria-label="Initiative options"
         aria-expanded={menu.open}
         onClick={() => menu.toggle()}
       >
@@ -24,7 +25,7 @@ export function NoteOptions({ note, board }: { note: Note; board: Board }) {
         <label>
           List
           <select
-            aria-label="Move note to list"
+            aria-label="Move initiative to list"
             value={note.listId}
             onChange={(event) => moveNote(note.id, event.target.value)}
           >
@@ -36,50 +37,29 @@ export function NoteOptions({ note, board }: { note: Note; board: Board }) {
           </select>
         </label>
         <label>
-          Card label
+          Label
           <select
-            aria-label="Card label"
-            value={note.tag}
-            onChange={(event) => updateNote(note.id, { tag: event.target.value })}
+            aria-label="Initiative label"
+            value={note.labelId ?? ''}
+            onChange={(event) => updateNote(note.id, { labelId: event.target.value || undefined })}
           >
-            {Array.from(
-              new Set([
-                note.tag,
-                'Free writing',
-                'Notes',
-                'Personal',
-                'Work',
-                'Ideas',
-                'Essay',
-                'Guide',
-              ]),
-            ).map((tag) => (
-              <option key={tag}>{tag}</option>
+            <option value="">No label</option>
+            {workspace.labels?.map((label) => (
+              <option key={label.id} value={label.id}>
+                {label.name}
+              </option>
             ))}
           </select>
         </label>
-        <label>
-          Label color
-          <div className="cover-choices label-choices">
-            {LABEL_COLORS.map((color) => {
-              const selected =
-                note.labelColor === color.id ||
-                (!note.labelColor && labelColor(note) === color.value);
-              return (
-                <button
-                  key={color.id}
-                  aria-label={`${color.name} label`}
-                  aria-pressed={selected}
-                  className={`cover-choice ${color.id === 'none' ? 'none' : ''}`}
-                  style={{ background: color.value }}
-                  onClick={() => updateNote(note.id, { labelColor: color.id })}
-                >
-                  {selected ? <Check size={15} /> : color.id === 'none' ? <X size={13} /> : null}
-                </button>
-              );
-            })}
-          </div>
-        </label>
+        <button
+          onClick={() => {
+            openDialog({ kind: 'manage-labels' });
+            menu.close();
+          }}
+        >
+          <Tags size={15} />
+          Manage labels
+        </button>
         <button
           className="danger"
           onClick={() => {
@@ -93,7 +73,7 @@ export function NoteOptions({ note, board }: { note: Note; board: Board }) {
           }}
         >
           <Trash2 size={15} />
-          Delete note
+          Delete initiative
         </button>
       </Dropdown>
     </div>

@@ -1,16 +1,18 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, ChevronDown, Feather, LayoutGrid, Plus } from 'lucide-react';
+import { BookOpen, ChevronDown, Feather, FileText, LayoutGrid, Plus, Tags } from 'lucide-react';
 import { useWorkspace, useWorkspaceActions } from '@/hooks/useWorkspace';
 import { useAuth } from '@/context/auth-context';
 import { useUI } from '@/hooks/useUI';
 import type { Board } from '@/features/workspace/types';
 export function Sidebar({
   board,
+  section,
   inert,
   collapsed,
 }: {
   board: Board;
+  section: 'boards' | 'pages';
   inert: boolean;
   collapsed: boolean;
 }) {
@@ -40,6 +42,10 @@ export function Sidebar({
     navigate(`/board/${id}`);
     setSidebarOpen(false);
   }
+  function goPages() {
+    navigate('/pages');
+    setSidebarOpen(false);
+  }
   return (
     <>
       {sidebarOpen && (
@@ -67,9 +73,20 @@ export function Sidebar({
           </div>
           <ChevronDown size={15} />
         </div>
-        <button className="side-link active" onClick={() => go(board.id)}>
+        <button
+          className={`side-link ${section === 'boards' ? 'active' : ''}`}
+          onClick={() => go(board.id)}
+        >
           <LayoutGrid size={18} />
           My boards<span className="side-count">{workspace.boards.length}</span>
+        </button>
+        <button className={`side-link ${section === 'pages' ? 'active' : ''}`} onClick={goPages}>
+          <FileText size={18} />
+          Pages<span className="side-count">{workspace.pages?.length ?? 0}</span>
+        </button>
+        <button className="side-link" onClick={() => openDialog({ kind: 'manage-labels' })}>
+          <Tags size={18} />
+          Labels<span className="side-count">{workspace.labels?.length ?? 0}</span>
         </button>
         <div className="side-section">
           <span>YOUR BOARDS</span>
@@ -80,7 +97,7 @@ export function Sidebar({
         <nav aria-label="Boards">
           {workspace.boards.map((b) => (
             <button
-              className={`board-nav ${b.id === board.id ? 'selected' : ''}`}
+              className={`board-nav ${section === 'boards' && b.id === board.id ? 'selected' : ''}`}
               key={b.id}
               onClick={() => go(b.id)}
             >

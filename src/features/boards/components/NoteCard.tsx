@@ -1,16 +1,17 @@
 import { useNavigate } from 'react-router-dom';
 import { FileText, MoreHorizontal, Trash2 } from 'lucide-react';
 import type { Board, Note } from '@/features/workspace/types';
-import { useWorkspaceActions } from '@/hooks/useWorkspace';
+import { useWorkspace, useWorkspaceActions } from '@/hooks/useWorkspace';
 import { useUI } from '@/hooks/useUI';
 import { useDropdown } from '@/hooks/useDropdown';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { wordCount } from '@/lib/text';
-import { labelColor, editedLabel } from '@/lib/note-metadata';
+import { editedLabel, labelColorValue, noteLabel } from '@/lib/note-metadata';
 import { useBoardDrag } from '../useBoardDrag';
 export function NoteCard({ note, board }: { note: Note; board: Board }) {
   const navigate = useNavigate(),
     { moveNote } = useWorkspaceActions(),
+    label = noteLabel(useWorkspace().workspace, note),
     { openDialog } = useUI(),
     menu = useDropdown(),
     drag = useBoardDrag();
@@ -38,13 +39,15 @@ export function NoteCard({ note, board }: { note: Note; board: Board }) {
         aria-label={`Open ${note.title || 'Untitled'}`}
       >
         <div className="card-body">
-          <span
-            className="card-label-strip"
-            style={{ background: labelColor(note) }}
-            title={note.tag}
-          >
-            <span className="sr-only">{note.tag}</span>
-          </span>
+          {label && (
+            <span
+              className="card-label-strip"
+              style={{ background: labelColorValue(label.color) }}
+              title={label.name}
+            >
+              <span className="sr-only">{label.name}</span>
+            </span>
+          )}
           <h3>{note.title || 'Untitled'}</h3>
           <div className="card-meta">
             <span>
@@ -70,7 +73,7 @@ export function NoteCard({ note, board }: { note: Note; board: Board }) {
           <label>
             Move to
             <select
-              aria-label="Move card to list"
+              aria-label="Move initiative to list"
               value={note.listId}
               onChange={(event) => {
                 moveNote(note.id, event.target.value);
@@ -97,7 +100,7 @@ export function NoteCard({ note, board }: { note: Note; board: Board }) {
             }}
           >
             <Trash2 size={15} />
-            Delete card
+            Delete initiative
           </button>
         </Dropdown>
       </div>

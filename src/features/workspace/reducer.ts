@@ -1,4 +1,14 @@
-import type { Board, BoardList, Note, NotePatch, Workspace } from './types';
+import type {
+  Board,
+  BoardList,
+  Label,
+  LabelPatch,
+  Note,
+  NotePatch,
+  Page,
+  PagePatch,
+  Workspace,
+} from './types';
 export type WorkspaceAction =
   | { type: 'workspace/replace'; workspace: Workspace }
   | { type: 'board/create'; board: Board }
@@ -10,7 +20,14 @@ export type WorkspaceAction =
   | { type: 'note/create'; note: Note }
   | { type: 'note/update'; noteId: string; patch: NotePatch; timestamp: number }
   | { type: 'note/move'; noteId: string; listId: string; beforeId?: string }
-  | { type: 'note/delete'; noteId: string };
+  | { type: 'note/delete'; noteId: string }
+  | { type: 'label/create'; label: Label }
+  | { type: 'label/update'; labelId: string; patch: LabelPatch }
+  | { type: 'label/delete'; labelId: string }
+  | { type: 'page/create'; page: Page }
+  | { type: 'page/update'; pageId: string; patch: PagePatch; timestamp: number }
+  | { type: 'page/publish'; pageId: string; published: Page['published'] }
+  | { type: 'page/delete'; pageId: string };
 
 export function workspaceReducer(state: Workspace, action: WorkspaceAction): Workspace {
   switch (action.type) {
@@ -113,5 +130,51 @@ export function workspaceReducer(state: Workspace, action: WorkspaceAction): Wor
     }
     case 'note/delete':
       return { ...state, cards: state.cards.filter((c) => c.id !== action.noteId) };
+    case 'label/create':
+      return action.label.name.trim() && !state.labels?.some((l) => l.id === action.label.id)
+        ? { ...state, labels: [...(state.labels ?? []), action.label] }
+        : state;
+    case 'label/update': {
+      const name = action.patch.name?.trim();
+      if (action.patch.name !== undefined && !name) return state;
+      return {
+        ...state,
+        labels: state.labels?.map((l) =>
+          l.id === action.labelId ? { ...l, ...action.patch, ...(name && { name }) } : l,
+        ),
+      };
+    }
+    case 'label/delete':
+      return {
+        ...state,
+        labels: state.labels?.filter((l) => l.id !== action.labelId),
+        cards: state.cards.map((c) =>
+          c.labelId === action.labelId ? { ...c, labelId: undefined } : c,
+        ),
+      };
+    case 'page/create':
+      return state.pages?.some((p) => p.id === action.page.id)
+        ? state
+        : { ...state, pages: [action.page, ...(state.pages ?? [])] };
+    case 'page/update':
+      return {
+        ...state,
+        pages: state.pages?.map((p) => {
+          if (p.id !== action.pageId) return p;
+          const changed = (Object.keys(action.patch) as (keyof PagePatch)[]).some(
+            (key) => action.patch[key] !== undefined && action.patch[key] !== p[key],
+          );
+          return changed ? { ...p, ...action.patch, updatedAt: action.timestamp } : p;
+        }),
+      };
+    case 'page/publish':
+      return {
+        ...state,
+        pages: state.pages?.map((p) =>
+          p.id === action.pageId ? { ...p, published: action.published } : p,
+        ),
+      };
+    case 'page/delete':
+      return { ...state, pages: state.pages?.filter((p) => p.id !== action.pageId) };
   }
 }

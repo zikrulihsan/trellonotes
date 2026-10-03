@@ -5,7 +5,9 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { BoardPage } from '@/features/boards/BoardPage';
 import { WorkspaceDialogs } from '@/features/workspace/WorkspaceDialogs';
 import { useBoardTools } from '@/integrations/useBoardTools';
+import { PagesPage } from '@/features/pages/PagesPage';
 const EditorPage = lazy(() => import('@/features/editor/EditorPage'));
+const PageEditorPage = lazy(() => import('@/features/pages/PageEditorPage'));
 export function App() {
   const { workspace } = useWorkspace();
   useBoardTools();
@@ -26,6 +28,21 @@ export function App() {
                 }
               >
                 <EditorPage />
+              </Suspense>
+            }
+          />
+          <Route path="pages" element={<PagesPage />} />
+          <Route
+            path="page/:pageId"
+            element={
+              <Suspense
+                fallback={
+                  <div className="editor-placeholder" role="status">
+                    Opening your page…
+                  </div>
+                }
+              >
+                <PageEditorPage />
               </Suspense>
             }
           />

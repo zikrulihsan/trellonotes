@@ -47,7 +47,7 @@ describe('writing workspace invariants', () => {
     const label = workspaceReducer(initial, {
       type: 'note/update',
       noteId: 'small',
-      patch: { tag: 'Free writing', labelColor: 'coral' },
+      patch: { labelId: 'label-essay' },
       timestamp: 2000,
     });
     expect(label.cards[0].updatedAt).toBe(1000);

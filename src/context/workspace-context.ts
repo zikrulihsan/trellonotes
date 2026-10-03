@@ -1,5 +1,12 @@
 import { createContext } from 'react';
-import type { Note, NotePatch, Workspace } from '@/features/workspace/types';
+import type {
+  LabelPatch,
+  Note,
+  NotePatch,
+  Page,
+  PagePatch,
+  Workspace,
+} from '@/features/workspace/types';
 export interface WorkspaceActions {
   createBoard: (title: string) => string;
   renameBoard: (boardId: string, title: string) => void;
@@ -11,6 +18,13 @@ export interface WorkspaceActions {
   updateNote: (noteId: string, patch: NotePatch) => void;
   moveNote: (noteId: string, listId: string, beforeId?: string) => void;
   deleteNote: (noteId: string) => void;
+  createLabel: (name: string, color: string) => string;
+  updateLabel: (labelId: string, patch: LabelPatch) => void;
+  deleteLabel: (labelId: string) => void;
+  createPage: () => string;
+  updatePage: (pageId: string, patch: PagePatch) => void;
+  setPagePublished: (pageId: string, published: Page['published']) => void;
+  deletePage: (pageId: string) => void;
   /** Uploads pending edits; resolves false if they could not reach the cloud. */
   finishSync: () => Promise<boolean>;
 }

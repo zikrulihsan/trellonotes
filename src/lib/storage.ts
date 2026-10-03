@@ -1,4 +1,4 @@
-import type { Board, BoardList, Note, Workspace } from '@/features/workspace/types';
+import type { Board, BoardList, Label, Note, Page, Workspace } from '@/features/workspace/types';
 import { seedWorkspace } from '@/features/workspace/seed';
 export const STORAGE_KEY = 'folio.workspace.v1';
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -25,9 +25,33 @@ function isNote(value: unknown): value is Note {
     ) &&
     typeof value.updatedAt === 'number' &&
     Number.isFinite(value.updatedAt) &&
-    (value.labelColor === undefined || typeof value.labelColor === 'string')
+    (value.labelColor === undefined || typeof value.labelColor === 'string') &&
+    (value.labelId === undefined || typeof value.labelId === 'string')
   );
 }
+function isLabel(value: unknown): value is Label {
+  return (
+    isRecord(value) &&
+    typeof value.id === 'string' &&
+    typeof value.name === 'string' &&
+    typeof value.color === 'string'
+  );
+}
+function isPage(value: unknown): value is Page {
+  const published = isRecord(value) ? value.published : undefined;
+  return (
+    isRecord(value) &&
+    ['id', 'title', 'content'].every((key) => typeof value[key] === 'string') &&
+    typeof value.updatedAt === 'number' &&
+    Number.isFinite(value.updatedAt) &&
+    (published === undefined ||
+      (isRecord(published) &&
+        typeof published.slug === 'string' &&
+        typeof published.at === 'number'))
+  );
+}
+const isOptionalList = <T>(value: unknown, check: (item: unknown) => item is T) =>
+  value === undefined || (Array.isArray(value) && value.every(check));
 export function isWorkspace(value: unknown): value is Workspace {
   if (
     !isRecord(value) ||
@@ -35,7 +59,9 @@ export function isWorkspace(value: unknown): value is Workspace {
     !value.boards.length ||
     !value.boards.every(isBoard) ||
     !Array.isArray(value.cards) ||
-    !value.cards.every(isNote)
+    !value.cards.every(isNote) ||
+    !isOptionalList(value.labels, isLabel) ||
+    !isOptionalList(value.pages, isPage)
   )
     return false;
   const boards = value.boards,

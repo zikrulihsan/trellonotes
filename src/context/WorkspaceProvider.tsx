@@ -9,7 +9,8 @@ import {
 } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { workspaceReducer } from '@/features/workspace/reducer';
-import { createBoard, createNote } from '@/features/workspace/factories';
+import { createBoard, createLabel, createNote, createPage } from '@/features/workspace/factories';
+import { withLabels } from '@/features/workspace/labels';
 import { mergeWorkspaces } from '@/features/workspace/merge';
 import {
   hasUnsyncedChanges,
@@ -39,7 +40,7 @@ export function WorkspaceProvider({ children }: PropsWithChildren) {
   const cloudEnabled = Boolean(client);
   const storageKey = workspaceStorageKey(userId);
   const [workspace, dispatch] = useReducer(workspaceReducer, storageKey, (key) =>
-    loadWorkspace(localStorage, key),
+    withLabels(loadWorkspace(localStorage, key)),
   );
   const [saveError, setSaveError] = useState(false);
   const [firstLoadDone, setFirstLoadDone] = useState(!cloudEnabled);
@@ -80,8 +81,9 @@ export function WorkspaceProvider({ children }: PropsWithChildren) {
             base = null;
             continue;
           }
-          const theirs = remote.workspace;
-          if (!isWorkspace(theirs)) throw new Error('The saved workspace data is invalid.');
+          if (!isWorkspace(remote.workspace))
+            throw new Error('The saved workspace data is invalid.');
+          const theirs = withLabels(remote.workspace);
           next = mergeWorkspaces(base?.workspace ?? null, next, theirs);
           base = { workspace: theirs, version: remote.version };
         }
@@ -133,7 +135,10 @@ export function WorkspaceProvider({ children }: PropsWithChildren) {
         }
         if (!hasUnsyncedChanges(storageKey)) {
           if (remote) {
-            const base = { workspace: remote.workspace as Workspace, version: remote.version };
+            const base = {
+              workspace: withLabels(remote.workspace as Workspace),
+              version: remote.version,
+            };
             baseRef.current = base;
             saveSyncBase(storageKey, base);
             syncedRef.current = base.workspace;
@@ -183,7 +188,7 @@ export function WorkspaceProvider({ children }: PropsWithChildren) {
         // With local edits pending, the next save merges instead.
         if (!active || !remote || !clean || remote.version === baseRef.current?.version) return;
         if (!isWorkspace(remote.workspace)) return;
-        const base = { workspace: remote.workspace, version: remote.version };
+        const base = { workspace: withLabels(remote.workspace), version: remote.version };
         baseRef.current = base;
         saveSyncBase(storageKey, base);
         syncedRef.current = base.workspace;
@@ -268,6 +273,32 @@ export function WorkspaceProvider({ children }: PropsWithChildren) {
       },
       deleteNote(noteId) {
         dispatch({ type: 'note/delete', noteId });
+      },
+      createLabel(name, color) {
+        if (!name.trim()) throw new Error('Give the label a name');
+        const label = createLabel(name, color);
+        dispatch({ type: 'label/create', label });
+        return label.id;
+      },
+      updateLabel(labelId, patch) {
+        dispatch({ type: 'label/update', labelId, patch });
+      },
+      deleteLabel(labelId) {
+        dispatch({ type: 'label/delete', labelId });
+      },
+      createPage() {
+        const page = createPage();
+        dispatch({ type: 'page/create', page });
+        return page.id;
+      },
+      updatePage(pageId, patch) {
+        dispatch({ type: 'page/update', pageId, patch, timestamp: Date.now() });
+      },
+      setPagePublished(pageId, published) {
+        dispatch({ type: 'page/publish', pageId, published });
+      },
+      deletePage(pageId) {
+        dispatch({ type: 'page/delete', pageId });
       },
       async finishSync() {
         if (!cloudEnabled || stateRef.current === syncedRef.current) return true;

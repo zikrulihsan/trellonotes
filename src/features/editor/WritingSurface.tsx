@@ -1,60 +1,92 @@
-import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react';
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import Placeholder from '@tiptap/extension-placeholder';
-import { useNavigate } from 'react-router-dom';
-import type { Board, Note } from '@/features/workspace/types';
-import { useWorkspace, useWorkspaceActions } from '@/hooks/useWorkspace';
+import { useWorkspace } from '@/hooks/useWorkspace';
 import { wordCount } from '@/lib/text';
+import { writingExtensions } from './extensions';
 import { EditorToolbar } from './components/EditorToolbar';
 import { WritingBar } from './components/WritingBar';
 import { LinkDialog } from './components/LinkDialog';
-export function WritingEditor({ card, board }: { card: Note; board: Board }) {
+import { SlashMenu } from './components/SlashMenu';
+
+export interface WritingDoc {
+  id: string;
+  title: string;
+  content: string;
+  updatedAt: number;
+}
+
+/** The distraction-free page used to write both board notes and Pages. */
+export function WritingSurface({
+  doc,
+  onChange,
+  backLabel,
+  onBack,
+  actions,
+  menu,
+}: {
+  doc: WritingDoc;
+  onChange: (patch: { title?: string; content?: string }) => void;
+  backLabel: string;
+  onBack: () => void;
+  /** Extra controls before the menu, such as a publish button. */
+  actions?: ReactNode;
+  menu: ReactNode;
+}) {
   const title = useRef<HTMLTextAreaElement>(null),
-    [savedEdit, setSavedEdit] = useState(card.updatedAt),
+    slashKeys = useRef<(event: globalThis.KeyboardEvent) => boolean>(() => false),
+    [savedEdit, setSavedEdit] = useState(doc.updatedAt),
     [link, setLink] = useState<string | null>(null),
     [calm, setCalm] = useState(false);
-  const { updateNote: update } = useWorkspaceActions(),
-    { saveError, syncStatus } = useWorkspace(),
-    navigate = useNavigate();
+  const { saveError, syncStatus } = useWorkspace();
+  const changeRef = useRef(onChange);
+  useLayoutEffect(() => {
+    changeRef.current = onChange;
+  });
   const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        link: {
-          openOnClick: false,
-          autolink: true,
-          HTMLAttributes: { target: '_blank', rel: 'noopener noreferrer' },
-        },
-      }),
-      Placeholder.configure({ placeholder: 'Let your ideas find their way onto the page…' }),
-    ],
-    content: card.content,
+    extensions: writingExtensions('Write freely, or type / for dates and templates…'),
+    content: doc.content,
     shouldRerenderOnTransaction: true,
     editorProps: {
       attributes: {
         class: 'writing-content',
-        'aria-label': 'Note content',
+        'aria-label': 'Content',
         role: 'textbox',
         'aria-multiline': 'true',
       },
+      handleKeyDown: (_view, event) => slashKeys.current(event),
     },
-    onUpdate: ({ editor }) => update(card.id, { content: editor.getHTML() }),
+    onUpdate: ({ editor }) => changeRef.current({ content: editor.getHTML() }),
   });
+  useLayoutEffect(() => {
+    // Open at the top, not at the previous screen's scroll position, and start a
+    // brand-new page or note at its title.
+    window.scrollTo(0, 0);
+    if (!doc.title && !doc.content) title.current?.focus();
+    // Runs once per document; the surface is keyed by document id.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   useLayoutEffect(() => {
     if (title.current) {
       title.current.style.height = 'auto';
       title.current.style.height = title.current.scrollHeight + 'px';
     }
-  }, [card.title]);
+  }, [doc.title]);
   useEffect(() => {
-    // Typing keeps these equal; a difference means another device changed this note.
-    if (editor && !editor.isDestroyed && editor.getHTML() !== card.content)
-      editor.commands.setContent(card.content, { emitUpdate: false });
-  }, [editor, card.content]);
+    // Typing keeps these equal; a difference means another device changed this text.
+    if (editor && !editor.isDestroyed && editor.getHTML() !== doc.content)
+      editor.commands.setContent(doc.content, { emitUpdate: false });
+  }, [editor, doc.content]);
   useEffect(() => {
-    const timer = setTimeout(() => setSavedEdit(card.updatedAt), 500);
+    const timer = setTimeout(() => setSavedEdit(doc.updatedAt), 500);
     return () => clearTimeout(timer);
-  }, [card.updatedAt]);
+  }, [doc.updatedAt]);
   useEffect(() => {
     if (!calm) return;
     let start: { x: number; y: number } | null = null;
@@ -74,8 +106,8 @@ export function WritingEditor({ card, board }: { card: Note; board: Board }) {
     window.addEventListener('keydown', fn);
     return () => window.removeEventListener('keydown', fn);
   }, []);
-  const count = wordCount(card.content);
-  const saving = savedEdit !== card.updatedAt;
+  const count = wordCount(doc.content);
+  const saving = savedEdit !== doc.updatedAt;
   const applyLink = (url: string) => {
     if (url) editor?.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
     else editor?.chain().focus().unsetLink().run();
@@ -90,9 +122,8 @@ export function WritingEditor({ card, board }: { card: Note; board: Board }) {
   return (
     <div className={`writing-page ${calm ? 'is-calm' : ''}`}>
       <WritingBar
-        note={card}
-        board={board}
-        onBack={() => navigate(`/board/${board.id}`)}
+        backLabel={backLabel}
+        onBack={onBack}
         saving={saving}
         saveError={saveError}
         syncStatus={syncStatus}
@@ -102,17 +133,20 @@ export function WritingEditor({ card, board }: { card: Note; board: Board }) {
             onLink={() => setLink(editor?.getAttributes('link').href || '')}
           />
         }
-      />
+      >
+        {actions}
+        {menu}
+      </WritingBar>
       <article className="paper" {...calmProps}>
         <textarea
           ref={title}
           className="note-title"
-          aria-label="Note title"
+          aria-label="Title"
           placeholder="Untitled"
           rows={1}
           maxLength={200}
-          value={card.title}
-          onChange={(e) => update(card.id, { title: e.target.value })}
+          value={doc.title}
+          onChange={(e) => onChange({ title: e.target.value })}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.preventDefault();
@@ -122,6 +156,7 @@ export function WritingEditor({ card, board }: { card: Note; board: Board }) {
         />
         <EditorContent editor={editor} />
       </article>
+      <SlashMenu editor={editor} keysRef={slashKeys} />
       <div className="writing-meta" aria-live="off">
         {count} {count === 1 ? 'word' : 'words'}
       </div>
