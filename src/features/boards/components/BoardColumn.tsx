@@ -20,6 +20,21 @@ export function BoardColumn({
   return (
     <section
       className={`column ${drag.dropListId === list.id ? 'drop-active' : ''}`}
+      onWheel={(event) => {
+        const horizontalDelta = event.shiftKey && event.deltaX === 0 ? event.deltaY : event.deltaX;
+        if (
+          !horizontalDelta ||
+          (!event.shiftKey && Math.abs(horizontalDelta) < Math.abs(event.deltaY))
+        ) {
+          return;
+        }
+
+        const boardCanvas = event.currentTarget.closest('.board-canvas');
+        if (!(boardCanvas instanceof HTMLElement)) return;
+
+        event.preventDefault();
+        boardCanvas.scrollLeft += horizontalDelta;
+      }}
       onDragOver={(event) => {
         event.preventDefault();
         if (drag.dragId) drag.setDropListId(list.id);

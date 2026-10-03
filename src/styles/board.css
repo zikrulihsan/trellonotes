@@ -542,7 +542,6 @@
   scrollbar-width: thin;
   scrollbar-color: #cec5dd #efeff4;
   scroll-padding: 10px;
-  overscroll-behavior: contain;
 }
 .board-workspace .card-stack:empty {
   display: none;
