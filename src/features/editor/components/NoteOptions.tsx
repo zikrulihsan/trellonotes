@@ -1,12 +1,12 @@
 import { Check, MoreHorizontal, Trash2, X } from 'lucide-react';
-import type { Note } from '@/features/workspace/types';
+import type { Board, Note } from '@/features/workspace/types';
 import { useWorkspaceActions } from '@/hooks/useWorkspace';
 import { useUI } from '@/hooks/useUI';
 import { useDropdown } from '@/hooks/useDropdown';
 import { Dropdown } from '@/components/ui/Dropdown';
-import { LABEL_COLORS, labelColor } from '@/lib/note-metadata';
-export function NoteOptions({ note }: { note: Note }) {
-  const { updateNote } = useWorkspaceActions(),
+import { editedLabel, LABEL_COLORS, labelColor } from '@/lib/note-metadata';
+export function NoteOptions({ note, board }: { note: Note; board: Board }) {
+  const { updateNote, moveNote } = useWorkspaceActions(),
     { openDialog } = useUI(),
     menu = useDropdown();
   return (
@@ -17,9 +17,24 @@ export function NoteOptions({ note }: { note: Note }) {
         aria-expanded={menu.open}
         onClick={() => menu.toggle()}
       >
-        <MoreHorizontal size={21} />
+        <MoreHorizontal size={19} />
       </button>
       <Dropdown id={menu.id} open={menu.open} className="note-options">
+        <p className="note-options-meta">{editedLabel(note.updatedAt)}</p>
+        <label>
+          List
+          <select
+            aria-label="Move note to list"
+            value={note.listId}
+            onChange={(event) => moveNote(note.id, event.target.value)}
+          >
+            {board.lists.map((list) => (
+              <option key={list.id} value={list.id}>
+                {list.title}
+              </option>
+            ))}
+          </select>
+        </label>
         <label>
           Card label
           <select

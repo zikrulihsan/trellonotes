@@ -11,8 +11,6 @@ export interface UIState {
   setSidebarOpen: Dispatch<SetStateAction<boolean>>;
   sidebarCollapsed: boolean;
   setSidebarCollapsed: Dispatch<SetStateAction<boolean>>;
-  focusMode: boolean;
-  setFocusMode: Dispatch<SetStateAction<boolean>>;
   dialog: WorkspaceDialog | null;
   openDialog: (dialog: WorkspaceDialog) => void;
   closeDialog: () => void;

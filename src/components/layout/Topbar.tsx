@@ -9,7 +9,7 @@ import {
 import { useUI } from '@/hooks/useUI';
 import type { Board } from '@/features/workspace/types';
 import { useWorkspace } from '@/hooks/useWorkspace';
-export function Topbar({ board, writing }: { board: Board; writing: boolean }) {
+export function Topbar({ board }: { board: Board }) {
   const { sidebarOpen, setSidebarOpen, sidebarCollapsed, setSidebarCollapsed } = useUI();
   const { cloudEnabled, syncStatus } = useWorkspace();
   return (
@@ -38,12 +38,6 @@ export function Topbar({ board, writing }: { board: Board; writing: boolean }) {
         <button onClick={() => setSidebarOpen(true)}>My boards</button>
         <ChevronRight size={14} />
         <span>{board.title}</span>
-        {writing && (
-          <>
-            <ChevronRight size={14} />
-            <span className="crumb-card">Writing</span>
-          </>
-        )}
       </div>
       <span className="topbar-hint">
         <span className="small-logo">

@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -6,15 +6,15 @@ import { useNavigate } from 'react-router-dom';
 import type { Board, Note } from '@/features/workspace/types';
 import { useWorkspace, useWorkspaceActions } from '@/hooks/useWorkspace';
 import { wordCount } from '@/lib/text';
-import { editedLabel } from '@/lib/note-metadata';
 import { EditorToolbar } from './components/EditorToolbar';
-import { EditorControls } from './components/EditorControls';
+import { WritingBar } from './components/WritingBar';
 import { LinkDialog } from './components/LinkDialog';
 export function WritingEditor({ card, board }: { card: Note; board: Board }) {
   const title = useRef<HTMLTextAreaElement>(null),
     [savedEdit, setSavedEdit] = useState(card.updatedAt),
-    [link, setLink] = useState<string | null>(null);
-  const { updateNote: update, moveNote } = useWorkspaceActions(),
+    [link, setLink] = useState<string | null>(null),
+    [calm, setCalm] = useState(false);
+  const { updateNote: update } = useWorkspaceActions(),
     { saveError, syncStatus } = useWorkspace(),
     navigate = useNavigate();
   const editor = useEditor({
@@ -56,7 +56,18 @@ export function WritingEditor({ card, board }: { card: Note; board: Board }) {
     return () => clearTimeout(timer);
   }, [card.updatedAt]);
   useEffect(() => {
-    const fn = (event: KeyboardEvent) => {
+    if (!calm) return;
+    let start: { x: number; y: number } | null = null;
+    // Ignore tiny movements, such as a hand resting on the trackpad.
+    const wake = (event: MouseEvent) => {
+      start ??= { x: event.clientX, y: event.clientY };
+      if (Math.hypot(event.clientX - start.x, event.clientY - start.y) > 12) setCalm(false);
+    };
+    window.addEventListener('mousemove', wake);
+    return () => window.removeEventListener('mousemove', wake);
+  }, [calm]);
+  useEffect(() => {
+    const fn = (event: globalThis.KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key === 's') event.preventDefault();
       if (event.key === 'Escape') setLink(null);
     };
@@ -69,35 +80,30 @@ export function WritingEditor({ card, board }: { card: Note; board: Board }) {
     if (url) editor?.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
     else editor?.chain().focus().unsetLink().run();
   };
+  // Calm hides the controls while typing; moving the mouse brings them back.
+  const calmProps = {
+    onKeyDown: (event: KeyboardEvent) => {
+      if (!event.metaKey && !event.ctrlKey && !event.altKey && event.key.length === 1)
+        setCalm(true);
+    },
+  };
   return (
-    <div className="writing-page">
-      <EditorControls
+    <div className={`writing-page ${calm ? 'is-calm' : ''}`}>
+      <WritingBar
         note={card}
+        board={board}
         onBack={() => navigate(`/board/${board.id}`)}
         saving={saving}
         saveError={saveError}
         syncStatus={syncStatus}
+        toolbar={
+          <EditorToolbar
+            editor={editor}
+            onLink={() => setLink(editor?.getAttributes('link').href || '')}
+          />
+        }
       />
-      <EditorToolbar
-        editor={editor}
-        onLink={() => setLink(editor?.getAttributes('link').href || '')}
-      />
-      <div className="paper">
-        <div className="note-context">
-          <span className={`tag tag-${card.tag.toLowerCase()}`}>{card.tag}</span>
-          <span className="note-context-divider" />
-          <select
-            aria-label="Move note to list"
-            value={card.listId}
-            onChange={(e) => moveNote(card.id, e.target.value)}
-          >
-            {board.lists.map((l) => (
-              <option key={l.id} value={l.id}>
-                {l.title}
-              </option>
-            ))}
-          </select>
-        </div>
+      <article className="paper" {...calmProps}>
         <textarea
           ref={title}
           className="note-title"
@@ -114,19 +120,10 @@ export function WritingEditor({ card, board }: { card: Note; board: Board }) {
             }
           }}
         />
-        <div className="note-byline">
-          <span className="writer-avatar">S</span>
-          <span>{editedLabel(card.updatedAt)}</span>
-          <span className="byline-dot">·</span>
-          <span>{count} words</span>
-        </div>
         <EditorContent editor={editor} />
-        <div className="paper-footer">
-          <span>
-            {count} {count === 1 ? 'word' : 'words'}
-          </span>
-          <span>One idea at a time.</span>
-        </div>
+      </article>
+      <div className="writing-meta" aria-live="off">
+        {count} {count === 1 ? 'word' : 'words'}
       </div>
       {link !== null && (
         <LinkDialog initialUrl={link} onClose={() => setLink(null)} onApply={applyLink} />

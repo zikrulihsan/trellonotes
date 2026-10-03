@@ -5,7 +5,6 @@ export function UIProvider({ children }: PropsWithChildren) {
     [sidebarCollapsed, setSidebarCollapsed] = useState(
       () => localStorage.getItem('folio.sidebar-collapsed') === 'true',
     ),
-    [focusMode, setFocusMode] = useState(false),
     [dialog, setDialog] = useState<WorkspaceDialog | null>(null);
   useEffect(() => {
     localStorage.setItem('folio.sidebar-collapsed', String(sidebarCollapsed));
@@ -15,7 +14,6 @@ export function UIProvider({ children }: PropsWithChildren) {
       if (e.key === 'Escape') {
         setDialog(null);
         setSidebarOpen(false);
-        setFocusMode(false);
       }
     };
     window.addEventListener('keydown', escape);
@@ -32,13 +30,11 @@ export function UIProvider({ children }: PropsWithChildren) {
       setSidebarOpen,
       sidebarCollapsed,
       setSidebarCollapsed,
-      focusMode,
-      setFocusMode,
       dialog,
       openDialog,
       closeDialog,
     }),
-    [sidebarOpen, sidebarCollapsed, focusMode, dialog, openDialog, closeDialog],
+    [sidebarOpen, sidebarCollapsed, dialog, openDialog, closeDialog],
   );
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>;
 }

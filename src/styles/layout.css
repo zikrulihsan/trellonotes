@@ -175,9 +175,6 @@
 .breadcrumb > span {
   color: #555560;
 }
-.breadcrumb > .crumb-card {
-  color: #8a8a96;
-}
 .topbar-hint {
   color: #9696a0;
   font-size: 12px;
@@ -283,11 +280,6 @@
 @media (max-width: 760px) {
   .breadcrumb > span {
     max-width: 175px;
-  }
-}
-@media (max-width: 760px) {
-  .breadcrumb > .crumb-card {
-    display: none;
   }
 }
 .topbar-local {

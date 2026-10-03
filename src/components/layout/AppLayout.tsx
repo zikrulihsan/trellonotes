@@ -6,7 +6,7 @@ import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
 export function AppLayout() {
   const { workspace, saveError, cloudEnabled, syncStatus } = useWorkspace(),
-    { sidebarOpen, sidebarCollapsed, focusMode } = useUI(),
+    { sidebarOpen, sidebarCollapsed } = useUI(),
     narrow = useMediaQuery('(max-width:760px)');
   const noteRoute = useMatch('/card/:noteId'),
     boardRoute = useMatch('/board/:boardId');
@@ -17,15 +17,18 @@ export function AppLayout() {
   const writing = Boolean(noteRoute);
   return (
     <div
-      className={`app ${writing ? 'writing-view' : 'board-workspace'} ${focusMode ? 'focus-mode' : ''} ${sidebarCollapsed && !narrow ? 'sidebar-collapsed' : ''}`}
+      className={`app ${writing ? 'writing-view' : 'board-workspace'} ${sidebarCollapsed && !narrow ? 'sidebar-collapsed' : ''}`}
     >
-      <Sidebar
-        board={board}
-        inert={!sidebarOpen && narrow}
-        collapsed={sidebarCollapsed && !narrow}
-      />
+      {/* The writing page keeps only the page itself in view. */}
+      {!writing && (
+        <Sidebar
+          board={board}
+          inert={!sidebarOpen && narrow}
+          collapsed={sidebarCollapsed && !narrow}
+        />
+      )}
       <main className="main">
-        <Topbar board={board} writing={writing} />
+        {!writing && <Topbar board={board} />}
         {saveError && (
           <div className="storage-warning" role="alert">
             {cloudEnabled && syncStatus === 'error'
