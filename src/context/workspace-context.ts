@@ -11,6 +11,8 @@ export interface WorkspaceActions {
   updateNote: (noteId: string, patch: NotePatch) => void;
   moveNote: (noteId: string, listId: string, beforeId?: string) => void;
   deleteNote: (noteId: string) => void;
+  /** Uploads pending edits; resolves false if they could not reach the cloud. */
+  finishSync: () => Promise<boolean>;
 }
 export const WorkspaceStateContext = createContext<{
   workspace: Workspace;

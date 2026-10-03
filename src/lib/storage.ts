@@ -52,9 +52,16 @@ export function isWorkspace(value: unknown): value is Workspace {
     boards.find((b) => b.id === c.boardId)?.lists.some((l) => l.id === c.listId),
   );
 }
-export function loadWorkspace(storage: Pick<Storage, 'getItem'> = localStorage): Workspace {
+/** Signed-in users each get their own copy so accounts on one browser never mix. */
+export function workspaceStorageKey(userId?: string): string {
+  return userId ? `${STORAGE_KEY}.${userId}` : STORAGE_KEY;
+}
+export function loadWorkspace(
+  storage: Pick<Storage, 'getItem'> = localStorage,
+  key = STORAGE_KEY,
+): Workspace {
   try {
-    const raw = storage.getItem(STORAGE_KEY);
+    const raw = storage.getItem(key);
     if (raw) {
       const value: unknown = JSON.parse(raw);
       if (isWorkspace(value)) return value;
@@ -67,6 +74,49 @@ export function loadWorkspace(storage: Pick<Storage, 'getItem'> = localStorage):
 export function saveWorkspace(
   workspace: Workspace,
   storage: Pick<Storage, 'setItem'> = localStorage,
+  key = STORAGE_KEY,
 ): void {
-  storage.setItem(STORAGE_KEY, JSON.stringify(workspace));
+  storage.setItem(key, JSON.stringify(workspace));
+}
+/**
+ * Marks that this device holds changes the cloud has not confirmed yet, so a
+ * reload or closed tab pushes them instead of replacing them with the older cloud copy.
+ */
+export function hasUnsyncedChanges(key: string): boolean {
+  try {
+    return localStorage.getItem(`${key}.unsynced`) === '1';
+  } catch {
+    return false;
+  }
+}
+export function setUnsyncedChanges(key: string, unsynced: boolean): void {
+  try {
+    if (unsynced) localStorage.setItem(`${key}.unsynced`, '1');
+    else localStorage.removeItem(`${key}.unsynced`);
+  } catch {
+    /* The workspace save itself reports storage failures. */
+  }
+}
+/** The last workspace this device and the cloud agreed on, and the cloud version it came from. */
+export interface SyncBase {
+  workspace: Workspace;
+  version: string;
+}
+export function loadSyncBase(key: string): SyncBase | null {
+  try {
+    const raw = localStorage.getItem(`${key}.base`);
+    const value: unknown = raw ? JSON.parse(raw) : null;
+    if (isRecord(value) && typeof value.version === 'string' && isWorkspace(value.workspace))
+      return { workspace: value.workspace, version: value.version };
+  } catch {
+    /* Without a base, the next sync merges without detecting deletions. */
+  }
+  return null;
+}
+export function saveSyncBase(key: string, base: SyncBase): void {
+  try {
+    localStorage.setItem(`${key}.base`, JSON.stringify(base));
+  } catch {
+    /* The workspace save itself reports storage failures. */
+  }
 }

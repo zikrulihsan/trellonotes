@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, ChevronDown, Feather, LayoutGrid, Plus } from 'lucide-react';
-import { useWorkspace } from '@/hooks/useWorkspace';
+import { useWorkspace, useWorkspaceActions } from '@/hooks/useWorkspace';
 import { useAuth } from '@/context/auth-context';
 import { useUI } from '@/hooks/useUI';
 import type { Board } from '@/features/workspace/types';
@@ -14,9 +15,27 @@ export function Sidebar({
   collapsed: boolean;
 }) {
   const { workspace, cloudEnabled, syncStatus } = useWorkspace(),
+    { finishSync } = useWorkspaceActions(),
     { user, signOut } = useAuth(),
+    [signingOut, setSigningOut] = useState(false),
     { sidebarOpen, setSidebarOpen, openDialog } = useUI(),
     navigate = useNavigate();
+  async function handleSignOut() {
+    setSigningOut(true);
+    try {
+      const synced = await finishSync();
+      if (
+        !synced &&
+        !window.confirm(
+          'Some changes have not reached the cloud yet. They stay on this device and sync the next time you sign in here. Sign out anyway?',
+        )
+      )
+        return setSigningOut(false);
+      await signOut();
+    } catch {
+      setSigningOut(false);
+    }
+  }
   function go(id: string) {
     navigate(`/board/${id}`);
     setSidebarOpen(false);
@@ -97,10 +116,11 @@ export function Sidebar({
           {cloudEnabled ? (
             <button
               className="local-pill signout-pill"
-              onClick={() => void signOut()}
+              onClick={() => void handleSignOut()}
+              disabled={signingOut}
               title="Sign out"
             >
-              Sign out
+              {signingOut ? 'Saving…' : 'Sign out'}
             </button>
           ) : (
             <span className="local-pill">Local</span>

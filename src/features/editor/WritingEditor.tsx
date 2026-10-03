@@ -47,6 +47,11 @@ export function WritingEditor({ card, board }: { card: Note; board: Board }) {
     }
   }, [card.title]);
   useEffect(() => {
+    // Typing keeps these equal; a difference means another device changed this note.
+    if (editor && !editor.isDestroyed && editor.getHTML() !== card.content)
+      editor.commands.setContent(card.content, { emitUpdate: false });
+  }, [editor, card.content]);
+  useEffect(() => {
     const timer = setTimeout(() => setSavedEdit(card.updatedAt), 500);
     return () => clearTimeout(timer);
   }, [card.updatedAt]);
