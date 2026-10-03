@@ -1,6 +1,6 @@
 # TrelloNotes
 
-A Trello-style board whose cards open into full-page free-writing notes. Dark scrollable lists, colored labels, and a mountain backdrop stay on the board; Tiptap powers the spacious writing editor.
+A Trello-style board whose cards open into full-page free-writing notes. Soft gray scrollable lists, white cards, purple accents, and a charcoal sidebar frame the board; Tiptap powers the spacious writing editor.
 
 ## Stack
 

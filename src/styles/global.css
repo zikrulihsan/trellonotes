@@ -94,12 +94,6 @@ a {
     display: none;
   }
 }
-:root {
-  --board-bg: #0e1207;
-  --board-card: #242528;
-  --board-text: #d0d0d4;
-  --board-secondary: #abaeb7;
-}
 .sr-only {
   position: absolute;
   width: 1px;

@@ -19,7 +19,7 @@ export function AppLayout() {
     <div
       className={`app ${writing ? 'writing-view' : 'board-workspace'} ${focusMode ? 'focus-mode' : ''}`}
     >
-      <Sidebar board={board} inert={!sidebarOpen && (!writing || narrow)} />
+      <Sidebar board={board} inert={!sidebarOpen && narrow} />
       <main className="main">
         <Topbar board={board} writing={writing} />
         {saveError && (
