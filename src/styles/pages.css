@@ -47,18 +47,22 @@
 }
 
 /* Label manager */
+.label-manager {
+  width: 480px;
+  max-width: calc(100vw - 32px);
+}
 .label-list {
   list-style: none;
   padding: 0;
-  margin: 0 0 16px;
+  margin: 0 0 18px;
   display: grid;
-  gap: 6px;
+  gap: 10px;
 }
 .label-row,
 .label-add {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
 }
 .label-row input,
 .label-add input {
@@ -75,7 +79,9 @@
 }
 .label-swatches {
   display: flex;
-  gap: 4px;
+  /* Leaves room for the ring around the chosen color. */
+  gap: 10px;
+  padding: 0 4px;
   flex-shrink: 0;
 }
 .label-swatch {
@@ -83,10 +89,15 @@
   height: 18px;
   border-radius: 50%;
   padding: 0;
+  transition: transform 0.12s ease;
+}
+.label-swatch:hover {
+  transform: scale(1.15);
 }
 .label-swatch[aria-checked='true'] {
-  outline: 2px solid #5d4a7e;
-  outline-offset: 2px;
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 0 4px #5d4a7e;
 }
 .label-dot {
   width: 12px;
@@ -95,8 +106,11 @@
   flex-shrink: 0;
 }
 .label-add {
-  padding-top: 14px;
+  padding-top: 18px;
   border-top: 1px solid #efedf3;
+}
+.label-add .label-dot {
+  margin-left: 4px;
 }
 .label-add .button {
   min-height: 36px;
@@ -105,6 +119,18 @@
 /* Note and page menus */
 .note-options-meta {
   padding: 4px 9px;
+}
+.note-options .label-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-left: 6px;
+}
+/* Separates the menu's actions from its pickers. */
+.menu-actions {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid #efedf3;
 }
 .dropdown-link {
   display: flex;
@@ -357,6 +383,13 @@
   }
   .slash-menu {
     width: min(300px, calc(100vw - 32px));
+  }
+  .label-swatches {
+    gap: 7px;
+  }
+  .label-row,
+  .label-add {
+    gap: 10px;
   }
 }
 

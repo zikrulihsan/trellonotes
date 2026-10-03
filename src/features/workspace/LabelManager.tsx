@@ -22,7 +22,7 @@ export function LabelManager({ onClose }: { onClose: () => void }) {
     setName('');
   }
   return (
-    <Modal title="Labels" onClose={onClose}>
+    <Modal title="Labels" onClose={onClose} className="label-manager">
       {labels.length ? (
         <ul className="label-list">
           {labels.map((label) => (

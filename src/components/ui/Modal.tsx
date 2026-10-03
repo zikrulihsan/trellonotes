@@ -4,14 +4,15 @@ import { useDialogFocus } from '@/hooks/useDialogFocus';
 interface Props extends PropsWithChildren {
   title: string;
   onClose: () => void;
+  className?: string;
 }
-export function Modal({ title, onClose, children }: Props) {
+export function Modal({ title, onClose, className = '', children }: Props) {
   const titleId = useId();
   useDialogFocus(true);
   return (
     <div className="modal-overlay" onClick={onClose}>
       <section
-        className="modal"
+        className={`modal ${className}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}

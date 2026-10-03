@@ -4,10 +4,11 @@ import { useWorkspace, useWorkspaceActions } from '@/hooks/useWorkspace';
 import { useUI } from '@/hooks/useUI';
 import { useDropdown } from '@/hooks/useDropdown';
 import { Dropdown } from '@/components/ui/Dropdown';
-import { editedLabel } from '@/lib/note-metadata';
+import { editedLabel, labelColorValue, noteLabel } from '@/lib/note-metadata';
 export function NoteOptions({ note, board }: { note: Note; board: Board }) {
   const { updateNote, moveNote } = useWorkspaceActions(),
     { workspace } = useWorkspace(),
+    label = noteLabel(workspace, note),
     { openDialog } = useUI(),
     menu = useDropdown();
   return (
@@ -38,6 +39,9 @@ export function NoteOptions({ note, board }: { note: Note; board: Board }) {
         </label>
         <label>
           Label
+          {label && (
+            <span className="label-dot" style={{ background: labelColorValue(label.color) }} />
+          )}
           <select
             aria-label="Initiative label"
             value={note.labelId ?? ''}
@@ -51,30 +55,32 @@ export function NoteOptions({ note, board }: { note: Note; board: Board }) {
             ))}
           </select>
         </label>
-        <button
-          onClick={() => {
-            openDialog({ kind: 'manage-labels' });
-            menu.close();
-          }}
-        >
-          <Tags size={15} />
-          Manage labels
-        </button>
-        <button
-          className="danger"
-          onClick={() => {
-            openDialog({
-              kind: 'delete-note',
-              noteId: note.id,
-              boardId: note.boardId,
-              title: note.title || 'Untitled',
-            });
-            menu.close();
-          }}
-        >
-          <Trash2 size={15} />
-          Delete initiative
-        </button>
+        <div className="menu-actions">
+          <button
+            onClick={() => {
+              openDialog({ kind: 'manage-labels' });
+              menu.close();
+            }}
+          >
+            <Tags size={15} />
+            Manage labels
+          </button>
+          <button
+            className="danger"
+            onClick={() => {
+              openDialog({
+                kind: 'delete-note',
+                noteId: note.id,
+                boardId: note.boardId,
+                title: note.title || 'Untitled',
+              });
+              menu.close();
+            }}
+          >
+            <Trash2 size={15} />
+            Delete initiative
+          </button>
+        </div>
       </Dropdown>
     </div>
   );
