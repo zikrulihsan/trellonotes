@@ -8,7 +8,7 @@ A Trello-style board whose cards open into full-page free-writing notes. Soft gr
 - **React 19** — function components and feature-based composition.
 - **React Router** — board and note routes using `HashRouter`, suitable for static hosting.
 - **React Context + useReducer** — typed workspace actions, shared UI state, and predictable updates.
-- **Supabase Auth + Postgres** — email magic-link sign-in and per-user workspace synchronization protected by row-level security.
+- **Supabase Auth + Postgres** — Google sign-in and per-user workspace synchronization protected by row-level security.
 - **Tiptap** — rich text, headings, lists, links, quotes, undo, and redo.
 - **CSS + Lucide** — feature styles and accessible icon controls.
 - **Vitest + Testing Library** — reducer, persistence, context, and writing-helper tests.
@@ -24,7 +24,7 @@ npm ci
 
 For cloud sync, copy `.env.example` to `.env.local` and add the SweGrowth project's URL and publishable key. The app can still run without these values using browser storage only.
 
-In Supabase Auth settings, allow the local callback URLs `http://localhost:5173/**` and `http://127.0.0.1:5173/**`. Add the deployed app origin there when publishing. Magic-link emails return to the app origin.
+To enable Google sign-in, create a Google OAuth client of type **Web application**. Add `http://localhost:5173` and `http://127.0.0.1:5173` as authorized JavaScript origins, and add `https://vqtzmhfnyaujkbczibwu.supabase.co/auth/v1/callback` as its authorized redirect URI. Enter that client ID and secret in the SweGrowth project's **Authentication → Sign In / Providers → Google** settings. In **Authentication → URL Configuration**, allow `http://localhost:5173/**` and `http://127.0.0.1:5173/**`; add the deployed app origin before publishing.
 
 ```sh
 npm run dev

@@ -33,11 +33,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
       loading,
       session,
       user: session?.user ?? null,
-      async sendMagicLink(email) {
+      async signInWithGoogle() {
         if (!supabase) throw new Error('Supabase is not configured for this app.');
-        const { error } = await supabase.auth.signInWithOtp({
-          email,
-          options: { emailRedirectTo: window.location.origin },
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: { redirectTo: window.location.origin },
         });
         if (error) throw error;
       },

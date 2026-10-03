@@ -157,26 +157,28 @@ a {
   border-color: #9675df;
   box-shadow: 0 0 0 3px #eee8fb;
 }
-.auth-form button {
+.google-signin {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 9px;
   min-height: 46px;
-  margin-top: 7px;
-  border: 0;
+  width: 100%;
+  margin-top: 24px;
+  border: 1px solid #dedde5;
   border-radius: 9px;
-  color: white;
-  background: #7954d8;
+  color: #302f38;
+  background: white;
   font: inherit;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
 }
-.auth-form button:hover {
-  background: #6843c5;
+.google-signin:hover {
+  background: #faf9fc;
+  border-color: #c9c4d2;
 }
-.auth-form button:disabled {
+.google-signin:disabled {
   opacity: 0.65;
   cursor: wait;
 }

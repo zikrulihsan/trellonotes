@@ -6,7 +6,7 @@ export type AuthContextValue = {
   loading: boolean;
   session: Session | null;
   user: User | null;
-  sendMagicLink: (email: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
 };
 
