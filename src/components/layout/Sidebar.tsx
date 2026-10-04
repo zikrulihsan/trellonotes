@@ -16,10 +16,10 @@ import { useWorkspace, useWorkspaceActions } from '@/hooks/useWorkspace';
 import { useAuth } from '@/context/auth-context';
 import { useUI } from '@/hooks/useUI';
 import type { Board } from '@/features/workspace/types';
-import { boardPath, pagePath } from '@/lib/app-paths';
+import { boardPath } from '@/lib/app-paths';
 import { useFocus } from '@/features/focus/focus-context';
 import { formatClock } from '@/features/focus/focus-timer';
-import { todoPage } from '@/features/pages/templates';
+import { taskProgress } from '@/lib/tasks';
 export function Sidebar({
   board,
   section,
@@ -32,7 +32,7 @@ export function Sidebar({
   collapsed: boolean;
 }) {
   const { workspace, cloudEnabled, syncStatus } = useWorkspace(),
-    { finishSync, createPage } = useWorkspaceActions(),
+    { finishSync } = useWorkspaceActions(),
     focus = useFocus(),
     { user, signOut } = useAuth(),
     [signingOut, setSigningOut] = useState(false),
@@ -66,11 +66,12 @@ export function Sidebar({
     navigate('/write');
     setSidebarOpen(false);
   }
-  function newTodoList() {
-    const start = todoPage();
-    navigate(pagePath({ id: createPage(start), title: start.title }));
+  function openTodo() {
+    navigate('/todo');
     setSidebarOpen(false);
   }
+  const tasks = taskProgress(workspace.todo?.content ?? ''),
+    openTasks = tasks.total - tasks.done;
   function openFocus() {
     focus.setPanelOpen(true);
     setSidebarOpen(false);
@@ -124,9 +125,10 @@ export function Sidebar({
           <PenLine size={18} />
           Free write
         </button>
-        <button className="side-link side-quick" onClick={newTodoList}>
+        <button className="side-link side-quick" onClick={openTodo}>
           <ListChecks size={18} />
-          New to-do list
+          To-do list
+          {openTasks > 0 && <span className="side-count">{openTasks}</span>}
         </button>
         <button
           className="side-link side-quick"

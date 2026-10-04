@@ -5,6 +5,7 @@ import type {
   NotePatch,
   Page,
   PagePatch,
+  SheetName,
   Workspace,
 } from '@/features/workspace/types';
 export interface WorkspaceActions {
@@ -26,7 +27,7 @@ export interface WorkspaceActions {
   updatePage: (pageId: string, patch: PagePatch) => void;
   setPagePublished: (pageId: string, published: Page['published']) => void;
   deletePage: (pageId: string) => void;
-  updateScratch: (content: string) => void;
+  updateSheet: (sheet: SheetName, content: string) => void;
   /** Moves the free writing into a new page and clears the scratchpad; returns the page id. */
   keepScratchAsPage: (title: string) => string;
   /** Uploads pending edits; resolves false if they could not reach the cloud. */

@@ -4,7 +4,7 @@ import type {
   Label,
   Note,
   Page,
-  Scratch,
+  Sheet,
   Workspace,
 } from '@/features/workspace/types';
 import { seedWorkspace } from '@/features/workspace/seed';
@@ -58,7 +58,7 @@ function isPage(value: unknown): value is Page {
         typeof published.at === 'number'))
   );
 }
-function isScratch(value: unknown): value is Scratch {
+function isSheet(value: unknown): value is Sheet {
   return (
     isRecord(value) &&
     typeof value.content === 'string' &&
@@ -78,7 +78,8 @@ export function isWorkspace(value: unknown): value is Workspace {
     !value.cards.every(isNote) ||
     !isOptionalList(value.labels, isLabel) ||
     !isOptionalList(value.pages, isPage) ||
-    (value.scratch !== undefined && !isScratch(value.scratch))
+    (value.scratch !== undefined && !isSheet(value.scratch)) ||
+    (value.todo !== undefined && !isSheet(value.todo))
   )
     return false;
   const boards = value.boards,

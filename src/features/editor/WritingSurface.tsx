@@ -31,6 +31,7 @@ export function WritingSurface({
   actions,
   menu,
   untitled = false,
+  heading,
   placeholder = 'Write freely, or type / for dates and templates…',
 }: {
   doc: WritingDoc;
@@ -42,6 +43,8 @@ export function WritingSurface({
   menu: ReactNode;
   /** Free writing has no title; the text starts right away. */
   untitled?: boolean;
+  /** A fixed heading for an untitled sheet, such as "To-do". */
+  heading?: string;
   placeholder?: string;
 }) {
   const title = useRef<HTMLTextAreaElement>(null),
@@ -149,6 +152,7 @@ export function WritingSurface({
         {menu}
       </WritingBar>
       <article className="paper" {...calmProps}>
+        {untitled && heading && <h1 className="note-title sheet-heading">{heading}</h1>}
         {!untitled && (
           <textarea
             ref={title}
@@ -180,15 +184,28 @@ export function WritingSurface({
   );
 }
 
-/** Lands in a template's first empty item, not the blank line the editor keeps after lists. */
+/**
+ * Lands in the first empty list item (a fresh template), else at the end of the writing.
+ * When the writing ends in a list, that means the end of its last item, not the blank
+ * line the editor keeps after lists.
+ */
 function focusFirstBlank(editor: Editor) {
   if (editor.isDestroyed) return;
-  let target: number | null = null;
-  editor.state.doc.descendants((node, pos) => {
-    if (target !== null) return false;
-    if ((node.type.name === 'taskItem' || node.type.name === 'listItem') && !node.textContent)
-      target = pos + 2;
+  const { doc } = editor.state;
+  const isItem = (name?: string) => name === 'taskItem' || name === 'listItem';
+  let blank: number | null = null,
+    lastItemEnd: number | null = null;
+  doc.descendants((node, pos, parent) => {
+    if (blank !== null) return false;
+    if (isItem(node.type.name) && !node.textContent) blank = pos + 2;
+    else if (node.isTextblock && isItem(parent?.type.name))
+      lastItemEnd = pos + 1 + node.content.size;
   });
+  const last = doc.lastChild,
+    beforeLast = doc.childCount > 1 ? doc.child(doc.childCount - 2) : null;
+  const endsInList =
+    last?.type.name === 'paragraph' && !last.textContent && beforeLast?.type.name.endsWith('List');
+  const target = blank ?? (endsInList ? lastItemEnd : null);
   if (target === null) editor.commands.focus('end');
   else editor.chain().focus().setTextSelection(target).run();
 }

@@ -138,6 +138,63 @@
   font-weight: 600;
   box-shadow: 0 1px 3px rgba(44, 32, 66, 0.1);
 }
+.focus-rounds {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  font-size: 12px;
+  color: #857e90;
+}
+.focus-rounds-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.focus-dots {
+  display: flex;
+  gap: 4px;
+}
+.focus-dots span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #e6e0ee;
+}
+.focus-dots span.is-done {
+  background: var(--focus-accent);
+}
+.focus-stepper {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  background: #f5f3f8;
+  border-radius: 8px;
+}
+.focus-stepper button {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 24px;
+  border-radius: 6px;
+  color: #6f6879;
+}
+.focus-stepper button:hover:not(:disabled) {
+  background: #fff;
+  color: var(--focus-accent);
+}
+.focus-stepper button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.focus-stepper output {
+  min-width: 18px;
+  text-align: center;
+  font-weight: 600;
+  color: #3a3346;
+  font-variant-numeric: tabular-nums;
+}
 .focus-today {
   margin: 12px 0 0;
   text-align: center;
@@ -202,4 +259,11 @@
   .writing-page.is-untitled .paper {
     padding-top: 48px;
   }
+}
+/* The fixed heading of an untitled sheet, such as the to-do list. */
+.sheet-heading {
+  margin: 0 0 26px;
+}
+.writing-page.is-untitled .paper:has(.sheet-heading) {
+  padding-top: 72px;
 }

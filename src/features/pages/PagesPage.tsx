@@ -8,7 +8,6 @@ import { pagePath } from '@/lib/app-paths';
 import { PublicAddress } from './PublicAddress';
 import { PageStatus } from './PageStatus';
 import { TaskCount } from '@/components/ui/TaskCount';
-import { todoPage } from './templates';
 
 export function PagesPage() {
   const { workspace, cloudEnabled } = useWorkspace(),
@@ -16,10 +15,6 @@ export function PagesPage() {
     navigate = useNavigate();
   const pages = [...(workspace.pages ?? [])].sort((a, b) => b.updatedAt - a.updatedAt);
   const newPage = () => navigate(pagePath({ id: createPage(), title: '' }));
-  const newTodoList = () => {
-    const start = todoPage();
-    navigate(pagePath({ id: createPage(start), title: start.title }));
-  };
   return (
     <div className="pages-view">
       <section className="board-header">
@@ -30,7 +25,7 @@ export function PagesPage() {
           {cloudEnabled && <PublicAddress />}
         </div>
         <div className="board-actions">
-          <Button onClick={newTodoList}>
+          <Button onClick={() => navigate('/todo')}>
             <ListChecks size={17} />
             To-do list
           </Button>

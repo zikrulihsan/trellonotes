@@ -1,5 +1,5 @@
 import { isWorkspace } from '@/lib/storage';
-import type { Board, Label, Note, Page, Scratch, Workspace } from './types';
+import type { Board, Label, Note, Page, Sheet, SheetName, Workspace } from './types';
 
 type Entity = { id: string };
 
@@ -137,14 +137,14 @@ export function mergeWorkspaces(
         updatedAt: (_b, lu, ru) => Math.max(lu as number, ru as number),
       }),
     );
-  if (local.scratch && remote.scratch)
-    merged.scratch = mergeFields<Scratch>(
-      base?.scratch,
-      local.scratch,
-      remote.scratch,
-      local.scratch.updatedAt >= remote.scratch.updatedAt,
-      { updatedAt: (_b, lu, ru) => Math.max(lu as number, ru as number) },
-    );
-  else if (local.scratch || remote.scratch) merged.scratch = local.scratch ?? remote.scratch;
+  for (const name of ['scratch', 'todo'] as SheetName[]) {
+    const l = local[name],
+      r = remote[name];
+    if (l && r)
+      merged[name] = mergeFields<Sheet>(base?.[name], l, r, l.updatedAt >= r.updatedAt, {
+        updatedAt: (_b, lu, ru) => Math.max(lu as number, ru as number),
+      });
+    else if (l || r) merged[name] = l ?? r;
+  }
   return isWorkspace(merged) ? merged : local;
 }

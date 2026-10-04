@@ -15,7 +15,7 @@ import { shortDay } from '@/features/pages/templates';
 /** One blank sheet, always there: no title, no board, no list. Kept until cleared. */
 export default function FreeWritePage() {
   const { workspace } = useWorkspace(),
-    { updateScratch } = useWorkspaceActions(),
+    { updateSheet } = useWorkspaceActions(),
     navigate = useNavigate();
   const scratch = workspace.scratch ?? { content: '', updatedAt: 0 };
   // Go back to wherever free writing was opened from; a direct visit goes home.
@@ -23,7 +23,7 @@ export default function FreeWritePage() {
   return (
     <WritingSurface
       doc={{ id: 'free-writing', title: '', ...scratch }}
-      onChange={(patch) => patch.content !== undefined && updateScratch(patch.content)}
+      onChange={(patch) => patch.content !== undefined && updateSheet('scratch', patch.content)}
       backLabel="Back"
       onBack={back}
       untitled
@@ -34,7 +34,7 @@ export default function FreeWritePage() {
 }
 
 function FreeWriteOptions({ updatedAt, empty }: { updatedAt: number; empty: boolean }) {
-  const { keepScratchAsPage, updateScratch } = useWorkspaceActions(),
+  const { keepScratchAsPage, updateSheet } = useWorkspaceActions(),
     navigate = useNavigate(),
     menu = useDropdown(),
     [confirming, setConfirming] = useState(false);
@@ -82,7 +82,7 @@ function FreeWriteOptions({ updatedAt, empty }: { updatedAt: number; empty: bool
             <Button
               variant="destructive"
               onClick={() => {
-                updateScratch('');
+                updateSheet('scratch', '');
                 setConfirming(false);
               }}
             >

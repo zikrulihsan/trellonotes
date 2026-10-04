@@ -7,6 +7,7 @@ import type {
   NotePatch,
   Page,
   PagePatch,
+  SheetName,
   Workspace,
 } from './types';
 export type WorkspaceAction =
@@ -28,7 +29,7 @@ export type WorkspaceAction =
   | { type: 'page/update'; pageId: string; patch: PagePatch; timestamp: number }
   | { type: 'page/publish'; pageId: string; published: Page['published'] }
   | { type: 'page/delete'; pageId: string }
-  | { type: 'scratch/update'; content: string; timestamp: number };
+  | { type: 'sheet/update'; sheet: SheetName; content: string; timestamp: number };
 
 export function workspaceReducer(state: Workspace, action: WorkspaceAction): Workspace {
   switch (action.type) {
@@ -177,9 +178,9 @@ export function workspaceReducer(state: Workspace, action: WorkspaceAction): Wor
       };
     case 'page/delete':
       return { ...state, pages: state.pages?.filter((p) => p.id !== action.pageId) };
-    case 'scratch/update':
-      return action.content === (state.scratch?.content ?? '')
+    case 'sheet/update':
+      return action.content === (state[action.sheet]?.content ?? '')
         ? state
-        : { ...state, scratch: { content: action.content, updatedAt: action.timestamp } };
+        : { ...state, [action.sheet]: { content: action.content, updatedAt: action.timestamp } };
   }
 }

@@ -79,13 +79,15 @@ describe('writing workspace invariants', () => {
   });
   it('stamps free writing only when its text changes', () => {
     const written = workspaceReducer(fixture(), {
-      type: 'scratch/update',
+      type: 'sheet/update',
+      sheet: 'scratch',
       content: '<p>morning pages</p>',
       timestamp: 5,
     });
     expect(written.scratch).toEqual({ content: '<p>morning pages</p>', updatedAt: 5 });
     const same = workspaceReducer(written, {
-      type: 'scratch/update',
+      type: 'sheet/update',
+      sheet: 'scratch',
       content: '<p>morning pages</p>',
       timestamp: 9,
     });

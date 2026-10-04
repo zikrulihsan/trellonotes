@@ -16,6 +16,7 @@ export interface FocusTimer {
   reset: () => void;
   skip: () => void;
   setLength: (minutes: number) => void;
+  setRounds: (rounds: number) => void;
 }
 
 export const FocusContext = createContext<FocusTimer | null>(null);

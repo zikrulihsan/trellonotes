@@ -8,6 +8,7 @@ import {
   readFocus,
   reset,
   setFocusLength,
+  setRounds,
   start,
   timeLeft,
 } from './focus-timer';
@@ -44,6 +45,24 @@ describe('focus timer', () => {
     ]);
     expect(state.round).toBe(0);
     expect(state.today.count).toBe(4);
+  });
+
+  it('takes the long break after the chosen number of sessions', () => {
+    let state = setRounds(initialFocus(25, now), 2);
+    const phases: string[] = [];
+    for (let i = 0; i < 4; i++) {
+      state = advance(state, now, true);
+      phases.push(state.phase);
+    }
+    expect(phases).toEqual(['short', 'focus', 'long', 'focus']);
+    expect(setRounds(state, 0).rounds).toBe(1);
+    expect(setRounds(state, 20).rounds).toBe(8);
+  });
+
+  it('reads a timer saved before sessions could be changed as four sessions', () => {
+    const old: Partial<ReturnType<typeof initialFocus>> = initialFocus(25, now);
+    delete old.rounds;
+    expect(readFocus(JSON.stringify(old)).rounds).toBe(4);
   });
 
   it('does not count a skipped focus session, and starts each day at zero', () => {

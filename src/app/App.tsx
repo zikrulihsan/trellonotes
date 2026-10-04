@@ -11,6 +11,7 @@ import { FocusPanel } from '@/features/focus/FocusPanel';
 const EditorPage = lazy(() => import('@/features/editor/EditorPage'));
 const PageEditorPage = lazy(() => import('@/features/pages/PageEditorPage'));
 const FreeWritePage = lazy(() => import('@/features/free-write/FreeWritePage'));
+const TodoPage = lazy(() => import('@/features/todo/TodoPage'));
 export function App() {
   const { workspace } = useWorkspace();
   useBoardTools();
@@ -74,6 +75,20 @@ export function App() {
                 }
               >
                 <FreeWritePage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="todo"
+            element={
+              <Suspense
+                fallback={
+                  <div className="editor-placeholder" role="status">
+                    Opening your page…
+                  </div>
+                }
+              >
+                <TodoPage />
               </Suspense>
             }
           />

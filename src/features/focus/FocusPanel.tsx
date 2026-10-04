@@ -1,6 +1,6 @@
-import { Pause, Play, RotateCcw, SkipForward, Timer, X } from 'lucide-react';
+import { Minus, Pause, Play, Plus, RotateCcw, SkipForward, Timer, X } from 'lucide-react';
 import { useFocus } from './focus-context';
-import { FOCUS_LENGTHS, ROUNDS, formatClock, phaseMinutes } from './focus-timer';
+import { FOCUS_LENGTHS, MAX_ROUNDS, MIN_ROUNDS, formatClock, phaseMinutes } from './focus-timer';
 
 const PHASE_LABEL = { focus: 'Focus', short: 'Short break', long: 'Long break' } as const;
 
@@ -18,6 +18,7 @@ export function FocusPanel() {
     reset,
     skip,
     setLength,
+    setRounds,
   } = useFocus();
   if (!panelOpen) return null;
   const total = phaseMinutes(state.phase, state.focusMinutes) * 60_000;
@@ -33,7 +34,7 @@ export function FocusPanel() {
           {PHASE_LABEL[state.phase]}
           {state.phase === 'focus' && (
             <span className="focus-round">
-              {Math.min(state.round + 1, ROUNDS)} of {ROUNDS}
+              {Math.min(state.round + 1, state.rounds)} of {state.rounds}
             </span>
           )}
         </span>
@@ -95,6 +96,37 @@ export function FocusPanel() {
             {minutes} min
           </button>
         ))}
+      </div>
+      <div className="focus-rounds">
+        <span className="focus-rounds-label">
+          Sessions
+          <span className="focus-dots" aria-hidden="true">
+            {Array.from({ length: state.rounds }, (_, i) => (
+              <span key={i} className={i < state.round ? 'is-done' : ''} />
+            ))}
+          </span>
+        </span>
+        <span
+          className="focus-stepper"
+          role="group"
+          aria-label="Focus sessions before the long break"
+        >
+          <button
+            onClick={() => setRounds(state.rounds - 1)}
+            disabled={state.rounds <= MIN_ROUNDS}
+            aria-label="Fewer sessions"
+          >
+            <Minus size={14} />
+          </button>
+          <output aria-live="polite">{state.rounds}</output>
+          <button
+            onClick={() => setRounds(state.rounds + 1)}
+            disabled={state.rounds >= MAX_ROUNDS}
+            aria-label="More sessions"
+          >
+            <Plus size={14} />
+          </button>
+        </span>
       </div>
       <p className="focus-today">
         {done

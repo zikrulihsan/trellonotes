@@ -17,6 +17,7 @@ import {
   reset,
   sessionsToday,
   setFocusLength,
+  setRounds,
   start,
   timeLeft,
   type FocusState,
@@ -142,6 +143,7 @@ export function FocusProvider({ children }: PropsWithChildren) {
       reset: () => setState(reset),
       skip: () => setState((current) => advance(current, Date.now(), false)),
       setLength: (minutes) => setState((current) => setFocusLength(current, minutes)),
+      setRounds: (rounds) => setState((current) => setRounds(current, rounds)),
     }),
     [state, now, left, running, panelOpen],
   );

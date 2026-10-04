@@ -10,3 +10,15 @@ export function taskProgress(html: string): { done: number; total: number } {
 /** An empty checklist, ready for the first item. */
 export const EMPTY_CHECKLIST =
   '<ul data-type="taskList"><li data-type="taskItem" data-checked="false"><p></p></li></ul>';
+
+/** Drops checked items (and anything nested under them); a list left empty is removed. */
+export function removeDoneTasks(html: string): string {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  doc.querySelectorAll('li[data-type="taskItem"][data-checked="true"]').forEach((item) => {
+    item.remove();
+  });
+  doc.querySelectorAll('ul[data-type="taskList"]').forEach((list) => {
+    if (!list.querySelector('li')) list.remove();
+  });
+  return doc.body.innerHTML;
+}

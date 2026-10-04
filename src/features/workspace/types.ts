@@ -39,8 +39,8 @@ export interface Page {
   /** Present while the page is live on the public writing page. */
   published?: { slug: string; at: number };
 }
-/** The one free-writing scratchpad: no title, not listed anywhere, kept until cleared. */
-export interface Scratch {
+/** A standing sheet that is always there, not listed with pages: free writing or the to-do list. */
+export interface Sheet {
   content: string;
   updatedAt: number;
 }
@@ -50,8 +50,12 @@ export interface Workspace {
   /** Missing in workspaces saved before labels and pages existed. */
   labels?: Label[];
   pages?: Page[];
-  scratch?: Scratch;
+  /** Free writing: no title, kept until cleared. */
+  scratch?: Sheet;
+  /** The one running to-do list. */
+  todo?: Sheet;
 }
+export type SheetName = 'scratch' | 'todo';
 export type NotePatch = Partial<Pick<Note, 'title' | 'content' | 'labelId'>>;
 export type LabelPatch = Partial<Pick<Label, 'name' | 'color'>>;
 export type PagePatch = Partial<Pick<Page, 'title' | 'content'>>;

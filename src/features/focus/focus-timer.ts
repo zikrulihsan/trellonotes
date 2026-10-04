@@ -1,4 +1,4 @@
-/** A Pomodoro cycle: four focus sessions with short breaks between, then a long break. */
+/** A Pomodoro cycle: focus sessions (four by default) with short breaks between, then a long break. */
 export type FocusPhase = 'focus' | 'short' | 'long';
 
 export interface FocusState {
@@ -7,15 +7,19 @@ export interface FocusState {
   endsAt: number | null;
   /** Milliseconds left while stopped or paused. */
   remaining: number;
-  /** Focus sessions finished in the current cycle (0–3). */
+  /** Focus sessions finished in the current cycle. */
   round: number;
+  /** Focus sessions in a cycle before the long break. */
+  rounds: number;
   focusMinutes: number;
   /** Focus sessions finished today, on this device. */
   today: { day: string; count: number };
 }
 
 export const FOCUS_LENGTHS = [15, 25, 50] as const;
-export const ROUNDS = 4;
+export const DEFAULT_ROUNDS = 4;
+export const MIN_ROUNDS = 1;
+export const MAX_ROUNDS = 8;
 const MINUTE = 60_000;
 
 /** Breaks scale with the focus length: 25 min of focus earns 5 min, every fourth earns 15. */
@@ -32,6 +36,7 @@ export function initialFocus(focusMinutes = 25, now = Date.now()): FocusState {
     endsAt: null,
     remaining: focusMinutes * MINUTE,
     round: 0,
+    rounds: DEFAULT_ROUNDS,
     focusMinutes,
     today: { day: dayKey(now), count: 0 },
   };
@@ -74,7 +79,7 @@ export function advance(state: FocusState, now: number, completed: boolean): Foc
   if (phase === 'focus') {
     round += 1;
     if (completed) today = { ...today, count: today.count + 1 };
-    phase = round >= ROUNDS ? 'long' : 'short';
+    phase = round >= state.rounds ? 'long' : 'short';
   } else {
     if (phase === 'long') round = 0;
     phase = 'focus';
@@ -86,6 +91,11 @@ export function advance(state: FocusState, now: number, completed: boolean): Foc
 export function setFocusLength(state: FocusState, focusMinutes: number): FocusState {
   const next = { ...state, focusMinutes };
   return isActive(state) ? next : reset(next);
+}
+
+/** Sets how many focus sessions come before the long break; the current session keeps going. */
+export function setRounds(state: FocusState, rounds: number): FocusState {
+  return { ...state, rounds: Math.min(MAX_ROUNDS, Math.max(MIN_ROUNDS, Math.round(rounds))) };
 }
 
 /** Sessions finished today, ignoring a count left over from an earlier day. */
@@ -111,7 +121,11 @@ export function readFocus(raw: string | null): FocusState {
       typeof value.today?.day === 'string' &&
       typeof value.today.count === 'number'
     )
-      return value as FocusState;
+      // Timers saved before the session count could be changed have four sessions.
+      return {
+        ...value,
+        rounds: typeof value.rounds === 'number' ? value.rounds : DEFAULT_ROUNDS,
+      } as FocusState;
   } catch {
     // Fall through to a fresh timer.
   }

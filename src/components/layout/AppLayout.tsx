@@ -14,6 +14,7 @@ export function AppLayout() {
     noteRoute = initiativeRoute ?? legacyNoteRoute,
     pageRoute = useMatch('/page/:ref'),
     freeWriteRoute = useMatch('/write'),
+    todoRoute = useMatch('/todo'),
     pagesRoute = useMatch('/pages'),
     boardRoute = useMatch('/board/:ref');
   const note = findByRef(workspace.cards, noteRoute?.params.ref);
@@ -21,7 +22,7 @@ export function AppLayout() {
     (note
       ? workspace.boards.find((board) => board.id === note.boardId)
       : findByRef(workspace.boards, boardRoute?.params.ref)) ?? workspace.boards[0];
-  const writing = Boolean(noteRoute || pageRoute || freeWriteRoute);
+  const writing = Boolean(noteRoute || pageRoute || freeWriteRoute || todoRoute);
   return (
     <div
       className={`app ${writing ? 'writing-view' : 'board-workspace'} ${sidebarCollapsed && !narrow ? 'sidebar-collapsed' : ''}`}

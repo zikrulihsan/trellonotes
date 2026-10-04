@@ -300,13 +300,13 @@ export function WorkspaceProvider({ children }: PropsWithChildren) {
       deletePage(pageId) {
         dispatch({ type: 'page/delete', pageId });
       },
-      updateScratch(content) {
-        dispatch({ type: 'scratch/update', content, timestamp: Date.now() });
+      updateSheet(sheet, content) {
+        dispatch({ type: 'sheet/update', sheet, content, timestamp: Date.now() });
       },
       keepScratchAsPage(title) {
         const page = createPage({ title, content: stateRef.current.scratch?.content ?? '' });
         dispatch({ type: 'page/create', page });
-        dispatch({ type: 'scratch/update', content: '', timestamp: Date.now() });
+        dispatch({ type: 'sheet/update', sheet: 'scratch', content: '', timestamp: Date.now() });
         return page.id;
       },
       async finishSync() {
