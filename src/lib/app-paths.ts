@@ -33,6 +33,7 @@ export function findByRef<T extends { id: string }>(
 export const boardPath = (board: Linkable) => `/board/${linkRef(board)}`;
 export const initiativePath = (note: Linkable) => `/initiative/${linkRef(note)}`;
 export const pagePath = (page: Linkable) => `/page/${linkRef(page)}`;
+export const todoPath = (todo: Linkable) => `/todo/${linkRef(todo)}`;
 
 /** Public addresses: "/@handle[/slug]", and the older "/read/<account id>[/slug]". */
 export function isPublicPath(pathname: string): boolean {

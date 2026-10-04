@@ -9,8 +9,14 @@ import {
 } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { workspaceReducer } from '@/features/workspace/reducer';
-import { createBoard, createLabel, createNote, createPage } from '@/features/workspace/factories';
-import { withLabels } from '@/features/workspace/labels';
+import {
+  createBoard,
+  createLabel,
+  createNote,
+  createPage,
+  createTodoList,
+} from '@/features/workspace/factories';
+import { normalizeWorkspace } from '@/features/workspace/normalize';
 import { mergeWorkspaces } from '@/features/workspace/merge';
 import {
   hasUnsyncedChanges,
@@ -40,7 +46,7 @@ export function WorkspaceProvider({ children }: PropsWithChildren) {
   const cloudEnabled = Boolean(client);
   const storageKey = workspaceStorageKey(userId);
   const [workspace, dispatch] = useReducer(workspaceReducer, storageKey, (key) =>
-    withLabels(loadWorkspace(localStorage, key)),
+    normalizeWorkspace(loadWorkspace(localStorage, key)),
   );
   const [saveError, setSaveError] = useState(false);
   const [firstLoadDone, setFirstLoadDone] = useState(!cloudEnabled);
@@ -83,7 +89,7 @@ export function WorkspaceProvider({ children }: PropsWithChildren) {
           }
           if (!isWorkspace(remote.workspace))
             throw new Error('The saved workspace data is invalid.');
-          const theirs = withLabels(remote.workspace);
+          const theirs = normalizeWorkspace(remote.workspace);
           next = mergeWorkspaces(base?.workspace ?? null, next, theirs);
           base = { workspace: theirs, version: remote.version };
         }
@@ -136,7 +142,7 @@ export function WorkspaceProvider({ children }: PropsWithChildren) {
         if (!hasUnsyncedChanges(storageKey)) {
           if (remote) {
             const base = {
-              workspace: withLabels(remote.workspace as Workspace),
+              workspace: normalizeWorkspace(remote.workspace as Workspace),
               version: remote.version,
             };
             baseRef.current = base;
@@ -188,7 +194,7 @@ export function WorkspaceProvider({ children }: PropsWithChildren) {
         // With local edits pending, the next save merges instead.
         if (!active || !remote || !clean || remote.version === baseRef.current?.version) return;
         if (!isWorkspace(remote.workspace)) return;
-        const base = { workspace: withLabels(remote.workspace), version: remote.version };
+        const base = { workspace: normalizeWorkspace(remote.workspace), version: remote.version };
         baseRef.current = base;
         saveSyncBase(storageKey, base);
         syncedRef.current = base.workspace;
@@ -299,6 +305,17 @@ export function WorkspaceProvider({ children }: PropsWithChildren) {
       },
       deletePage(pageId) {
         dispatch({ type: 'page/delete', pageId });
+      },
+      createTodoList() {
+        const todo = createTodoList();
+        dispatch({ type: 'todo/create', todo });
+        return todo.id;
+      },
+      updateTodoList(todoId, patch) {
+        dispatch({ type: 'todo/update', todoId, patch, timestamp: Date.now() });
+      },
+      deleteTodoList(todoId) {
+        dispatch({ type: 'todo/delete', todoId });
       },
       updateSheet(sheet, content) {
         dispatch({ type: 'sheet/update', sheet, content, timestamp: Date.now() });

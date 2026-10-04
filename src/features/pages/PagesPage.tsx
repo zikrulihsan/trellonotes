@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { FileText, ListChecks, Plus } from 'lucide-react';
+import { FileText, Plus } from 'lucide-react';
 import { useWorkspace, useWorkspaceActions } from '@/hooks/useWorkspace';
 import { Button } from '@/components/ui/Button';
 import { editedLabel } from '@/lib/note-metadata';
@@ -25,10 +25,6 @@ export function PagesPage() {
           {cloudEnabled && <PublicAddress />}
         </div>
         <div className="board-actions">
-          <Button onClick={() => navigate('/todo')}>
-            <ListChecks size={17} />
-            To-do list
-          </Button>
           <Button variant="primary" onClick={newPage}>
             <Plus size={17} />
             New page

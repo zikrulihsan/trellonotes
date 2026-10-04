@@ -6,6 +6,7 @@ import type {
   Page,
   PagePatch,
   SheetName,
+  TodoPatch,
   Workspace,
 } from '@/features/workspace/types';
 export interface WorkspaceActions {
@@ -27,6 +28,9 @@ export interface WorkspaceActions {
   updatePage: (pageId: string, patch: PagePatch) => void;
   setPagePublished: (pageId: string, published: Page['published']) => void;
   deletePage: (pageId: string) => void;
+  createTodoList: () => string;
+  updateTodoList: (todoId: string, patch: TodoPatch) => void;
+  deleteTodoList: (todoId: string) => void;
   updateSheet: (sheet: SheetName, content: string) => void;
   /** Moves the free writing into a new page and clears the scratchpad; returns the page id. */
   keepScratchAsPage: (title: string) => string;

@@ -87,15 +87,19 @@ describe('merging edits from two devices', () => {
     expect(mergeWorkspaces(base, local, remote).scratch).toEqual(remote.scratch);
   });
 
-  it('merges the to-do list on its own, apart from free writing', () => {
-    const base = seedWorkspace();
+  it('keeps to-do lists added on both devices and the newer edit to the same list', () => {
+    const base = {
+      ...seedWorkspace(),
+      todos: [{ id: 't1', title: 'Launch', content: '', updatedAt: 1 }],
+    };
     const local = clone(base),
       remote = clone(base);
-    local.scratch = { content: '<p>notes</p>', updatedAt: 100 };
-    remote.todo = { content: '<p>list</p>', updatedAt: 50 };
+    local.todos!.push({ id: 't2', title: 'Groceries', content: '', updatedAt: 5 });
+    remote.todos![0] = { ...remote.todos![0], content: '<p>phone</p>', updatedAt: 9 };
+    local.todos![0] = { ...local.todos![0], content: '<p>laptop</p>', updatedAt: 3 };
     const merged = mergeWorkspaces(base, local, remote);
-    expect(merged.scratch).toEqual(local.scratch);
-    expect(merged.todo).toEqual(remote.todo);
+    expect(merged.todos?.map((t) => t.id).sort()).toEqual(['t1', 't2']);
+    expect(merged.todos?.find((t) => t.id === 't1')?.content).toBe('<p>phone</p>');
   });
 
   it('treats the cloud copy key order as unchanged', () => {

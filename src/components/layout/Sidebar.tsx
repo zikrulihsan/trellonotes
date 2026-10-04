@@ -19,7 +19,6 @@ import type { Board } from '@/features/workspace/types';
 import { boardPath } from '@/lib/app-paths';
 import { useFocus } from '@/features/focus/focus-context';
 import { formatClock } from '@/features/focus/focus-timer';
-import { taskProgress } from '@/lib/tasks';
 export function Sidebar({
   board,
   section,
@@ -27,7 +26,7 @@ export function Sidebar({
   collapsed,
 }: {
   board: Board;
-  section: 'boards' | 'pages';
+  section: 'boards' | 'pages' | 'todos';
   inert: boolean;
   collapsed: boolean;
 }) {
@@ -66,12 +65,10 @@ export function Sidebar({
     navigate('/write');
     setSidebarOpen(false);
   }
-  function openTodo() {
-    navigate('/todo');
+  function goTodos() {
+    navigate('/todos');
     setSidebarOpen(false);
   }
-  const tasks = taskProgress(workspace.todo?.content ?? ''),
-    openTasks = tasks.total - tasks.done;
   function openFocus() {
     focus.setPanelOpen(true);
     setSidebarOpen(false);
@@ -114,6 +111,10 @@ export function Sidebar({
           <FileText size={18} />
           Pages<span className="side-count">{workspace.pages?.length ?? 0}</span>
         </button>
+        <button className={`side-link ${section === 'todos' ? 'active' : ''}`} onClick={goTodos}>
+          <ListChecks size={18} />
+          To-do lists<span className="side-count">{workspace.todos?.length ?? 0}</span>
+        </button>
         <button className="side-link" onClick={() => openDialog({ kind: 'manage-labels' })}>
           <Tags size={18} />
           Labels<span className="side-count">{workspace.labels?.length ?? 0}</span>
@@ -124,11 +125,6 @@ export function Sidebar({
         <button className="side-link side-quick" onClick={freeWrite}>
           <PenLine size={18} />
           Free write
-        </button>
-        <button className="side-link side-quick" onClick={openTodo}>
-          <ListChecks size={18} />
-          To-do list
-          {openTasks > 0 && <span className="side-count">{openTasks}</span>}
         </button>
         <button
           className="side-link side-quick"

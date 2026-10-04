@@ -3,6 +3,7 @@ import {
   Feather,
   FileText,
   LayoutGrid,
+  ListChecks,
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
@@ -11,8 +12,14 @@ import { useUI } from '@/hooks/useUI';
 import type { Board } from '@/features/workspace/types';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { FocusPill } from '@/features/focus/FocusPill';
-/** `board` is null on the Pages screen. */
-export function Topbar({ board }: { board: Board | null }) {
+/** The breadcrumb names the board on board screens, otherwise the section. */
+export function Topbar({
+  board,
+  section,
+}: {
+  board: Board;
+  section: 'boards' | 'pages' | 'todos';
+}) {
   const { sidebarOpen, setSidebarOpen, sidebarCollapsed, setSidebarCollapsed } = useUI();
   const { cloudEnabled, syncStatus } = useWorkspace();
   return (
@@ -37,17 +44,22 @@ export function Topbar({ board }: { board: Board | null }) {
         >
           <Menu size={20} />
         </button>
-        {board ? (
+        {section === 'boards' ? (
           <>
             <LayoutGrid size={16} />
             <button onClick={() => setSidebarOpen(true)}>My boards</button>
             <ChevronRight size={14} />
             <span>{board.title}</span>
           </>
-        ) : (
+        ) : section === 'pages' ? (
           <>
             <FileText size={16} />
             <span>Pages</span>
+          </>
+        ) : (
+          <>
+            <ListChecks size={16} />
+            <span>To-do lists</span>
           </>
         )}
       </div>

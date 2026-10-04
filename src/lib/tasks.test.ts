@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { EMPTY_CHECKLIST, removeDoneTasks, taskProgress } from './tasks';
+import { EMPTY_CHECKLIST, openTasks, removeDoneTasks, taskProgress } from './tasks';
 
 describe('taskProgress', () => {
   it('is zero for writing without a checklist', () => {
@@ -36,5 +36,17 @@ describe('removeDoneTasks', () => {
     const html =
       '<ul data-type="taskList"><li data-type="taskItem" data-checked="true"><p>a</p></li></ul>';
     expect(removeDoneTasks(html)).toBe('');
+  });
+});
+
+describe('openTasks', () => {
+  it('lists unchecked items in order, skipping done and empty ones', () => {
+    const html =
+      '<ul data-type="taskList">' +
+      '<li data-type="taskItem" data-checked="false"><p>Reply</p></li>' +
+      '<li data-type="taskItem" data-checked="true"><p>Done</p></li>' +
+      '<li data-type="taskItem" data-checked="false"><p></p></li>' +
+      '<li data-type="taskItem" data-checked="false"><p>Pick cover</p></li></ul>';
+    expect(openTasks(html)).toEqual(['Reply', 'Pick cover']);
   });
 });

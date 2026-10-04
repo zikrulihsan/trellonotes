@@ -39,7 +39,14 @@ export interface Page {
   /** Present while the page is live on the public writing page. */
   published?: { slug: string; at: number };
 }
-/** A standing sheet that is always there, not listed with pages: free writing or the to-do list. */
+/** A checklist kept under To-do lists, apart from Pages. */
+export interface TodoList {
+  id: string;
+  title: string;
+  content: string;
+  updatedAt: number;
+}
+/** A standing sheet that is always there, not listed anywhere: free writing. */
 export interface Sheet {
   content: string;
   updatedAt: number;
@@ -52,10 +59,12 @@ export interface Workspace {
   pages?: Page[];
   /** Free writing: no title, kept until cleared. */
   scratch?: Sheet;
-  /** The one running to-do list. */
+  todos?: TodoList[];
+  /** A single standing to-do list used briefly before To-do lists; moved into `todos` on load. */
   todo?: Sheet;
 }
-export type SheetName = 'scratch' | 'todo';
+export type SheetName = 'scratch';
 export type NotePatch = Partial<Pick<Note, 'title' | 'content' | 'labelId'>>;
 export type LabelPatch = Partial<Pick<Label, 'name' | 'color'>>;
 export type PagePatch = Partial<Pick<Page, 'title' | 'content'>>;
+export type TodoPatch = Partial<Pick<TodoList, 'title' | 'content'>>;

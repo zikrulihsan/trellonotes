@@ -5,6 +5,7 @@ import type {
   Note,
   Page,
   Sheet,
+  TodoList,
   Workspace,
 } from '@/features/workspace/types';
 import { seedWorkspace } from '@/features/workspace/seed';
@@ -58,6 +59,14 @@ function isPage(value: unknown): value is Page {
         typeof published.at === 'number'))
   );
 }
+function isTodoList(value: unknown): value is TodoList {
+  return (
+    isRecord(value) &&
+    ['id', 'title', 'content'].every((key) => typeof value[key] === 'string') &&
+    typeof value.updatedAt === 'number' &&
+    Number.isFinite(value.updatedAt)
+  );
+}
 function isSheet(value: unknown): value is Sheet {
   return (
     isRecord(value) &&
@@ -78,6 +87,7 @@ export function isWorkspace(value: unknown): value is Workspace {
     !value.cards.every(isNote) ||
     !isOptionalList(value.labels, isLabel) ||
     !isOptionalList(value.pages, isPage) ||
+    !isOptionalList(value.todos, isTodoList) ||
     (value.scratch !== undefined && !isSheet(value.scratch)) ||
     (value.todo !== undefined && !isSheet(value.todo))
   )

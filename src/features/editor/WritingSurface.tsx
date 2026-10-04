@@ -57,6 +57,11 @@ export function WritingSurface({
   useLayoutEffect(() => {
     changeRef.current = onChange;
   });
+  // Where the cursor starts: an untitled document at its title; free writing and
+  // fresh templates (such as a titled, empty checklist) in the text.
+  const [startAt] = useState(() =>
+    untitled ? 'text' : !plainText(doc.content) ? (doc.title ? 'text' : 'title') : null,
+  );
   const editor = useEditor({
     extensions: writingExtensions(placeholder),
     content: doc.content,
@@ -74,15 +79,14 @@ export function WritingSurface({
     // Free writing and fresh templates (such as an empty checklist) start in the text,
     // once the editor is on the page (focusing waits a frame by itself).
     onMount: ({ editor }) => {
-      if (untitled || ((doc.title || doc.content) && !plainText(doc.content)))
-        focusFirstBlank(editor);
+      if (startAt === 'text') focusFirstBlank(editor);
     },
   });
   useLayoutEffect(() => {
     // Open at the top, not at the previous screen's scroll position, and start a
     // brand-new page or note at its title.
     window.scrollTo(0, 0);
-    if (!untitled && !doc.title && !doc.content) title.current?.focus();
+    if (startAt === 'title') title.current?.focus();
     // Runs once per document; the surface is keyed by document id.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

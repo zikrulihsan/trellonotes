@@ -1,4 +1,4 @@
-import type { Board, Label, Note, Page } from './types';
+import type { Board, Label, Note, Page, TodoList } from './types';
 export function createBoard(title: string): Board {
   return {
     id: crypto.randomUUID(),
@@ -27,4 +27,7 @@ export function createLabel(name: string, color: string): Label {
 }
 export function createPage(start: Partial<Pick<Page, 'title' | 'content'>> = {}): Page {
   return { id: crypto.randomUUID(), title: '', content: '', ...start, updatedAt: Date.now() };
+}
+export function createTodoList(): TodoList {
+  return { id: crypto.randomUUID(), title: '', content: '', updatedAt: Date.now() };
 }

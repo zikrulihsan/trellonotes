@@ -22,3 +22,12 @@ export function removeDoneTasks(html: string): string {
   });
   return doc.body.innerHTML;
 }
+
+/** The text of each unchecked item, in order, e.g. for a preview of what is left. */
+export function openTasks(html: string): string[] {
+  if (!html.includes('data-type="taskItem"')) return [];
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  return [...doc.querySelectorAll('li[data-type="taskItem"][data-checked="false"]')]
+    .map((item) => item.querySelector(':scope > div > p, :scope > p')?.textContent?.trim() ?? '')
+    .filter(Boolean);
+}

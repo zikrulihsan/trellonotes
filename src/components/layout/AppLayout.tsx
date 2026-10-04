@@ -14,14 +14,16 @@ export function AppLayout() {
     noteRoute = initiativeRoute ?? legacyNoteRoute,
     pageRoute = useMatch('/page/:ref'),
     freeWriteRoute = useMatch('/write'),
-    todoRoute = useMatch('/todo'),
+    todoRoute = useMatch('/todo/:ref'),
     pagesRoute = useMatch('/pages'),
+    todosRoute = useMatch('/todos'),
     boardRoute = useMatch('/board/:ref');
   const note = findByRef(workspace.cards, noteRoute?.params.ref);
   const board =
     (note
       ? workspace.boards.find((board) => board.id === note.boardId)
       : findByRef(workspace.boards, boardRoute?.params.ref)) ?? workspace.boards[0];
+  const section = pagesRoute ? 'pages' : todosRoute ? 'todos' : 'boards';
   const writing = Boolean(noteRoute || pageRoute || freeWriteRoute || todoRoute);
   return (
     <div
@@ -31,13 +33,13 @@ export function AppLayout() {
       {!writing && (
         <Sidebar
           board={board}
-          section={pagesRoute ? 'pages' : 'boards'}
+          section={section}
           inert={!sidebarOpen && narrow}
           collapsed={sidebarCollapsed && !narrow}
         />
       )}
       <main className="main">
-        {!writing && <Topbar board={pagesRoute ? null : board} />}
+        {!writing && <Topbar board={board} section={section} />}
         {saveError && (
           <div className="storage-warning" role="alert">
             {cloudEnabled && syncStatus === 'error'

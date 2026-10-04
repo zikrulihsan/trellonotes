@@ -6,12 +6,13 @@ import { BoardPage } from '@/features/boards/BoardPage';
 import { WorkspaceDialogs } from '@/features/workspace/WorkspaceDialogs';
 import { useBoardTools } from '@/integrations/useBoardTools';
 import { PagesPage } from '@/features/pages/PagesPage';
+import { TodoListsPage } from '@/features/todo/TodoListsPage';
 import { boardPath } from '@/lib/app-paths';
 import { FocusPanel } from '@/features/focus/FocusPanel';
 const EditorPage = lazy(() => import('@/features/editor/EditorPage'));
 const PageEditorPage = lazy(() => import('@/features/pages/PageEditorPage'));
 const FreeWritePage = lazy(() => import('@/features/free-write/FreeWritePage'));
-const TodoPage = lazy(() => import('@/features/todo/TodoPage'));
+const TodoListPage = lazy(() => import('@/features/todo/TodoListPage'));
 export function App() {
   const { workspace } = useWorkspace();
   useBoardTools();
@@ -78,8 +79,11 @@ export function App() {
               </Suspense>
             }
           />
+          <Route path="todos" element={<TodoListsPage />} />
+          {/* The single to-do list lived at /todo before To-do lists. */}
+          <Route path="todo" element={<Navigate to="/todos" replace />} />
           <Route
-            path="todo"
+            path="todo/:todoRef"
             element={
               <Suspense
                 fallback={
@@ -88,7 +92,7 @@ export function App() {
                   </div>
                 }
               >
-                <TodoPage />
+                <TodoListPage />
               </Suspense>
             }
           />

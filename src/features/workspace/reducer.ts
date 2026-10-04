@@ -8,6 +8,8 @@ import type {
   Page,
   PagePatch,
   SheetName,
+  TodoList,
+  TodoPatch,
   Workspace,
 } from './types';
 export type WorkspaceAction =
@@ -29,6 +31,9 @@ export type WorkspaceAction =
   | { type: 'page/update'; pageId: string; patch: PagePatch; timestamp: number }
   | { type: 'page/publish'; pageId: string; published: Page['published'] }
   | { type: 'page/delete'; pageId: string }
+  | { type: 'todo/create'; todo: TodoList }
+  | { type: 'todo/update'; todoId: string; patch: TodoPatch; timestamp: number }
+  | { type: 'todo/delete'; todoId: string }
   | { type: 'sheet/update'; sheet: SheetName; content: string; timestamp: number };
 
 export function workspaceReducer(state: Workspace, action: WorkspaceAction): Workspace {
@@ -178,6 +183,23 @@ export function workspaceReducer(state: Workspace, action: WorkspaceAction): Wor
       };
     case 'page/delete':
       return { ...state, pages: state.pages?.filter((p) => p.id !== action.pageId) };
+    case 'todo/create':
+      return state.todos?.some((t) => t.id === action.todo.id)
+        ? state
+        : { ...state, todos: [action.todo, ...(state.todos ?? [])] };
+    case 'todo/update':
+      return {
+        ...state,
+        todos: state.todos?.map((t) => {
+          if (t.id !== action.todoId) return t;
+          const changed = (Object.keys(action.patch) as (keyof TodoPatch)[]).some(
+            (key) => action.patch[key] !== undefined && action.patch[key] !== t[key],
+          );
+          return changed ? { ...t, ...action.patch, updatedAt: action.timestamp } : t;
+        }),
+      };
+    case 'todo/delete':
+      return { ...state, todos: state.todos?.filter((t) => t.id !== action.todoId) };
     case 'sheet/update':
       return action.content === (state[action.sheet]?.content ?? '')
         ? state
