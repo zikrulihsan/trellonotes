@@ -10,6 +10,7 @@ import {
 import { useUI } from '@/hooks/useUI';
 import type { Board } from '@/features/workspace/types';
 import { useWorkspace } from '@/hooks/useWorkspace';
+import { FocusPill } from '@/features/focus/FocusPill';
 /** `board` is null on the Pages screen. */
 export function Topbar({ board }: { board: Board | null }) {
   const { sidebarOpen, setSidebarOpen, sidebarCollapsed, setSidebarCollapsed } = useUI();
@@ -50,19 +51,22 @@ export function Topbar({ board }: { board: Board | null }) {
           </>
         )}
       </div>
-      <span className="topbar-hint">
-        <span className="small-logo">
-          <Feather size={14} />
+      <div className="topbar-end">
+        <FocusPill />
+        <span className="topbar-hint">
+          <span className="small-logo">
+            <Feather size={14} />
+          </span>
+          folio
+          <span className="topbar-local">
+            {cloudEnabled
+              ? syncStatus === 'error'
+                ? 'Sync paused'
+                : 'Synced with SweGrowth'
+              : 'Saved on this device'}
+          </span>
         </span>
-        folio
-        <span className="topbar-local">
-          {cloudEnabled
-            ? syncStatus === 'error'
-              ? 'Sync paused'
-              : 'Synced with SweGrowth'
-            : 'Saved on this device'}
-        </span>
-      </span>
+      </div>
     </header>
   );
 }

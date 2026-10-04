@@ -1,4 +1,12 @@
-import type { Board, BoardList, Label, Note, Page, Workspace } from '@/features/workspace/types';
+import type {
+  Board,
+  BoardList,
+  Label,
+  Note,
+  Page,
+  Scratch,
+  Workspace,
+} from '@/features/workspace/types';
 import { seedWorkspace } from '@/features/workspace/seed';
 export const STORAGE_KEY = 'folio.workspace.v1';
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -50,6 +58,14 @@ function isPage(value: unknown): value is Page {
         typeof published.at === 'number'))
   );
 }
+function isScratch(value: unknown): value is Scratch {
+  return (
+    isRecord(value) &&
+    typeof value.content === 'string' &&
+    typeof value.updatedAt === 'number' &&
+    Number.isFinite(value.updatedAt)
+  );
+}
 const isOptionalList = <T>(value: unknown, check: (item: unknown) => item is T) =>
   value === undefined || (Array.isArray(value) && value.every(check));
 export function isWorkspace(value: unknown): value is Workspace {
@@ -61,7 +77,8 @@ export function isWorkspace(value: unknown): value is Workspace {
     !Array.isArray(value.cards) ||
     !value.cards.every(isNote) ||
     !isOptionalList(value.labels, isLabel) ||
-    !isOptionalList(value.pages, isPage)
+    !isOptionalList(value.pages, isPage) ||
+    (value.scratch !== undefined && !isScratch(value.scratch))
   )
     return false;
   const boards = value.boards,

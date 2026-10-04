@@ -5,6 +5,7 @@ import { AuthProvider } from '@/context/AuthProvider';
 import { WorkspaceSession } from './WorkspaceSession';
 import { PublicReader } from '@/features/reader/PublicReader';
 import { isPublicPath } from '@/lib/app-paths';
+import { FocusProvider } from '@/features/focus/FocusProvider';
 
 /** Published writing (/@handle/…) is public; everything else is the signed-in app. */
 function AppOrReader({ children }: PropsWithChildren) {
@@ -12,7 +13,9 @@ function AppOrReader({ children }: PropsWithChildren) {
   if (isPublicPath(pathname)) return <PublicReader />;
   return (
     <UIProvider>
-      <WorkspaceSession>{children}</WorkspaceSession>
+      <FocusProvider>
+        <WorkspaceSession>{children}</WorkspaceSession>
+      </FocusProvider>
     </UIProvider>
   );
 }

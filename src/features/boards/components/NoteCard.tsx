@@ -6,6 +6,8 @@ import { useUI } from '@/hooks/useUI';
 import { useDropdown } from '@/hooks/useDropdown';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { wordCount } from '@/lib/text';
+import { taskProgress } from '@/lib/tasks';
+import { TaskCount } from '@/components/ui/TaskCount';
 import { initiativePath } from '@/lib/app-paths';
 import { editedLabel, labelColorValue, noteLabel } from '@/lib/note-metadata';
 import { useBoardDrag } from '../useBoardDrag';
@@ -51,10 +53,15 @@ export function NoteCard({ note, board }: { note: Note; board: Board }) {
           )}
           <h3>{note.title || 'Untitled'}</h3>
           <div className="card-meta">
-            <span>
-              <FileText size={14} />
-              {wordCount(note.content)} words
-            </span>
+            {/* A checklist shows its progress instead of a word count. */}
+            {taskProgress(note.content).total ? (
+              <TaskCount content={note.content} />
+            ) : (
+              <span>
+                <FileText size={14} />
+                {wordCount(note.content)} words
+              </span>
+            )}
             <span title={new Date(note.updatedAt).toLocaleString()}>
               {editedLabel(note.updatedAt)}
             </span>

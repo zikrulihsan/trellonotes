@@ -21,10 +21,14 @@ export interface WorkspaceActions {
   createLabel: (name: string, color: string) => string;
   updateLabel: (labelId: string, patch: LabelPatch) => void;
   deleteLabel: (labelId: string) => void;
-  createPage: () => string;
+  /** Starts a page, optionally from a template's title and content. */
+  createPage: (start?: Partial<Pick<Page, 'title' | 'content'>>) => string;
   updatePage: (pageId: string, patch: PagePatch) => void;
   setPagePublished: (pageId: string, published: Page['published']) => void;
   deletePage: (pageId: string) => void;
+  updateScratch: (content: string) => void;
+  /** Moves the free writing into a new page and clears the scratchpad; returns the page id. */
+  keepScratchAsPage: (title: string) => string;
   /** Uploads pending edits; resolves false if they could not reach the cloud. */
   finishSync: () => Promise<boolean>;
 }

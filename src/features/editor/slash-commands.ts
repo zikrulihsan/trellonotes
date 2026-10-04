@@ -123,6 +123,13 @@ export const SLASH_COMMANDS: SlashCommand[] = [
       ),
   },
   {
+    id: 'todo',
+    title: 'Checklist',
+    keywords: ['checklist', 'task', 'checkbox', 'tugas', 'daftar'],
+    preview: () => '☐ To-do',
+    run: (editor, range) => editor.chain().focus().deleteRange(range).toggleTaskList().run(),
+  },
+  {
     id: 'divider',
     title: 'Divider',
     keywords: ['line', 'hr', 'separator', 'garis'],

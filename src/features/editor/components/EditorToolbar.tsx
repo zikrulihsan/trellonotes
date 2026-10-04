@@ -1,4 +1,14 @@
-import { Bold, Italic, Heading1, Heading2, List, ListOrdered, Quote, Link } from 'lucide-react';
+import {
+  Bold,
+  Italic,
+  Heading1,
+  Heading2,
+  List,
+  ListChecks,
+  ListOrdered,
+  Quote,
+  Link,
+} from 'lucide-react';
 import type { Editor } from '@tiptap/react';
 export function EditorToolbar({ editor, onLink }: { editor: Editor | null; onLink: () => void }) {
   const tool = (
@@ -59,6 +69,9 @@ export function EditorToolbar({ editor, onLink }: { editor: Editor | null; onLin
           editor?.chain().focus().toggleOrderedList().run();
         },
       )}
+      {tool('Checklist · type [ ] and space', ListChecks, !!editor?.isActive('taskList'), () => {
+        editor?.chain().focus().toggleTaskList().run();
+      })}
       {tool('Quote · type > and space', Quote, !!editor?.isActive('blockquote'), () => {
         editor?.chain().focus().toggleBlockquote().run();
       })}

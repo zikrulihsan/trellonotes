@@ -158,6 +158,74 @@
 .writing-content li p {
   margin: 4px 0;
 }
+/* Checklists. Rendered items carry data-checked but not data-type, so match by the list. */
+.writing-content ul[data-type='taskList'] {
+  list-style: none;
+  padding-left: 2px;
+}
+.writing-content ul[data-type='taskList'] ul[data-type='taskList'] {
+  margin: 2px 0 2px 4px;
+}
+.writing-content ul[data-type='taskList'] > li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.writing-content ul[data-type='taskList'] > li > label {
+  flex: none;
+  display: flex;
+  align-items: center;
+  /* Lines the box up with the first line of text (19px type, 1.85 line height). */
+  height: calc(1.85em + 8px);
+  user-select: none;
+}
+.writing-content ul[data-type='taskList'] > li > div {
+  flex: 1;
+  min-width: 0;
+}
+.writing-content ul[data-type='taskList'] > li input[type='checkbox'] {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border: 1.5px solid #b9aecb;
+  border-radius: 5px;
+  background: #fff;
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+.writing-content ul[data-type='taskList'] > li input[type='checkbox']::after {
+  content: '';
+  width: 5px;
+  height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: translateY(-1px) rotate(45deg) scale(0);
+  transition: transform 0.15s;
+}
+.writing-content ul[data-type='taskList'] > li input[type='checkbox']:checked {
+  background: #8962c8;
+  border-color: #8962c8;
+}
+.writing-content ul[data-type='taskList'] > li input[type='checkbox']:checked::after {
+  transform: translateY(-1px) rotate(45deg) scale(1);
+}
+.writing-content ul[data-type='taskList'] > li input[type='checkbox']:focus-visible {
+  outline: 2px solid #b79be6;
+  outline-offset: 2px;
+}
+.writing-content ul[data-type='taskList'] > li input[type='checkbox']:disabled {
+  cursor: default;
+}
+.writing-content ul[data-type='taskList'] > li[data-checked='true'] > div > p {
+  color: #a59cb0;
+  text-decoration: line-through;
+  text-decoration-color: #cbc2d6;
+}
 .writing-content hr {
   border: 0;
   border-top: 1px solid #e6e0ed;

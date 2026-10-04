@@ -1,11 +1,25 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, ChevronDown, Feather, FileText, LayoutGrid, Plus, Tags } from 'lucide-react';
+import {
+  BookOpen,
+  ChevronDown,
+  Feather,
+  FileText,
+  LayoutGrid,
+  ListChecks,
+  PenLine,
+  Plus,
+  Tags,
+  Timer,
+} from 'lucide-react';
 import { useWorkspace, useWorkspaceActions } from '@/hooks/useWorkspace';
 import { useAuth } from '@/context/auth-context';
 import { useUI } from '@/hooks/useUI';
 import type { Board } from '@/features/workspace/types';
-import { boardPath } from '@/lib/app-paths';
+import { boardPath, pagePath } from '@/lib/app-paths';
+import { useFocus } from '@/features/focus/focus-context';
+import { formatClock } from '@/features/focus/focus-timer';
+import { todoPage } from '@/features/pages/templates';
 export function Sidebar({
   board,
   section,
@@ -18,7 +32,8 @@ export function Sidebar({
   collapsed: boolean;
 }) {
   const { workspace, cloudEnabled, syncStatus } = useWorkspace(),
-    { finishSync } = useWorkspaceActions(),
+    { finishSync, createPage } = useWorkspaceActions(),
+    focus = useFocus(),
     { user, signOut } = useAuth(),
     [signingOut, setSigningOut] = useState(false),
     { sidebarOpen, setSidebarOpen, openDialog } = useUI(),
@@ -45,6 +60,19 @@ export function Sidebar({
   }
   function goPages() {
     navigate('/pages');
+    setSidebarOpen(false);
+  }
+  function freeWrite() {
+    navigate('/write');
+    setSidebarOpen(false);
+  }
+  function newTodoList() {
+    const start = todoPage();
+    navigate(pagePath({ id: createPage(start), title: start.title }));
+    setSidebarOpen(false);
+  }
+  function openFocus() {
+    focus.setPanelOpen(true);
     setSidebarOpen(false);
   }
   return (
@@ -88,6 +116,30 @@ export function Sidebar({
         <button className="side-link" onClick={() => openDialog({ kind: 'manage-labels' })}>
           <Tags size={18} />
           Labels<span className="side-count">{workspace.labels?.length ?? 0}</span>
+        </button>
+        <div className="side-section">
+          <span>QUICK ACTIONS</span>
+        </div>
+        <button className="side-link side-quick" onClick={freeWrite}>
+          <PenLine size={18} />
+          Free write
+        </button>
+        <button className="side-link side-quick" onClick={newTodoList}>
+          <ListChecks size={18} />
+          New to-do list
+        </button>
+        <button
+          className="side-link side-quick"
+          onClick={openFocus}
+          aria-expanded={focus.panelOpen}
+        >
+          <Timer size={18} />
+          Focus timer
+          {focus.active && (
+            <span className={`side-count side-timer ${focus.running ? '' : 'is-paused'}`}>
+              {formatClock(focus.left)}
+            </span>
+          )}
         </button>
         <div className="side-section">
           <span>YOUR BOARDS</span>

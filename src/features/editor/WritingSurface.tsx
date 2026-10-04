@@ -6,9 +6,9 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from 'react';
-import { useEditor, EditorContent } from '@tiptap/react';
+import { useEditor, EditorContent, type Editor } from '@tiptap/react';
 import { useWorkspace } from '@/hooks/useWorkspace';
-import { wordCount } from '@/lib/text';
+import { plainText, wordCount } from '@/lib/text';
 import { writingExtensions } from './extensions';
 import { EditorToolbar } from './components/EditorToolbar';
 import { WritingBar } from './components/WritingBar';
@@ -22,7 +22,7 @@ export interface WritingDoc {
   updatedAt: number;
 }
 
-/** The distraction-free page used to write both board notes and Pages. */
+/** The distraction-free page used to write board notes, Pages and free writing. */
 export function WritingSurface({
   doc,
   onChange,
@@ -30,6 +30,8 @@ export function WritingSurface({
   onBack,
   actions,
   menu,
+  untitled = false,
+  placeholder = 'Write freely, or type / for dates and templates…',
 }: {
   doc: WritingDoc;
   onChange: (patch: { title?: string; content?: string }) => void;
@@ -38,6 +40,9 @@ export function WritingSurface({
   /** Extra controls before the menu, such as a publish button. */
   actions?: ReactNode;
   menu: ReactNode;
+  /** Free writing has no title; the text starts right away. */
+  untitled?: boolean;
+  placeholder?: string;
 }) {
   const title = useRef<HTMLTextAreaElement>(null),
     slashKeys = useRef<(event: globalThis.KeyboardEvent) => boolean>(() => false),
@@ -50,7 +55,7 @@ export function WritingSurface({
     changeRef.current = onChange;
   });
   const editor = useEditor({
-    extensions: writingExtensions('Write freely, or type / for dates and templates…'),
+    extensions: writingExtensions(placeholder),
     content: doc.content,
     shouldRerenderOnTransaction: true,
     editorProps: {
@@ -63,12 +68,18 @@ export function WritingSurface({
       handleKeyDown: (_view, event) => slashKeys.current(event),
     },
     onUpdate: ({ editor }) => changeRef.current({ content: editor.getHTML() }),
+    // Free writing and fresh templates (such as an empty checklist) start in the text,
+    // once the editor is on the page (focusing waits a frame by itself).
+    onMount: ({ editor }) => {
+      if (untitled || ((doc.title || doc.content) && !plainText(doc.content)))
+        focusFirstBlank(editor);
+    },
   });
   useLayoutEffect(() => {
     // Open at the top, not at the previous screen's scroll position, and start a
     // brand-new page or note at its title.
     window.scrollTo(0, 0);
-    if (!doc.title && !doc.content) title.current?.focus();
+    if (!untitled && !doc.title && !doc.content) title.current?.focus();
     // Runs once per document; the surface is keyed by document id.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -120,7 +131,7 @@ export function WritingSurface({
     },
   };
   return (
-    <div className={`writing-page ${calm ? 'is-calm' : ''}`}>
+    <div className={`writing-page ${calm ? 'is-calm' : ''} ${untitled ? 'is-untitled' : ''}`}>
       <WritingBar
         backLabel={backLabel}
         onBack={onBack}
@@ -138,22 +149,24 @@ export function WritingSurface({
         {menu}
       </WritingBar>
       <article className="paper" {...calmProps}>
-        <textarea
-          ref={title}
-          className="note-title"
-          aria-label="Title"
-          placeholder="Untitled"
-          rows={1}
-          maxLength={200}
-          value={doc.title}
-          onChange={(e) => onChange({ title: e.target.value })}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              editor?.commands.focus('start');
-            }
-          }}
-        />
+        {!untitled && (
+          <textarea
+            ref={title}
+            className="note-title"
+            aria-label="Title"
+            placeholder="Untitled"
+            rows={1}
+            maxLength={200}
+            value={doc.title}
+            onChange={(e) => onChange({ title: e.target.value })}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                editor?.commands.focus('start');
+              }
+            }}
+          />
+        )}
         <EditorContent editor={editor} />
       </article>
       <SlashMenu editor={editor} keysRef={slashKeys} />
@@ -165,4 +178,17 @@ export function WritingSurface({
       )}
     </div>
   );
+}
+
+/** Lands in a template's first empty item, not the blank line the editor keeps after lists. */
+function focusFirstBlank(editor: Editor) {
+  if (editor.isDestroyed) return;
+  let target: number | null = null;
+  editor.state.doc.descendants((node, pos) => {
+    if (target !== null) return false;
+    if ((node.type.name === 'taskItem' || node.type.name === 'listItem') && !node.textContent)
+      target = pos + 2;
+  });
+  if (target === null) editor.commands.focus('end');
+  else editor.chain().focus().setTextSelection(target).run();
 }

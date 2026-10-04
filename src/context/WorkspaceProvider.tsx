@@ -286,8 +286,8 @@ export function WorkspaceProvider({ children }: PropsWithChildren) {
       deleteLabel(labelId) {
         dispatch({ type: 'label/delete', labelId });
       },
-      createPage() {
-        const page = createPage();
+      createPage(start) {
+        const page = createPage(start);
         dispatch({ type: 'page/create', page });
         return page.id;
       },
@@ -299,6 +299,15 @@ export function WorkspaceProvider({ children }: PropsWithChildren) {
       },
       deletePage(pageId) {
         dispatch({ type: 'page/delete', pageId });
+      },
+      updateScratch(content) {
+        dispatch({ type: 'scratch/update', content, timestamp: Date.now() });
+      },
+      keepScratchAsPage(title) {
+        const page = createPage({ title, content: stateRef.current.scratch?.content ?? '' });
+        dispatch({ type: 'page/create', page });
+        dispatch({ type: 'scratch/update', content: '', timestamp: Date.now() });
+        return page.id;
       },
       async finishSync() {
         if (!cloudEnabled || stateRef.current === syncedRef.current) return true;

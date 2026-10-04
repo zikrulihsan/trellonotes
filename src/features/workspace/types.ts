@@ -39,12 +39,18 @@ export interface Page {
   /** Present while the page is live on the public writing page. */
   published?: { slug: string; at: number };
 }
+/** The one free-writing scratchpad: no title, not listed anywhere, kept until cleared. */
+export interface Scratch {
+  content: string;
+  updatedAt: number;
+}
 export interface Workspace {
   boards: Board[];
   cards: Note[];
   /** Missing in workspaces saved before labels and pages existed. */
   labels?: Label[];
   pages?: Page[];
+  scratch?: Scratch;
 }
 export type NotePatch = Partial<Pick<Note, 'title' | 'content' | 'labelId'>>;
 export type LabelPatch = Partial<Pick<Label, 'name' | 'color'>>;

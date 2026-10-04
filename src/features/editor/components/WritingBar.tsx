@@ -1,5 +1,6 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 import { ArrowLeft } from 'lucide-react';
+import { FocusPill } from '@/features/focus/FocusPill';
 export function WritingBar({
   backLabel,
   onBack,
@@ -31,6 +32,7 @@ export function WritingBar({
       </button>
       {toolbar}
       <div className="writing-bar-end">
+        <FocusPill />
         <span role="status" className={`save-status ${saveError ? 'save-failed' : ''}`}>
           {status}
         </span>

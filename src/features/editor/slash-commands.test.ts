@@ -34,6 +34,12 @@ describe('slash commands', () => {
     expect(matchSlashCommands('laporan').map((c) => c.id)).toEqual(['update', 'weekly']);
   });
 
+  it('turns /todo into a checklist', () => {
+    const html = runSlash('/todo', now).getHTML();
+    expect(html).toContain('data-type="taskList"');
+    expect(html).toContain('data-checked="false"');
+  });
+
   it('replaces /date with today’s date', () => {
     expect(runSlash('Report /date', now).getText()).toBe(`Report ${formatDate(now)}`);
   });

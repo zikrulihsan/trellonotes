@@ -77,6 +77,16 @@ describe('merging edits from two devices', () => {
     expect(merged.cards.find((c) => c.id === base.cards[2].id)?.title).toBe('Renamed elsewhere');
   });
 
+  it('keeps the newer free writing, and free writing that exists on one device only', () => {
+    const base = seedWorkspace();
+    const local = clone(base),
+      remote = clone(base);
+    local.scratch = { content: '<p>laptop</p>', updatedAt: 100 };
+    expect(mergeWorkspaces(base, local, remote).scratch).toEqual(local.scratch);
+    remote.scratch = { content: '<p>phone</p>', updatedAt: 200 };
+    expect(mergeWorkspaces(base, local, remote).scratch).toEqual(remote.scratch);
+  });
+
   it('treats the cloud copy key order as unchanged', () => {
     const base = seedWorkspace();
     const reordered = JSON.parse(

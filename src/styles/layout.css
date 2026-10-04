@@ -9,6 +9,7 @@
   position: fixed;
   inset: 0 auto 0 0;
   z-index: 30;
+  overflow-y: auto;
 }
 .brand {
   display: flex;

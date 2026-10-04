@@ -25,6 +25,6 @@ export function createNote(boardId: string, listId: string, title: string): Note
 export function createLabel(name: string, color: string): Label {
   return { id: crypto.randomUUID(), name: name.trim(), color };
 }
-export function createPage(): Page {
-  return { id: crypto.randomUUID(), title: '', content: '', updatedAt: Date.now() };
+export function createPage(start: Partial<Pick<Page, 'title' | 'content'>> = {}): Page {
+  return { id: crypto.randomUUID(), title: '', content: '', ...start, updatedAt: Date.now() };
 }

@@ -77,6 +77,21 @@ describe('writing workspace invariants', () => {
     expect(result.cards.some((note) => note.id === 'attention')).toBe(true);
     expect(result.boards[0].lists.map((list) => list.id)).not.toContain('ideas');
   });
+  it('stamps free writing only when its text changes', () => {
+    const written = workspaceReducer(fixture(), {
+      type: 'scratch/update',
+      content: '<p>morning pages</p>',
+      timestamp: 5,
+    });
+    expect(written.scratch).toEqual({ content: '<p>morning pages</p>', updatedAt: 5 });
+    const same = workspaceReducer(written, {
+      type: 'scratch/update',
+      content: '<p>morning pages</p>',
+      timestamp: 9,
+    });
+    expect(same).toBe(written);
+  });
+
   it('protects the last board from deletion', () => {
     const initial = fixture();
     expect(workspaceReducer(initial, { type: 'board/delete', boardId: 'writing-room' })).toBe(

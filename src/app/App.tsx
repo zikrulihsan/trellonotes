@@ -7,8 +7,10 @@ import { WorkspaceDialogs } from '@/features/workspace/WorkspaceDialogs';
 import { useBoardTools } from '@/integrations/useBoardTools';
 import { PagesPage } from '@/features/pages/PagesPage';
 import { boardPath } from '@/lib/app-paths';
+import { FocusPanel } from '@/features/focus/FocusPanel';
 const EditorPage = lazy(() => import('@/features/editor/EditorPage'));
 const PageEditorPage = lazy(() => import('@/features/pages/PageEditorPage'));
+const FreeWritePage = lazy(() => import('@/features/free-write/FreeWritePage'));
 export function App() {
   const { workspace } = useWorkspace();
   useBoardTools();
@@ -61,10 +63,25 @@ export function App() {
               </Suspense>
             }
           />
+          <Route
+            path="write"
+            element={
+              <Suspense
+                fallback={
+                  <div className="editor-placeholder" role="status">
+                    Opening your page…
+                  </div>
+                }
+              >
+                <FreeWritePage />
+              </Suspense>
+            }
+          />
           <Route path="*" element={<Navigate to={boardPath(workspace.boards[0])} replace />} />
         </Route>
       </Routes>
       <WorkspaceDialogs />
+      <FocusPanel />
     </>
   );
 }

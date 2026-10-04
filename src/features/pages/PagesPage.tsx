@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { FileText, Plus } from 'lucide-react';
+import { FileText, ListChecks, Plus } from 'lucide-react';
 import { useWorkspace, useWorkspaceActions } from '@/hooks/useWorkspace';
 import { Button } from '@/components/ui/Button';
 import { editedLabel } from '@/lib/note-metadata';
@@ -7,6 +7,8 @@ import { plainText } from '@/lib/text';
 import { pagePath } from '@/lib/app-paths';
 import { PublicAddress } from './PublicAddress';
 import { PageStatus } from './PageStatus';
+import { TaskCount } from '@/components/ui/TaskCount';
+import { todoPage } from './templates';
 
 export function PagesPage() {
   const { workspace, cloudEnabled } = useWorkspace(),
@@ -14,6 +16,10 @@ export function PagesPage() {
     navigate = useNavigate();
   const pages = [...(workspace.pages ?? [])].sort((a, b) => b.updatedAt - a.updatedAt);
   const newPage = () => navigate(pagePath({ id: createPage(), title: '' }));
+  const newTodoList = () => {
+    const start = todoPage();
+    navigate(pagePath({ id: createPage(start), title: start.title }));
+  };
   return (
     <div className="pages-view">
       <section className="board-header">
@@ -24,6 +30,10 @@ export function PagesPage() {
           {cloudEnabled && <PublicAddress />}
         </div>
         <div className="board-actions">
+          <Button onClick={newTodoList}>
+            <ListChecks size={17} />
+            To-do list
+          </Button>
           <Button variant="primary" onClick={newPage}>
             <Plus size={17} />
             New page
@@ -41,6 +51,7 @@ export function PagesPage() {
                   {excerpt && <span className="page-row-excerpt">{excerpt}</span>}
                   <span className="page-row-meta">
                     <PageStatus page={page} />
+                    <TaskCount content={page.content} />
                     <span>{editedLabel(page.updatedAt)}</span>
                   </span>
                 </button>
