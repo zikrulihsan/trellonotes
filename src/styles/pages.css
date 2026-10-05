@@ -210,6 +210,14 @@
   min-height: calc(100vh - 60px);
   background: #faf9fc;
 }
+/* The workspace shell is locked to the viewport, so the list scrolls on its own. */
+.board-workspace .pages-view {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
 .page-list {
   list-style: none;
   max-width: 860px;
