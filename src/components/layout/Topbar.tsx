@@ -20,34 +20,41 @@ export function Topbar({
   board: Board;
   section: 'boards' | 'pages' | 'todos';
 }) {
-  const { sidebarOpen, setSidebarOpen, sidebarCollapsed, setSidebarCollapsed } = useUI();
+  const { sidebarVisible, narrowScreen, toggleSidebar, showSidebar } = useUI();
+  // One toggle for every screen size: it docks or hides the sidebar on wide
+  // screens and opens or closes the drawer on phones.
+  const toggleLabel = narrowScreen
+    ? sidebarVisible
+      ? 'Close navigation'
+      : 'Open navigation'
+    : sidebarVisible
+      ? 'Hide sidebar'
+      : 'Show sidebar';
   const { cloudEnabled, syncStatus } = useWorkspace();
   return (
     <header className="topbar">
       <div className="breadcrumb">
         <button
+          id="sidebar-toggle"
           className="sidebar-toggle icon-button"
-          onClick={() => setSidebarCollapsed((collapsed) => !collapsed)}
-          aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          aria-expanded={!sidebarCollapsed}
+          onClick={toggleSidebar}
+          aria-label={toggleLabel}
+          aria-expanded={sidebarVisible}
           aria-controls="app-sidebar"
-          title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          title={narrowScreen ? toggleLabel : `${toggleLabel} (Ctrl+\\)`}
         >
-          {sidebarCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
-        </button>
-        <button
-          className="mobile-menu icon-button"
-          onClick={() => setSidebarOpen((value) => !value)}
-          aria-label={sidebarOpen ? 'Close navigation' : 'Open navigation'}
-          aria-expanded={sidebarOpen}
-          aria-controls="app-sidebar"
-        >
-          <Menu size={20} />
+          {narrowScreen ? (
+            <Menu size={20} />
+          ) : sidebarVisible ? (
+            <PanelLeftClose size={18} />
+          ) : (
+            <PanelLeftOpen size={18} />
+          )}
         </button>
         {section === 'boards' ? (
           <>
             <LayoutGrid size={16} />
-            <button onClick={() => setSidebarOpen(true)}>My boards</button>
+            <button onClick={showSidebar}>My boards</button>
             <ChevronRight size={14} />
             <span>{board.title}</span>
           </>
