@@ -363,6 +363,59 @@
 .writing-content pre code.language-table {
   line-height: 1.2;
 }
+/* Syntax colours, tuned for the dark code background. */
+.writing-content pre .hljs-comment,
+.writing-content pre .hljs-quote,
+.writing-content pre .hljs-meta {
+  color: #8f86a0;
+  font-style: italic;
+}
+.writing-content pre .hljs-keyword,
+.writing-content pre .hljs-selector-tag,
+.writing-content pre .hljs-built_in,
+.writing-content pre .hljs-doctag {
+  color: #c79bff;
+}
+.writing-content pre .hljs-string,
+.writing-content pre .hljs-regexp,
+.writing-content pre .hljs-addition {
+  color: #a8dba0;
+}
+.writing-content pre .hljs-number,
+.writing-content pre .hljs-literal,
+.writing-content pre .hljs-symbol,
+.writing-content pre .hljs-bullet {
+  color: #f5b58a;
+}
+.writing-content pre .hljs-title,
+.writing-content pre .hljs-section,
+.writing-content pre .hljs-name,
+.writing-content pre .hljs-selector-id,
+.writing-content pre .hljs-selector-class {
+  color: #8cc8ff;
+}
+.writing-content pre .hljs-attr,
+.writing-content pre .hljs-attribute,
+.writing-content pre .hljs-variable,
+.writing-content pre .hljs-template-variable,
+.writing-content pre .hljs-type,
+.writing-content pre .hljs-params {
+  color: #f0d98a;
+}
+.writing-content pre .hljs-tag,
+.writing-content pre .hljs-punctuation,
+.writing-content pre .hljs-subst {
+  color: #d6cde4;
+}
+.writing-content pre .hljs-deletion {
+  color: #ff9a9a;
+}
+.writing-content pre .hljs-emphasis {
+  font-style: italic;
+}
+.writing-content pre .hljs-strong {
+  font-weight: 700;
+}
 .writing-content li > pre {
   margin: 8px 0;
 }

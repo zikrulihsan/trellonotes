@@ -5,11 +5,13 @@ import Highlight from '@tiptap/extension-highlight';
 import TextAlign from '@tiptap/extension-text-align';
 import { TableKit } from '@tiptap/extension-table';
 import { MarkdownPaste } from './markdown-paste';
+import { CodeHighlight } from './code-highlight';
 
 /** The rich-text features shared by the writing editor and the public reader. */
 export function writingExtensions(placeholder?: string) {
   return [
     StarterKit.configure({
+      codeBlock: false,
       link: {
         openOnClick: false,
         autolink: true,
@@ -26,6 +28,8 @@ export function writingExtensions(placeholder?: string) {
     TextAlign.configure({ types: ['heading', 'paragraph'] }),
     // Editable tables, with draggable column edges.
     TableKit.configure({ table: { resizable: true } }),
+    // Code blocks coloured by language: type ``` (or ```ts) and space, or use /code.
+    CodeHighlight,
     // Multi-line plain text pastes as Markdown: lists, code, tables and links.
     MarkdownPaste,
     ...(placeholder ? [Placeholder.configure({ placeholder })] : []),
