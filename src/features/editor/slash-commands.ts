@@ -58,7 +58,66 @@ function insertTemplate(editor: Editor, range: { from: number; to: number }, htm
   if (target !== null) editor.chain().focus().setTextSelection(target).run();
 }
 
+/** A block command: "/" and its name are removed, then the block is applied. */
+function block(
+  id: string,
+  title: string,
+  keywords: string[],
+  preview: string,
+  apply: (chain: ReturnType<Editor['chain']>) => ReturnType<Editor['chain']>,
+): SlashCommand {
+  return {
+    id,
+    title,
+    keywords,
+    preview: () => preview,
+    run: (editor, range) => apply(editor.chain().focus().deleteRange(range)).run(),
+  };
+}
+
 export const SLASH_COMMANDS: SlashCommand[] = [
+  block('text', 'Plain text', ['paragraph', 'body', 'teks', 'paragraf'], 'Aa', (chain) =>
+    chain.setParagraph(),
+  ),
+  block('h1', 'Heading', ['heading1', 'title', 'judul'], 'H1', (chain) =>
+    chain.setHeading({ level: 1 }),
+  ),
+  block('h2', 'Subheading', ['heading2', 'subjudul'], 'H2', (chain) =>
+    chain.setHeading({ level: 2 }),
+  ),
+  block('h3', 'Small heading', ['heading3', 'subjudul'], 'H3', (chain) =>
+    chain.setHeading({ level: 3 }),
+  ),
+  block('bullet', 'Bullet list', ['ul', 'unordered', 'poin', 'daftar'], '• List', (chain) =>
+    chain.toggleBulletList(),
+  ),
+  block(
+    'number',
+    'Numbered list',
+    ['ol', 'ordered', 'numbering', 'angka', 'nomor'],
+    '1. List',
+    (chain) => chain.toggleOrderedList(),
+  ),
+  block(
+    'todo',
+    'Checklist',
+    ['checklist', 'task', 'checkbox', 'tugas', 'daftar'],
+    '☐ To-do',
+    (chain) => chain.toggleTaskList(),
+  ),
+  block('table', 'Table', ['tabel', 'grid', 'kolom', 'baris'], '3 × 3', (chain) =>
+    chain.insertTable({ rows: 3, cols: 3, withHeaderRow: true }),
+  ),
+  block('quote', 'Quote', ['blockquote', 'kutipan'], '❝', (chain) => chain.toggleBlockquote()),
+  block('highlight', 'Highlight', ['mark', 'stabilo', 'sorot', 'tandai'], 'Marked', (chain) =>
+    chain.toggleHighlight(),
+  ),
+  block('code', 'Code block', ['snippet', 'shell', 'terminal', 'command', 'kode'], '```', (chain) =>
+    chain.setCodeBlock(),
+  ),
+  block('divider', 'Divider', ['line', 'hr', 'separator', 'garis'], '———', (chain) =>
+    chain.setHorizontalRule(),
+  ),
   {
     id: 'date',
     title: 'Date',
@@ -121,27 +180,6 @@ export const SLASH_COMMANDS: SlashCommand[] = [
           'Plan for next week',
         ]),
       ),
-  },
-  {
-    id: 'todo',
-    title: 'Checklist',
-    keywords: ['checklist', 'task', 'checkbox', 'tugas', 'daftar'],
-    preview: () => '☐ To-do',
-    run: (editor, range) => editor.chain().focus().deleteRange(range).toggleTaskList().run(),
-  },
-  {
-    id: 'code',
-    title: 'Code block',
-    keywords: ['snippet', 'shell', 'terminal', 'command', 'table', 'kode', 'perintah'],
-    preview: () => '```',
-    run: (editor, range) => editor.chain().focus().deleteRange(range).setCodeBlock().run(),
-  },
-  {
-    id: 'divider',
-    title: 'Divider',
-    keywords: ['line', 'hr', 'separator', 'garis'],
-    preview: () => '———',
-    run: (editor, range) => editor.chain().focus().deleteRange(range).setHorizontalRule().run(),
   },
 ];
 

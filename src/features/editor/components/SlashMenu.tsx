@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState, type RefObject } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react';
 import type { Editor } from '@tiptap/react';
 import { findSlashQuery, matchSlashCommands, type SlashCommand } from '../slash-commands';
 
@@ -18,6 +18,7 @@ export function SlashMenu({
   const [query, setQuery] = useState<SlashQuery | null>(null);
   const [active, setActive] = useState({ query: '', index: 0 });
   const [dismissedAt, setDismissedAt] = useState<number | null>(null);
+  const list = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!editor) return;
     const update = () => setQuery(findSlashQuery(editor));
@@ -56,12 +57,17 @@ export function SlashMenu({
       }
     };
   });
+  useEffect(() => {
+    // The menu scrolls once it has more commands than fit, so keep the choice in sight.
+    list.current?.querySelector('[aria-selected="true"]')?.scrollIntoView({ block: 'nearest' });
+  }, [index, open?.query]);
   if (!editor || !open || !items.length) return null;
   const coords = editor.view.coordsAtPos(open.from);
   const above = coords.bottom + 320 > window.innerHeight;
   const now = new Date();
   return (
     <div
+      ref={list}
       className={`slash-menu ${above ? 'is-above' : ''}`}
       role="listbox"
       aria-label="Insert"
