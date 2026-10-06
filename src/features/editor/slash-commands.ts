@@ -130,6 +130,13 @@ export const SLASH_COMMANDS: SlashCommand[] = [
     run: (editor, range) => editor.chain().focus().deleteRange(range).toggleTaskList().run(),
   },
   {
+    id: 'code',
+    title: 'Code block',
+    keywords: ['snippet', 'shell', 'terminal', 'command', 'table', 'kode', 'perintah'],
+    preview: () => '```',
+    run: (editor, range) => editor.chain().focus().deleteRange(range).setCodeBlock().run(),
+  },
+  {
     id: 'divider',
     title: 'Divider',
     keywords: ['line', 'hr', 'separator', 'garis'],

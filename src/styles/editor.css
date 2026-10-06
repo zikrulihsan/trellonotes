@@ -232,7 +232,9 @@
   margin: 40px 0;
 }
 .writing-content code {
-  font-family: monospace;
+  font-family:
+    ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, 'DejaVu Sans Mono', 'Liberation Mono',
+    monospace;
   background: #f0ebf6;
   padding: 2px 5px;
   border-radius: 4px;
@@ -241,14 +243,33 @@
 .writing-content pre {
   background: #272330;
   color: #e6ddf2;
-  padding: 20px;
+  padding: 16px 20px;
   border-radius: 8px;
-  overflow: auto;
+  overflow-x: auto;
   line-height: 1.5;
+  margin: 16px 0;
 }
+/* Code and box-drawing tables keep every space and never wrap, so columns stay
+   aligned; long lines scroll sideways inside the block instead. */
 .writing-content pre code {
+  display: block;
+  width: max-content;
+  min-width: 100%;
   background: none;
   color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: 14px;
+  white-space: pre;
+  tab-size: 4;
+  font-variant-ligatures: none;
+}
+/* Box-drawing lines only join up when the rows touch. */
+.writing-content pre code.language-table {
+  line-height: 1.2;
+}
+.writing-content li > pre {
+  margin: 8px 0;
 }
 .writing-content a {
   color: #8962c8;
