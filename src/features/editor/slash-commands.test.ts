@@ -40,6 +40,35 @@ describe('slash commands', () => {
     expect(html).toContain('data-checked="false"');
   });
 
+  it('inserts a table, a heading and a highlight', () => {
+    const table = runSlash('/table', now).getHTML();
+    expect(table).toContain('<table');
+    expect(table.match(/<tr>/g)).toHaveLength(3);
+    expect(table.match(/<th/g)).toHaveLength(3);
+    expect(runSlash('/h2', now).getHTML()).toContain('<h2>');
+    const ed = runSlash('/highlight', now);
+    ed.commands.insertContent('penting');
+    expect(ed.getHTML()).toContain('<mark>penting</mark>');
+  });
+
+  it('nests a list item with Tab and lifts it back with Shift+Tab', () => {
+    const ed = typeInto('');
+    ed.commands.setContent('<ul><li><p>a</p></li><li><p>b</p></li></ul>');
+    let inB = 0;
+    ed.state.doc.descendants((node, pos) => {
+      if (node.isText && node.text === 'b') inB = pos + 1;
+    });
+    ed.commands.setTextSelection(inB);
+    const press = (key: string, shiftKey = false) =>
+      ed.view.someProp('handleKeyDown', (handle) =>
+        handle(ed.view, new KeyboardEvent('keydown', { key, shiftKey })),
+      );
+    expect(press('Tab')).toBe(true);
+    expect(ed.getHTML()).toContain('<ul><li><p>a</p><ul><li><p>b</p></li></ul></li></ul>');
+    expect(press('Tab', true)).toBe(true);
+    expect(ed.getHTML()).toContain('<ul><li><p>a</p></li><li><p>b</p></li></ul>');
+  });
+
   it('replaces /date with today’s date', () => {
     expect(runSlash('Report /date', now).getText()).toBe(`Report ${formatDate(now)}`);
   });

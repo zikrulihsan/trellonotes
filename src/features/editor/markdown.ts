@@ -1,9 +1,10 @@
 /**
  * Turns pasted plain text (Markdown, or notes copied from a terminal) into editor HTML.
  *
- * It is deliberately forgiving: besides Markdown headings, lists, quotes, links and
- * fenced code, it keeps box-drawing and pipe tables aligned in a code block, and spots
- * shell commands (`kubectl …`, `curl …`, a `for` loop) that were pasted without fences.
+ * It is deliberately forgiving: besides Markdown headings, lists, quotes, links,
+ * highlights and fenced code, it reads Markdown pipe tables as real tables, keeps
+ * box-drawing tables aligned in a code block, and spots shell commands (`kubectl …`,
+ * `curl …`, a `for` loop) that were pasted without fences.
  */
 
 type Inline = string;
@@ -32,6 +33,13 @@ interface Item {
   checked: boolean | null;
   children: Block[];
 }
+interface Table {
+  kind: 'table';
+  header: Inline[];
+  rows: Inline[][];
+  /** One entry per column: the alignment its delimiter asked for, or null. */
+  align: (string | null)[];
+}
 interface List {
   kind: 'list';
   type: 'ol' | 'ul' | 'task';
@@ -41,7 +49,7 @@ interface List {
   tucked: boolean;
   items: Item[];
 }
-type Block = Para | Code | Heading | Rule | Quote | List;
+type Block = Para | Code | Heading | Rule | Quote | List | Table;
 
 const COMMANDS = new Set(
   (
@@ -72,6 +80,42 @@ const isTableLine = (line: string) => {
     return BOX.test(text);
   return /^\|.*\|$/.test(text);
 };
+
+const pipeCells = (line: string) =>
+  line
+    .trim()
+    .replace(/^\|/, '')
+    .replace(/\|$/, '')
+    .split(/(?<!\\)\|/)
+    .map((cell) => cell.trim().replace(/\\\|/g, '|'));
+
+/**
+ * A Markdown table: a header row, a `|---|:--:|` row, then the body. Those become a real
+ * table; anything else that looks like a table (box drawing, pipes without the delimiter
+ * row) stays in a code block, where its own spacing keeps the columns aligned.
+ */
+export function parsePipeTable(lines: string[]): Table | null {
+  if (lines.length < 2 || !lines.every((line) => /^\s*\|.*\|\s*$/.test(line))) return null;
+  const delimiters = pipeCells(lines[1]);
+  if (!delimiters.length || !delimiters.every((cell) => /^:?-+:?$/.test(cell))) return null;
+  const header = pipeCells(lines[0]);
+  if (header.length !== delimiters.length) return null;
+  const align = delimiters.map((cell) =>
+    cell.startsWith(':')
+      ? cell.endsWith(':')
+        ? 'center'
+        : 'left'
+      : cell.endsWith(':')
+        ? 'right'
+        : null,
+  );
+  const rows = lines.slice(2).map((line) => {
+    const cells = pipeCells(line);
+    // Short or long rows still make a rectangular table.
+    return Array.from({ length: header.length }, (_, i) => cells[i] ?? '');
+  });
+  return { kind: 'table', header, rows, align };
+}
 
 /** The start of a shell command: `$ …`, a known command, or a loop or condition. */
 export function isCommandLine(line: string): boolean {
@@ -192,7 +236,10 @@ export function parseMarkdown(text: string): Block[] {
     if (isTableLine(line)) {
       const body: string[] = [];
       while (i < lines.length && isTableLine(lines[i])) body.push(lines[i++]);
-      placeBlock({ kind: 'code', lines: dedentCode(body), lang: 'table' }, indent);
+      placeBlock(
+        parsePipeTable(body) ?? { kind: 'code', lines: dedentCode(body), lang: 'table' },
+        indent,
+      );
       afterBlank = false;
       continue;
     }
@@ -304,14 +351,14 @@ export function parseMarkdown(text: string): Block[] {
   return root;
 }
 
-/** Bold, italics, strikethrough, `code`, [links](…) and bare web addresses. */
+/** Bold, italics, strikethrough, ==highlight==, `code`, [links](…) and bare web addresses. */
 export function renderInline(text: string): string {
   const pattern =
-    /(`+)([^`]|[^`][\s\S]*?[^`])\1|\[([^\]]+)\]\(((?:https?:\/\/|mailto:)[^\s)]+)\)|(https?:\/\/[^\s<>"]+)|\*\*(?=\S)(.+?)(?<=\S)\*\*|~~(?=\S)(.+?)(?<=\S)~~|(?<![\w*])\*(?=[^\s*])([^*]+?)(?<=\S)\*(?![\w*])/g;
+    /(`+)([^`]|[^`][\s\S]*?[^`])\1|\[([^\]]+)\]\(((?:https?:\/\/|mailto:)[^\s)]+)\)|(https?:\/\/[^\s<>"]+)|\*\*(?=\S)(.+?)(?<=\S)\*\*|~~(?=\S)(.+?)(?<=\S)~~|==(?=\S)(.+?)(?<=\S)==|(?<![\w*])\*(?=[^\s*])([^*]+?)(?<=\S)\*(?![\w*])/g;
   let html = '',
     last = 0;
   for (const match of text.matchAll(pattern)) {
-    const [whole, , code, label, href, bare, bold, strike, italic] = match;
+    const [whole, , code, label, href, bare, bold, strike, mark, italic] = match;
     let out: string;
     let consumed = whole;
     if (code !== undefined) out = `<code>${escapeHtml(code)}</code>`;
@@ -325,6 +372,7 @@ export function renderInline(text: string): string {
       out = `<a href="${escapeHtml(url)}">${escapeHtml(url)}</a>`;
     } else if (bold !== undefined) out = `<strong>${renderInline(bold)}</strong>`;
     else if (strike !== undefined) out = `<s>${renderInline(strike)}</s>`;
+    else if (mark !== undefined) out = `<mark>${renderInline(mark)}</mark>`;
     else out = `<em>${renderInline(italic)}</em>`;
     html += escapeHtml(text.slice(last, match.index)) + out;
     last = match.index + consumed.length;
@@ -360,6 +408,13 @@ function renderBlocks(blocks: Block[]): string {
           return '<hr>';
         case 'quote':
           return `<blockquote><p>${block.lines.map(renderInline).join('<br>')}</p></blockquote>`;
+        case 'table': {
+          const cell = (tag: 'th' | 'td', text: Inline, align: string | null) =>
+            `<${tag}>${align ? `<p style="text-align: ${align}">` : '<p>'}${renderInline(text)}</p></${tag}>`;
+          const row = (tag: 'th' | 'td', cells: Inline[]) =>
+            `<tr>${cells.map((text, i) => cell(tag, text, block.align[i])).join('')}</tr>`;
+          return `<table>${row('th', block.header)}${block.rows.map((cells) => row('td', cells)).join('')}</table>`;
+        }
         case 'code': {
           const lang = block.lang ? ` class="language-${escapeHtml(block.lang)}"` : '';
           return `<pre><code${lang}>${escapeHtml(block.lines.join('\n'))}</code></pre>`;

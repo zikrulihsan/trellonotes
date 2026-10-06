@@ -1,13 +1,27 @@
 import {
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
+  BetweenHorizontalStart,
+  BetweenVerticalStart,
   Bold,
-  Italic,
+  Code,
+  Columns3,
   Heading1,
   Heading2,
+  Heading3,
+  Highlighter,
+  Italic,
+  Link,
   List,
   ListChecks,
   ListOrdered,
   Quote,
-  Link,
+  Rows3,
+  Strikethrough,
+  Table,
+  Trash2,
+  Underline,
 } from 'lucide-react';
 import type { Editor } from '@tiptap/react';
 export function EditorToolbar({ editor, onLink }: { editor: Editor | null; onLink: () => void }) {
@@ -32,13 +46,30 @@ export function EditorToolbar({ editor, onLink }: { editor: Editor | null; onLin
       <Icon size={16} />
     </button>
   );
+  /** A button that only toggles something on the writing, with no pressed state. */
+  const action = (label: string, Icon: typeof Bold, run: () => void) =>
+    tool(label, Icon, false, run);
+  const chain = () => editor?.chain().focus();
+  const inTable = !!editor?.isActive('table');
   return (
     <div className="format-tools" role="toolbar" aria-label="Writing formatting">
       {tool('Bold · ⌘/Ctrl B', Bold, !!editor?.isActive('bold'), () => {
-        editor?.chain().focus().toggleBold().run();
+        chain()?.toggleBold().run();
       })}
       {tool('Italic · ⌘/Ctrl I', Italic, !!editor?.isActive('italic'), () => {
-        editor?.chain().focus().toggleItalic().run();
+        chain()?.toggleItalic().run();
+      })}
+      {tool('Underline · ⌘/Ctrl U', Underline, !!editor?.isActive('underline'), () => {
+        chain()?.toggleUnderline().run();
+      })}
+      {tool('Strikethrough · ⌘/Ctrl ⇧ S', Strikethrough, !!editor?.isActive('strike'), () => {
+        chain()?.toggleStrike().run();
+      })}
+      {tool('Highlight · ⌘/Ctrl ⇧ H', Highlighter, !!editor?.isActive('highlight'), () => {
+        chain()?.toggleHighlight().run();
+      })}
+      {tool('Code · ⌘/Ctrl E', Code, !!editor?.isActive('code'), () => {
+        chain()?.toggleCode().run();
       })}
       <span className="format-divider" />
       {tool(
@@ -46,7 +77,7 @@ export function EditorToolbar({ editor, onLink }: { editor: Editor | null; onLin
         Heading1,
         !!editor?.isActive('heading', { level: 1 }),
         () => {
-          editor?.chain().focus().toggleHeading({ level: 1 }).run();
+          chain()?.toggleHeading({ level: 1 }).run();
         },
       )}
       {tool(
@@ -54,27 +85,73 @@ export function EditorToolbar({ editor, onLink }: { editor: Editor | null; onLin
         Heading2,
         !!editor?.isActive('heading', { level: 2 }),
         () => {
-          editor?.chain().focus().toggleHeading({ level: 2 }).run();
+          chain()?.toggleHeading({ level: 2 }).run();
+        },
+      )}
+      {tool(
+        'Small heading · type ### and space',
+        Heading3,
+        !!editor?.isActive('heading', { level: 3 }),
+        () => {
+          chain()?.toggleHeading({ level: 3 }).run();
         },
       )}
       <span className="format-divider" />
       {tool('Bullet list · type - and space', List, !!editor?.isActive('bulletList'), () => {
-        editor?.chain().focus().toggleBulletList().run();
+        chain()?.toggleBulletList().run();
       })}
       {tool(
         'Numbered list · type 1. and space',
         ListOrdered,
         !!editor?.isActive('orderedList'),
         () => {
-          editor?.chain().focus().toggleOrderedList().run();
+          chain()?.toggleOrderedList().run();
         },
       )}
       {tool('Checklist · type [ ] and space', ListChecks, !!editor?.isActive('taskList'), () => {
-        editor?.chain().focus().toggleTaskList().run();
+        chain()?.toggleTaskList().run();
       })}
       {tool('Quote · type > and space', Quote, !!editor?.isActive('blockquote'), () => {
-        editor?.chain().focus().toggleBlockquote().run();
+        chain()?.toggleBlockquote().run();
       })}
+      <span className="format-divider" />
+      {tool('Align left · ⌘/Ctrl ⇧ L', AlignLeft, !!editor?.isActive({ textAlign: 'left' }), () => {
+        chain()?.setTextAlign('left').run();
+      })}
+      {tool('Centre · ⌘/Ctrl ⇧ E', AlignCenter, !!editor?.isActive({ textAlign: 'center' }), () => {
+        chain()?.setTextAlign('center').run();
+      })}
+      {tool(
+        'Align right · ⌘/Ctrl ⇧ R',
+        AlignRight,
+        !!editor?.isActive({ textAlign: 'right' }),
+        () => {
+          chain()?.setTextAlign('right').run();
+        },
+      )}
+      <span className="format-divider" />
+      {tool('Table · type /table', Table, inTable, () => {
+        chain()?.insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+      })}
+      {inTable && (
+        <>
+          {action('Add row below', BetweenHorizontalStart, () => {
+            chain()?.addRowAfter().run();
+          })}
+          {action('Add column to the right', BetweenVerticalStart, () => {
+            chain()?.addColumnAfter().run();
+          })}
+          {action('Delete row', Rows3, () => {
+            chain()?.deleteRow().run();
+          })}
+          {action('Delete column', Columns3, () => {
+            chain()?.deleteColumn().run();
+          })}
+          {action('Delete table', Trash2, () => {
+            chain()?.deleteTable().run();
+          })}
+        </>
+      )}
       {tool('Add or edit link', Link, !!editor?.isActive('link'), onLink)}
     </div>
   );

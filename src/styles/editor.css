@@ -12,7 +12,7 @@
   top: 0;
   z-index: 15;
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, auto) minmax(0, 1fr);
   align-items: center;
   gap: 16px;
   padding: 10px 24px;
@@ -44,6 +44,17 @@
   display: flex;
   align-items: center;
   gap: 2px;
+  /* More tools than the bar is wide: they scroll instead of pushing it apart. */
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.format-tools::-webkit-scrollbar {
+  display: none;
+}
+.format-button {
+  flex: none;
 }
 .format-button {
   padding: 8px;
@@ -158,6 +169,40 @@
 .writing-content li p {
   margin: 4px 0;
 }
+/* A list inside a list sits closer to the item it belongs to. */
+.writing-content li > ul,
+.writing-content li > ol {
+  margin: 4px 0;
+}
+/* Sub-items by depth: 1. then a. then i., and • then ◦ then ▪. Tab nests, Shift+Tab lifts. */
+.writing-content ol {
+  list-style-type: decimal;
+}
+.writing-content ol ol {
+  list-style-type: lower-alpha;
+}
+.writing-content ol ol ol {
+  list-style-type: lower-roman;
+}
+.writing-content ol ol ol ol {
+  list-style-type: decimal;
+}
+.writing-content ul:not([data-type='taskList']) {
+  list-style-type: disc;
+}
+.writing-content ul:not([data-type='taskList']) ul:not([data-type='taskList']) {
+  list-style-type: circle;
+}
+.writing-content ul:not([data-type='taskList']) ul:not([data-type='taskList']) ul {
+  list-style-type: square;
+}
+.writing-content mark {
+  background: #fdf0a4;
+  color: inherit;
+  padding: 1px 2px;
+  border-radius: 3px;
+  box-decoration-break: clone;
+}
 /* Checklists. Rendered items carry data-checked but not data-type, so match by the list. */
 .writing-content ul[data-type='taskList'] {
   list-style: none;
@@ -226,6 +271,56 @@
   text-decoration: line-through;
   text-decoration-color: #cbc2d6;
 }
+/* Tables. The whole table scrolls sideways when it is wider than the column. */
+.writing-content .tableWrapper {
+  margin: 24px 0;
+  overflow-x: auto;
+}
+.writing-content table {
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+  font-size: 17px;
+  line-height: 1.6;
+}
+.writing-content th,
+.writing-content td {
+  border: 1px solid #e3dcec;
+  padding: 8px 12px;
+  vertical-align: top;
+  min-width: 60px;
+  position: relative;
+}
+.writing-content th {
+  background: #f7f3fc;
+  font-weight: 600;
+  text-align: left;
+  color: #322b3f;
+}
+.writing-content th p,
+.writing-content td p {
+  margin: 0;
+}
+.writing-content .selectedCell::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #8962c81f;
+  pointer-events: none;
+}
+/* The handle for dragging a column edge. */
+.writing-content .column-resize-handle {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  bottom: 0;
+  width: 4px;
+  background: #a685d9;
+  pointer-events: none;
+}
+.writing-content.resize-cursor {
+  cursor: col-resize;
+}
 .writing-content hr {
   border: 0;
   border-top: 1px solid #e6e0ed;
@@ -267,6 +362,59 @@
 /* Box-drawing lines only join up when the rows touch. */
 .writing-content pre code.language-table {
   line-height: 1.2;
+}
+/* Syntax colours, tuned for the dark code background. */
+.writing-content pre .hljs-comment,
+.writing-content pre .hljs-quote,
+.writing-content pre .hljs-meta {
+  color: #8f86a0;
+  font-style: italic;
+}
+.writing-content pre .hljs-keyword,
+.writing-content pre .hljs-selector-tag,
+.writing-content pre .hljs-built_in,
+.writing-content pre .hljs-doctag {
+  color: #c79bff;
+}
+.writing-content pre .hljs-string,
+.writing-content pre .hljs-regexp,
+.writing-content pre .hljs-addition {
+  color: #a8dba0;
+}
+.writing-content pre .hljs-number,
+.writing-content pre .hljs-literal,
+.writing-content pre .hljs-symbol,
+.writing-content pre .hljs-bullet {
+  color: #f5b58a;
+}
+.writing-content pre .hljs-title,
+.writing-content pre .hljs-section,
+.writing-content pre .hljs-name,
+.writing-content pre .hljs-selector-id,
+.writing-content pre .hljs-selector-class {
+  color: #8cc8ff;
+}
+.writing-content pre .hljs-attr,
+.writing-content pre .hljs-attribute,
+.writing-content pre .hljs-variable,
+.writing-content pre .hljs-template-variable,
+.writing-content pre .hljs-type,
+.writing-content pre .hljs-params {
+  color: #f0d98a;
+}
+.writing-content pre .hljs-tag,
+.writing-content pre .hljs-punctuation,
+.writing-content pre .hljs-subst {
+  color: #d6cde4;
+}
+.writing-content pre .hljs-deletion {
+  color: #ff9a9a;
+}
+.writing-content pre .hljs-emphasis {
+  font-style: italic;
+}
+.writing-content pre .hljs-strong {
+  font-weight: 700;
 }
 .writing-content li > pre {
   margin: 8px 0;

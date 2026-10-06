@@ -113,9 +113,17 @@ describe('markdownToHtml', () => {
     );
   });
 
-  it('keeps pipe tables aligned in a code block', () => {
-    expect(markdownToHtml('| a | b |\n|---|---|\n| 1 | 2 |')).toBe(
-      '<pre><code class="language-table">| a | b |\n|---|---|\n| 1 | 2 |</code></pre>',
+  it('reads a Markdown pipe table as a real table, with its column alignment', () => {
+    expect(markdownToHtml('| a | b |\n|---|:---:|\n| 1 | 2 |\n| 3 |')).toBe(
+      '<table><tr><th><p>a</p></th><th><p style="text-align: center">b</p></th></tr>' +
+        '<tr><td><p>1</p></td><td><p style="text-align: center">2</p></td></tr>' +
+        '<tr><td><p>3</p></td><td><p style="text-align: center"></p></td></tr></table>',
+    );
+  });
+
+  it('keeps a table without a |---| row, and box drawing, aligned in a code block', () => {
+    expect(markdownToHtml('| a | b |\n| 1 | 2 |')).toBe(
+      '<pre><code class="language-table">| a | b |\n| 1 | 2 |</code></pre>',
     );
   });
 });
@@ -136,6 +144,7 @@ describe('renderInline', () => {
       '(see <a href="https://c.io/z">https://c.io/z</a>)',
     );
     expect(renderInline('[x](javascript:alert(1))')).toBe('[x](javascript:alert(1))');
+    expect(renderInline('keep ==this bit== in mind')).toBe('keep <mark>this bit</mark> in mind');
   });
 });
 
@@ -168,6 +177,18 @@ describe('pasting into the editor', () => {
     expect(html).toContain(
       '<a target="_blank" rel="noopener noreferrer" href="https://github.com/example/repo/pull/42">',
     );
+    editor.destroy();
+  });
+
+  it('pastes a Markdown table as a table that can be edited', () => {
+    const editor = new Editor({ extensions: writingExtensions() });
+    expect(
+      paste(editor, { 'text/plain': '| Service | Hasil |\n|---|---|\n| Translate | manual |' }),
+    ).toBe(true);
+    const html = editor.getHTML();
+    expect(html).toContain('<table');
+    expect(html).toContain('<th');
+    expect(html).toContain('Translate');
     editor.destroy();
   });
 
