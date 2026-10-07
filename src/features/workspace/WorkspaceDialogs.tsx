@@ -6,18 +6,20 @@ import type { WorkspaceDialog } from '@/context/ui-context';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { boardPath, initiativePath } from '@/lib/app-paths';
+import { TelegramDialog } from '@/features/telegram/TelegramDialog';
 import { LabelManager } from './LabelManager';
 export function WorkspaceDialogs() {
   const { dialog, closeDialog } = useUI();
   if (!dialog) return null;
   if (dialog.kind === 'manage-labels') return <LabelManager onClose={closeDialog} />;
+  if (dialog.kind === 'telegram') return <TelegramDialog onClose={closeDialog} />;
   return <DialogForm key={JSON.stringify(dialog)} request={dialog} onClose={closeDialog} />;
 }
 function DialogForm({
   request,
   onClose,
 }: {
-  request: Exclude<WorkspaceDialog, { kind: 'manage-labels' }>;
+  request: Exclude<WorkspaceDialog, { kind: 'manage-labels' | 'telegram' }>;
   onClose: () => void;
 }) {
   const [value, setValue] = useState('title' in request ? request.title : '');

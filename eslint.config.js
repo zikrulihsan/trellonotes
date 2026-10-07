@@ -16,5 +16,5 @@ export default tseslint.config(
       'react-refresh/only-export-components': ['error', { allowConstantExport: true }],
     },
   },
-  { files: ['*.config.{js,ts}'], languageOptions: { globals: globals.node } },
+  { files: ['*.config.{js,ts}', 'netlify/**/*.ts'], languageOptions: { globals: globals.node } },
 );
