@@ -6,9 +6,10 @@ import TextAlign from '@tiptap/extension-text-align';
 import { TableKit } from '@tiptap/extension-table';
 import { MarkdownPaste } from './markdown-paste';
 import { CodeHighlight } from './code-highlight';
+import { MediaImage, type MediaImageOptions } from './media-image';
 
 /** The rich-text features shared by the writing editor and the public reader. */
-export function writingExtensions(placeholder?: string) {
+export function writingExtensions(placeholder?: string, media?: MediaImageOptions) {
   return [
     StarterKit.configure({
       codeBlock: false,
@@ -30,6 +31,8 @@ export function writingExtensions(placeholder?: string) {
     TableKit.configure({ table: { resizable: true } }),
     // Code blocks coloured by language: type ``` (or ```ts) and space, or use /code.
     CodeHighlight,
+    // Images: paste, drop, or /image. Only the writing editor can upload them.
+    MediaImage.configure(media ?? {}),
     // Multi-line plain text pastes as Markdown: lists, code, tables and links.
     MarkdownPaste,
     ...(placeholder ? [Placeholder.configure({ placeholder })] : []),

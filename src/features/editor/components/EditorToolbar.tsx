@@ -11,6 +11,7 @@ import {
   Heading2,
   Heading3,
   Highlighter,
+  ImagePlus,
   Italic,
   Link,
   List,
@@ -24,6 +25,7 @@ import {
   Underline,
 } from 'lucide-react';
 import type { Editor } from '@tiptap/react';
+import { canUploadMedia as canAddImages } from '@/lib/media';
 export function EditorToolbar({ editor, onLink }: { editor: Editor | null; onLink: () => void }) {
   const tool = (
     label: string,
@@ -153,6 +155,10 @@ export function EditorToolbar({ editor, onLink }: { editor: Editor | null; onLin
         </>
       )}
       {tool('Add or edit link', Link, !!editor?.isActive('link'), onLink)}
+      {canAddImages &&
+        action('Add image · paste, drop, or /image', ImagePlus, () => {
+          chain()?.pickImage().run();
+        })}
     </div>
   );
 }
