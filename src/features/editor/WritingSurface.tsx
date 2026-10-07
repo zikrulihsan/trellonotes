@@ -9,6 +9,7 @@ import {
 import { useEditor, EditorContent, type Editor } from '@tiptap/react';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { plainText, wordCount } from '@/lib/text';
+import { canUploadMedia, uploadMedia } from '@/lib/media';
 import { writingExtensions } from './extensions';
 import { EditorToolbar } from './components/EditorToolbar';
 import { WritingBar } from './components/WritingBar';
@@ -51,7 +52,8 @@ export function WritingSurface({
     slashKeys = useRef<(event: globalThis.KeyboardEvent) => boolean>(() => false),
     [savedEdit, setSavedEdit] = useState(doc.updatedAt),
     [link, setLink] = useState<string | null>(null),
-    [calm, setCalm] = useState(false);
+    [calm, setCalm] = useState(false),
+    [images, setImages] = useState<{ uploading: number; error?: string }>({ uploading: 0 });
   const { saveError, syncStatus } = useWorkspace();
   const changeRef = useRef(onChange);
   useLayoutEffect(() => {
@@ -63,7 +65,10 @@ export function WritingSurface({
     untitled ? 'text' : !plainText(doc.content) ? (doc.title ? 'text' : 'title') : null,
   );
   const editor = useEditor({
-    extensions: writingExtensions(placeholder),
+    extensions: writingExtensions(placeholder, {
+      upload: canUploadMedia ? uploadMedia : null,
+      onUploadStatus: setImages,
+    }),
     content: doc.content,
     shouldRerenderOnTransaction: true,
     editorProps: {
@@ -178,6 +183,16 @@ export function WritingSurface({
         <EditorContent editor={editor} />
       </article>
       <SlashMenu editor={editor} keysRef={slashKeys} />
+      {(images.uploading > 0 || images.error) && (
+        <div className={`writing-upload ${images.error ? 'is-error' : ''}`} role="status">
+          {images.uploading > 0 ? 'Uploading image…' : images.error}
+          {!images.uploading && (
+            <button type="button" aria-label="Dismiss" onClick={() => setImages({ uploading: 0 })}>
+              ×
+            </button>
+          )}
+        </div>
+      )}
       <div className="writing-meta" aria-live="off">
         {count} {count === 1 ? 'word' : 'words'}
       </div>

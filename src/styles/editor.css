@@ -540,3 +540,41 @@
     display: none;
   }
 }
+/* Images sit on their own line and never spill past the page. */
+.writing-content img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 28px auto;
+  border-radius: 6px;
+}
+.writing-content img.ProseMirror-selectednode {
+  outline: 3px solid #af91db;
+  outline-offset: 3px;
+}
+.writing-upload {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #322b3f;
+  color: #fff;
+  font-size: 13px;
+  z-index: 30;
+}
+.writing-upload.is-error {
+  background: #9f2d3a;
+}
+.writing-upload button {
+  border: 0;
+  background: none;
+  color: inherit;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}

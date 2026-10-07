@@ -108,6 +108,9 @@ export const SLASH_COMMANDS: SlashCommand[] = [
   block('table', 'Table', ['tabel', 'grid', 'kolom', 'baris'], '3 × 3', (chain) =>
     chain.insertTable({ rows: 3, cols: 3, withHeaderRow: true }),
   ),
+  block('image', 'Image', ['picture', 'photo', 'gambar', 'foto'], 'PNG · JPG', (chain) =>
+    chain.pickImage(),
+  ),
   block('quote', 'Quote', ['blockquote', 'kutipan'], '❝', (chain) => chain.toggleBlockquote()),
   block('highlight', 'Highlight', ['mark', 'stabilo', 'sorot', 'tandai'], 'Marked', (chain) =>
     chain.toggleHighlight(),
