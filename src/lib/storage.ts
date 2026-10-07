@@ -56,7 +56,8 @@ function isPage(value: unknown): value is Page {
     (published === undefined ||
       (isRecord(published) &&
         typeof published.slug === 'string' &&
-        typeof published.at === 'number'))
+        typeof published.at === 'number')) &&
+    (value.pinnedAt === undefined || typeof value.pinnedAt === 'number')
   );
 }
 function isTodoList(value: unknown): value is TodoList {

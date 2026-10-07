@@ -27,6 +27,8 @@ export interface WorkspaceActions {
   createPage: (start?: Partial<Pick<Page, 'title' | 'content'>>) => string;
   updatePage: (pageId: string, patch: PagePatch) => void;
   setPagePublished: (pageId: string, published: Page['published']) => void;
+  /** Pins a page to the top of the Pages list, or unpins it; does not count as an edit. */
+  setPagePinned: (pageId: string, pinned: boolean) => void;
   deletePage: (pageId: string) => void;
   createTodoList: () => string;
   updateTodoList: (todoId: string, patch: TodoPatch) => void;

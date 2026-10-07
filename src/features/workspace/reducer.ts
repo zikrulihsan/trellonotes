@@ -30,6 +30,7 @@ export type WorkspaceAction =
   | { type: 'page/create'; page: Page }
   | { type: 'page/update'; pageId: string; patch: PagePatch; timestamp: number }
   | { type: 'page/publish'; pageId: string; published: Page['published'] }
+  | { type: 'page/pin'; pageId: string; pinnedAt: number | undefined }
   | { type: 'page/delete'; pageId: string }
   | { type: 'todo/create'; todo: TodoList }
   | { type: 'todo/update'; todoId: string; patch: TodoPatch; timestamp: number }
@@ -180,6 +181,16 @@ export function workspaceReducer(state: Workspace, action: WorkspaceAction): Wor
         pages: state.pages?.map((p) =>
           p.id === action.pageId ? { ...p, published: action.published } : p,
         ),
+      };
+    case 'page/pin':
+      return {
+        ...state,
+        pages: state.pages?.map((p) => {
+          if (p.id !== action.pageId) return p;
+          const next = { ...p, pinnedAt: action.pinnedAt };
+          if (next.pinnedAt === undefined) delete next.pinnedAt;
+          return next;
+        }),
       };
     case 'page/delete':
       return { ...state, pages: state.pages?.filter((p) => p.id !== action.pageId) };
