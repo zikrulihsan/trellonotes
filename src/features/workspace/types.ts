@@ -38,6 +38,8 @@ export interface Page {
   updatedAt: number;
   /** Present while the page is live on the public writing page. */
   published?: { slug: string; at: number };
+  /** Set while the page is pinned to the top of the Pages list; when it was pinned. */
+  pinnedAt?: number;
 }
 /** A checklist kept under To-do lists, apart from Pages. */
 export interface TodoList {

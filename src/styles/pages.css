@@ -226,6 +226,9 @@
   display: grid;
   gap: 10px;
 }
+.page-item {
+  position: relative;
+}
 .page-row {
   display: flex;
   flex-direction: column;
@@ -241,9 +244,41 @@
   border-color: #d6cdea;
 }
 .page-row-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 36px;
   font-family: 'Literata', Georgia, serif;
   font-size: 19px;
   color: #2d2737;
+}
+.page-item.is-pinned .page-row {
+  border-color: #d6cdea;
+  background: #fbf9fe;
+}
+.page-pin-mark {
+  flex: none;
+  color: #7c5cc4;
+}
+.page-pin {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  color: #a39dab;
+  opacity: 0;
+}
+.page-item:hover .page-pin,
+.page-pin:focus-visible,
+.page-pin[aria-pressed='true'] {
+  opacity: 1;
+}
+.page-pin:hover {
+  color: #7c5cc4;
+}
+@media (hover: none) {
+  .page-pin {
+    opacity: 1;
+  }
 }
 .page-row-excerpt {
   font-size: 14px;

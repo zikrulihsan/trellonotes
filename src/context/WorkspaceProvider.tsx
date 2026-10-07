@@ -303,6 +303,9 @@ export function WorkspaceProvider({ children }: PropsWithChildren) {
       setPagePublished(pageId, published) {
         dispatch({ type: 'page/publish', pageId, published });
       },
+      setPagePinned(pageId, pinned) {
+        dispatch({ type: 'page/pin', pageId, pinnedAt: pinned ? Date.now() : undefined });
+      },
       deletePage(pageId) {
         dispatch({ type: 'page/delete', pageId });
       },

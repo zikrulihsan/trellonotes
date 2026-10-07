@@ -105,4 +105,17 @@ describe('writing workspace invariants', () => {
     const note = { ...initial.cards[0], id: 'new', listId: 'missing' };
     expect(workspaceReducer(initial, { type: 'note/create', note })).toBe(initial);
   });
+  it('pins and unpins a page without counting it as an edit', () => {
+    const page = { id: 'essay', title: 'Essay', content: '', updatedAt: 1000 };
+    const initial = { ...fixture(), pages: [page] };
+    const pinned = workspaceReducer(initial, { type: 'page/pin', pageId: 'essay', pinnedAt: 5 });
+    expect(pinned.pages?.[0]).toEqual({ ...page, pinnedAt: 5 });
+    const unpinned = workspaceReducer(pinned, {
+      type: 'page/pin',
+      pageId: 'essay',
+      pinnedAt: undefined,
+    });
+    expect(unpinned.pages?.[0]).toEqual(page);
+    expect('pinnedAt' in (unpinned.pages?.[0] ?? {})).toBe(false);
+  });
 });
