@@ -9,6 +9,7 @@ import {
   PanelLeftClose,
   PenLine,
   Plus,
+  Send,
   Tags,
   Timer,
   X,
@@ -181,6 +182,18 @@ export function Sidebar({
               </span>
             )}
           </button>
+          {cloudEnabled && (
+            <button
+              className="side-link side-quick"
+              onClick={() => {
+                openDialog({ kind: 'telegram' });
+                closeSidebarDrawer();
+              }}
+            >
+              <Send size={18} />
+              <span className="side-label">Telegram</span>
+            </button>
+          )}
           <div className="side-section">
             <span>YOUR BOARDS</span>
             <button

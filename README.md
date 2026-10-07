@@ -76,6 +76,28 @@ The workspace is saved in `localStorage` under the existing `folio.workspace.v1`
 
 Cloud data uses the dedicated `public.trellonotes_workspaces` table. RLS restricts each row to its authenticated owner; the migration is in `supabase/migrations`. Local browser storage remains a fallback copy. Cloud sync failures are shown while editing remains available.
 
+## Telegram
+
+Messages sent to a Telegram bot can become notes. The first line is the note's title and the rest is its body; notes land in the list chosen under **Telegram** in the sidebar (by default the first list of the first board). The bot only answers private chats.
+
+The bot is a Netlify function, `netlify/functions/telegram.ts`, served at `/api/telegram`. Chat links live in `public.trellonotes_telegram_links` (migration in `supabase/migrations`). In the app, **Telegram → Connect Telegram** makes a one-time code valid for 15 minutes; opening the bot with it (`/start <code>`) links that chat to the account. `/where` shows where notes go and `/stop` unlinks the chat.
+
+To set it up:
+
+1. Create a bot with [@BotFather](https://t.me/BotFather) (`/newbot`) and keep its token.
+2. Apply the migration to the Supabase project.
+3. In Netlify **Site configuration → Environment variables**, set `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET` (any long random string), `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (Supabase **Project Settings → API Keys**, the secret key; never expose it to the browser), and `VITE_TELEGRAM_BOT_USERNAME` (the bot's username, for the "Open in Telegram" link). Redeploy.
+4. Point the bot at the function once:
+
+```sh
+curl "https://api.telegram.org/bot<TOKEN>/setWebhook" \
+  -d url=https://<your-site>/api/telegram \
+  -d secret_token=<TELEGRAM_WEBHOOK_SECRET> \
+  -d 'allowed_updates=["message"]'
+```
+
+The function adds a note with the same `updated_at` check the app uses, so an open app merges the new note in on its next sync (it also refetches when the window regains focus).
+
 ## Background asset
 
 `public/images/highland-board.png` is an original image generated with the built-in image_gen tool. Prompt: Photorealistic wide Icelandic highland panorama with rugged ochre/brown rhyolite ridges, narrow valleys, scattered snow and glacial ice, and soft overcast gray sky; landscape fills the lower 85% of the image. Muted natural brown, gold, charcoal, gray, and white. No people, buildings, UI, text, logos, or watermark.

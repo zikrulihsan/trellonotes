@@ -2,6 +2,7 @@ import { createContext } from 'react';
 export type WorkspaceDialog =
   | { kind: 'create-board' }
   | { kind: 'manage-labels' }
+  | { kind: 'telegram' }
   | { kind: 'create-list'; boardId: string }
   | { kind: 'create-note'; boardId: string; listId: string }
   | { kind: 'rename-board' | 'delete-board'; boardId: string; title: string }
