@@ -178,6 +178,9 @@ a {
   background: #faf9fc;
   border-color: #c9c4d2;
 }
+.swegrowth-signin {
+  margin-top: 10px;
+}
 .google-signin:disabled {
   opacity: 0.65;
   cursor: wait;

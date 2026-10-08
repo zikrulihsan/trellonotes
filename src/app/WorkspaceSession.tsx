@@ -4,7 +4,7 @@ import { WorkspaceProvider } from '@/context/WorkspaceProvider';
 import { useAuth } from '@/context/auth-context';
 
 export function WorkspaceSession({ children }: PropsWithChildren) {
-  const { configured, loading, session, signInWithGoogle } = useAuth();
+  const { configured, loading, session, signInWithGoogle, signInWithSwegrowth } = useAuth();
   const [redirecting, setRedirecting] = useState(false);
   const [error, setError] = useState('');
 
@@ -52,12 +52,22 @@ export function WorkspaceSession({ children }: PropsWithChildren) {
           {redirecting ? <LoaderCircle size={18} className="auth-spinner" /> : <GoogleMark />}
           {redirecting ? 'Opening Google…' : 'Continue with Google'}
         </button>
+        <button
+          className="google-signin swegrowth-signin"
+          type="button"
+          onClick={signInWithSwegrowth}
+          disabled={redirecting}
+        >
+          Continue with SWE Growth
+        </button>
         {error && (
           <p className="auth-error" role="alert">
             {error}
           </p>
         )}
-        <p className="auth-footnote">Folio only uses your Google account to sign you in.</p>
+        <p className="auth-footnote">
+          Folio only uses your Google or SWE Growth account to sign you in.
+        </p>
       </section>
     </main>
   );
