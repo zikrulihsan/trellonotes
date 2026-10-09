@@ -7,6 +7,7 @@ export type AuthContextValue = {
   session: Session | null;
   user: User | null;
   signInWithGoogle: () => Promise<void>;
+  signInWithSwegrowth: () => void;
   signOut: () => Promise<void>;
 };
 
