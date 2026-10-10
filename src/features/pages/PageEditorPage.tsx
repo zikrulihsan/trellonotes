@@ -9,12 +9,18 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { supabase } from '@/lib/supabase/client';
 import { editedLabel } from '@/lib/note-metadata';
-import { publishPage, unpublishPage, writerUrl } from '@/lib/supabase/published-pages';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import {
+  publishPage,
+  setPageUnlisted,
+  unpublishPage,
+  writerUrl,
+} from '@/lib/supabase/published-pages';
 import { findByRef, pagePath } from '@/lib/app-paths';
 import { useProfile } from './useProfile';
 import type { Page } from '@/features/workspace/types';
 import { WritingSurface } from '@/features/editor/WritingSurface';
-import { publishState } from './publish-state';
+import { publishState, visibility, VISIBILITY_LABELS, type Visibility } from './publish-state';
 
 export default function PageEditorPage() {
   const { pageRef } = useParams(),
@@ -48,26 +54,52 @@ export default function PageEditorPage() {
   );
 }
 
+const VISIBILITY_HINTS: Record<Visibility, string> = {
+  draft: 'Only you can see this page',
+  published: 'Anyone can find this page on your public writing page',
+  unlisted: 'Anyone with the link can read this page, but it is not on your public list',
+};
+
 function PublishButton({ page }: { page: Page }) {
   const { setPagePublished } = useWorkspaceActions(),
     { user } = useAuth(),
     { ensure, displayName } = useProfile();
   const [busy, setBusy] = useState(false),
     [error, setError] = useState('');
-  const state = publishState(page);
-  async function publish() {
+  const state = publishState(page),
+    shown = visibility(page);
+  async function run(task: (client: SupabaseClient) => Promise<void>, failure: string) {
     if (!supabase || !user) return;
     setBusy(true);
     setError('');
     try {
-      // The first publish also picks the writer's public address (/@handle).
-      await ensure();
-      setPagePublished(page.id, await publishPage(supabase, page, displayName));
+      await task(supabase);
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : 'Could not publish this page.');
+      setError(reason instanceof Error ? reason.message : failure);
     } finally {
       setBusy(false);
     }
+  }
+  const publish = (unlisted?: boolean) =>
+    run(async (client) => {
+      // The first publish also picks the writer's public address (/@handle).
+      await ensure();
+      setPagePublished(page.id, await publishPage(client, page, displayName, unlisted));
+    }, 'Could not publish this page.');
+  function choose(next: Visibility) {
+    if (next === shown) return;
+    if (next === 'draft')
+      return run(async (client) => {
+        await unpublishPage(client, page.id);
+        setPagePublished(page.id, undefined);
+      }, 'Could not unpublish this page.');
+    const unlisted = next === 'unlisted';
+    if (!page.published) return publish(unlisted);
+    const { slug, at } = page.published;
+    return run(async (client) => {
+      await setPageUnlisted(client, page.id, unlisted);
+      setPagePublished(page.id, { slug, at, ...(unlisted && { unlisted }) });
+    }, 'Could not change who can see this page.');
   }
   if (!supabase || !user)
     return (
@@ -77,6 +109,20 @@ function PublishButton({ page }: { page: Page }) {
     );
   return (
     <>
+      <select
+        className="publish-visibility"
+        aria-label="Visibility"
+        title={VISIBILITY_HINTS[shown]}
+        value={shown}
+        disabled={busy}
+        onChange={(event) => void choose(event.target.value as Visibility)}
+      >
+        {(Object.keys(VISIBILITY_LABELS) as Visibility[]).map((option) => (
+          <option key={option} value={option}>
+            {VISIBILITY_LABELS[option]}
+          </option>
+        ))}
+      </select>
       <button
         className={`publish-button ${state === 'published' ? 'is-live' : ''}`}
         onClick={() => void publish()}
@@ -91,12 +137,12 @@ function PublishButton({ page }: { page: Page }) {
       >
         {state === 'published' && <Check size={14} />}
         {busy
-          ? 'Publishing…'
+          ? 'Saving…'
           : state === 'draft'
             ? 'Publish'
             : state === 'changed'
               ? 'Update'
-              : 'Published'}
+              : 'Up to date'}
       </button>
       {error && (
         <p className="publish-error" role="alert">

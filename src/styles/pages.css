@@ -168,6 +168,18 @@
   color: #4f8a6c;
   background: #e8f3ed;
 }
+.publish-visibility {
+  padding: 5px 8px;
+  border: 1px solid #e4e1ea;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 13px;
+  color: #4b4556;
+  background: #fff;
+}
+.publish-visibility:disabled {
+  opacity: 0.6;
+}
 .publish-hint {
   font-size: 12px;
   color: #aaa4b2;
@@ -199,6 +211,10 @@
 .page-status-published {
   color: #4f8a6c;
   background: #e8f3ed;
+}
+.page-status-unlisted {
+  color: #5b6fa8;
+  background: #e9edf8;
 }
 .page-status-changed {
   color: #a2763c;

@@ -36,8 +36,11 @@ export interface Page {
   title: string;
   content: string;
   updatedAt: number;
-  /** Present while the page is live on the public writing page. */
-  published?: { slug: string; at: number };
+  /**
+   * Present while the page is live. Unlisted pages open from their link but are
+   * left out of the public writing page.
+   */
+  published?: { slug: string; at: number; unlisted?: boolean };
   /** Set while the page is pinned to the top of the Pages list; when it was pinned. */
   pinnedAt?: number;
 }
