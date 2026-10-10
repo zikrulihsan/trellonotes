@@ -12,6 +12,8 @@ export interface PublishedPage {
   author_name: string | null;
   published_at: string;
   updated_at: string;
+  /** Left out of the public list; missing on a database that predates unlisted pages. */
+  unlisted?: boolean;
 }
 
 /** Who public pages belong to: the handle when one is set, else the account id (older links). */
@@ -131,12 +133,19 @@ export async function getPublishedPage(
   authorId: string,
   slug: string,
 ): Promise<PublishedPage | null> {
-  const { data, error } = await client
-    .from(TABLE)
-    .select('id, slug, title, content, author_name, published_at, updated_at')
-    .eq('user_id', authorId)
-    .eq('slug', slug)
-    .maybeSingle();
-  if (error) throw explain(error);
-  return data;
+  const query = (columns: string) =>
+    client
+      .from(TABLE)
+      .select(columns)
+      .eq('user_id', authorId)
+      .eq('slug', slug)
+      .maybeSingle<PublishedPage>();
+  const columns = 'id, slug, title, content, author_name, published_at, updated_at';
+  const { data, error } = await query(`${columns}, unlisted`);
+  if (!error) return data;
+  if (!lacksUnlisted(error)) throw explain(error);
+  // Before unlisted pages existed, every published page was listed.
+  const fallback = await query(columns);
+  if (fallback.error) throw explain(fallback.error);
+  return fallback.data;
 }

@@ -18,8 +18,9 @@ vi.mock('@/lib/supabase/published-pages', async (original) => ({
   ...(await original<object>()),
   getPublishedPage: (_client: unknown, userId: string, slug: string) =>
     Promise.resolve(
-      userId === AUTHOR && slug === 'catatan-rilis'
+      userId === AUTHOR && (slug === 'catatan-rilis' || slug === 'rahasia')
         ? {
+            unlisted: slug === 'rahasia',
             id: 'p1',
             slug,
             title: 'Catatan rilis',
@@ -56,6 +57,12 @@ describe('public reader', () => {
       'href',
       '/@zikrul',
     );
+  });
+
+  it('does not lead from an unlisted page to the public list', async () => {
+    renderAt('/@zikrul/rahasia');
+    expect(await screen.findByText('Isi tulisan.')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /More from/ })).toBeNull();
   });
 
   it('says so when the handle does not exist', async () => {

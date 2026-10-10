@@ -20,3 +20,9 @@ export const VISIBILITY_LABELS: Record<Visibility, string> = {
   published: 'Published',
   unlisted: 'Unlisted',
 };
+
+export const VISIBILITY_HINTS: Record<Visibility, string> = {
+  draft: 'Only you can see this page',
+  published: 'Anyone can find this page on your public writing page',
+  unlisted: 'Anyone with the link can read this page, but it is not on your public list',
+};
