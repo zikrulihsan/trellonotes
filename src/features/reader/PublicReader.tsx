@@ -152,10 +152,13 @@ function ArticlePage({ author, slug }: { author: Author; slug: string }) {
   const name = author.name ?? page.author_name;
   return (
     <main className="reader-column">
-      <Link className="reader-back" to={writerPath(author)}>
-        <ArrowLeft size={15} />
-        {name ? `More from ${name}` : 'More writing'}
-      </Link>
+      {/* Unlisted pages are shared by link only, so they don't lead to the public list. */}
+      {!page.unlisted && (
+        <Link className="reader-back" to={writerPath(author)}>
+          <ArrowLeft size={15} />
+          {name ? `More from ${name}` : 'More writing'}
+        </Link>
+      )}
       <article>
         <header className="reader-header">
           <h1>{page.title}</h1>
