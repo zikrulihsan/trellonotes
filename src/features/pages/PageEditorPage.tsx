@@ -1,6 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Check, Copy, ExternalLink, EyeOff, Link2, MoreHorizontal, Trash2 } from 'lucide-react';
+import {
+  Check,
+  Copy,
+  ExternalLink,
+  EyeOff,
+  Link2,
+  MoreHorizontal,
+  PencilLine,
+  Trash2,
+} from 'lucide-react';
 import { useWorkspace, useWorkspaceActions } from '@/hooks/useWorkspace';
 import { useDropdown } from '@/hooks/useDropdown';
 import { Dropdown } from '@/components/ui/Dropdown';
@@ -21,6 +30,7 @@ import { WritingSurface } from '@/features/editor/WritingSurface';
 import { publishState, visibility, VISIBILITY_LABELS } from './publish-state';
 import { usePageVisibility } from './usePageVisibility';
 import { VisibilitySelect } from './VisibilitySelect';
+import { ShortLinkDialog } from './ShortLinkDialog';
 
 export default function PageEditorPage() {
   const { pageRef } = useParams(),
@@ -104,6 +114,7 @@ function PageOptions({ page }: { page: Page }) {
     menu = useDropdown();
   const [copied, setCopied] = useState<'link' | 'short' | null>(null),
     [confirming, setConfirming] = useState(false),
+    [editingShort, setEditingShort] = useState(false),
     [error, setError] = useState('');
   const url = author && page.published ? writerUrl(author, page.published.slug) : null,
     shown = visibility(page),
@@ -185,6 +196,15 @@ function PageOptions({ page }: { page: Page }) {
               {copied === 'short' ? <Check size={15} /> : <Link2 size={15} />}
               {copied === 'short' ? 'Short link copied' : 'Copy short link'}
             </button>
+            <button
+              onClick={() => {
+                setEditingShort(true);
+                menu.close();
+              }}
+            >
+              <PencilLine size={15} />
+              {page.published?.code ? 'Change short link' : 'Custom short link'}
+            </button>
             <a className="dropdown-link" href={url} target="_blank" rel="noreferrer">
               <ExternalLink size={15} />
               {unlisted ? 'Open page' : 'Open public page'}
@@ -216,6 +236,7 @@ function PageOptions({ page }: { page: Page }) {
           {error}
         </p>
       )}
+      {editingShort && <ShortLinkDialog page={page} onClose={() => setEditingShort(false)} />}
       {confirming && (
         <Modal title="Delete page?" onClose={() => setConfirming(false)}>
           <p>

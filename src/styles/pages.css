@@ -562,3 +562,35 @@
 .public-address-error {
   color: #be4c5c;
 }
+
+/* Short link dialog */
+.short-link-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  font-size: 14px;
+}
+.short-link-form label {
+  color: #8a8593;
+}
+.short-link-form input {
+  flex: 1 1 160px;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid #dedbe5;
+  border-radius: 6px;
+  font: inherit;
+}
+.short-link-form p {
+  flex-basis: 100%;
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: #8a8593;
+}
+.short-link-form .short-link-error {
+  color: #c2453d;
+}
+.short-link-form .modal-actions {
+  flex-basis: 100%;
+}
