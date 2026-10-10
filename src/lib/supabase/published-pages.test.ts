@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { describe, expect, it } from 'vitest';
-import { listPublishedPages } from './published-pages';
+import { listPublishedPages, newShortCode } from './published-pages';
 
 /** A client whose query records its filters and answers with `respond`. */
 function fakeClient(respond: (filters: string[]) => { data: unknown; error: unknown }) {
@@ -41,5 +41,13 @@ describe('listPublishedPages', () => {
     );
     expect(await listPublishedPages(client, 'author')).toEqual([{ id: 'p1' }]);
     expect(calls).toEqual([['user_id', 'unlisted'], ['user_id']]);
+  });
+});
+
+describe('newShortCode', () => {
+  it('makes short codes from letters and digits that are hard to mix up', () => {
+    const codes = Array.from({ length: 200 }, () => newShortCode());
+    for (const code of codes) expect(code).toMatch(/^[a-hj-km-np-z2-9]{7}$/);
+    expect(new Set(codes).size).toBe(codes.length);
   });
 });

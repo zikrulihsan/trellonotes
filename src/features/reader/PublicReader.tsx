@@ -7,6 +7,7 @@ import { plainText } from '@/lib/text';
 import {
   getPublishedPage,
   listPublishedPages,
+  resolveShortCode,
   writerPath,
   type PublicAuthor,
 } from '@/lib/supabase/published-pages';
@@ -45,7 +46,8 @@ function usePublicData<T>(load: () => Promise<T>, deps: unknown[]): Load<T> {
   return state.key === key ? state : { status: 'loading' };
 }
 
-type Address = { handle: string; slug?: string } | { userId: string; slug?: string };
+type Address =
+  { handle: string; slug?: string } | { userId: string; slug?: string } | { code: string };
 
 function parseAddress(pathname: string): Address | null {
   let parts: string[];
@@ -54,17 +56,29 @@ function parseAddress(pathname: string): Address | null {
   } catch {
     return null;
   }
+  if (parts[0] === 's' && /^[a-z0-9]{6,12}$/i.test(parts[1] ?? '') && parts.length === 2)
+    return { code: parts[1] };
   if (parts[0]?.startsWith('@')) return { handle: parts[0].slice(1), slug: parts[1] };
   if (parts[0] === 'read' && UUID.test(parts[1] ?? '')) return { userId: parts[1], slug: parts[2] };
   return null;
 }
 
 type Author = PublicAuthor & { name: string | null };
-/** `redirect` is set when an older account-id link now has a handle address. */
-type Resolved = { author: Author; redirect?: string } | null;
+/**
+ * `redirect` is set when an older account-id link now has a handle address; `slug`
+ * is the page a short link points to.
+ */
+type Resolved = { author: Author; redirect?: string; slug?: string } | null;
 
 async function resolveAuthor(address: Address): Promise<Resolved> {
   if (!supabase) return null;
+  if ('code' in address) {
+    // A short link shows the page in place, keeping the short address in the bar.
+    const target = await resolveShortCode(supabase, address.code);
+    if (!target) return null;
+    const resolved = await resolveAuthor({ userId: target.userId });
+    return resolved && { author: resolved.author, slug: target.slug };
+  }
   const profile = await getProfile(
     supabase,
     'handle' in address ? { handle: address.handle } : { userId: address.userId },
@@ -88,8 +102,11 @@ export function PublicReader() {
   let body;
   if (result.status !== 'ready') body = <Status result={result} />;
   else if (!result.data || !address) body = <NotFound />;
+  else if (result.data.slug)
+    body = <ArticlePage author={result.data.author} slug={result.data.slug} />;
   else if (result.data.redirect) body = <Navigate to={result.data.redirect} replace />;
-  else if (address.slug) body = <ArticlePage author={result.data.author} slug={address.slug} />;
+  else if ('slug' in address && address.slug)
+    body = <ArticlePage author={result.data.author} slug={address.slug} />;
   else body = <AuthorPage author={result.data.author} />;
   return (
     <div className="reader">

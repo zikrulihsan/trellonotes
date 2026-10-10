@@ -16,6 +16,8 @@ vi.mock('@/lib/supabase/profiles', () => ({
 }));
 vi.mock('@/lib/supabase/published-pages', async (original) => ({
   ...(await original<object>()),
+  resolveShortCode: (_client: unknown, code: string) =>
+    Promise.resolve(code === 'k7m2xq9' ? { userId: AUTHOR, slug: 'rahasia' } : null),
   getPublishedPage: (_client: unknown, userId: string, slug: string) =>
     Promise.resolve(
       userId === AUTHOR && (slug === 'catatan-rilis' || slug === 'rahasia')
@@ -63,6 +65,17 @@ describe('public reader', () => {
     renderAt('/@zikrul/rahasia');
     expect(await screen.findByText('Isi tulisan.')).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /More from/ })).toBeNull();
+  });
+
+  it('opens the page a short link points to, keeping the short address', async () => {
+    renderAt('/s/k7m2xq9');
+    expect(await screen.findByText('Isi tulisan.')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /More from/ })).toBeNull();
+  });
+
+  it('says so when a short link points nowhere', async () => {
+    renderAt('/s/zzzzzzz');
+    expect(await screen.findByText('Page not found')).toBeInTheDocument();
   });
 
   it('says so when the handle does not exist', async () => {

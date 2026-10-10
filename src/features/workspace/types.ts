@@ -38,9 +38,9 @@ export interface Page {
   updatedAt: number;
   /**
    * Present while the page is live. Unlisted pages open from their link but are
-   * left out of the public writing page.
+   * left out of the public writing page. `code` is the short link (/s/<code>), once made.
    */
-  published?: { slug: string; at: number; unlisted?: boolean };
+  published?: { slug: string; at: number; unlisted?: boolean; code?: string };
   /** Set while the page is pinned to the top of the Pages list; when it was pinned. */
   pinnedAt?: number;
 }
