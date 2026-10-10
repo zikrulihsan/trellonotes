@@ -49,6 +49,71 @@ const UNLISTED_MISSING = new Error(
   'Unlisted pages are not set up yet: the database needs its latest update.',
 );
 
+/** Lowercase letters and digits that can't be mistaken for each other (no 0/o, 1/l/i). */
+const CODE_ALPHABET = 'abcdefghjkmnpqrstuvwxyz23456789';
+
+export function newShortCode(length = 7): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(length));
+  return Array.from(bytes, (byte) => CODE_ALPHABET[byte % CODE_ALPHABET.length]).join('');
+}
+
+/** "/s/k7m2xq9": a short link that opens the page wherever it lives. */
+export const shortPath = (code: string) => `/s/${code}`;
+export const shortUrl = (code: string) => `${window.location.origin}${shortPath(code)}`;
+
+/**
+ * Gives a live page its short link, the first time one is asked for. Returns the
+ * code to keep on the page.
+ */
+export async function ensureShortCode(client: SupabaseClient, page: Page): Promise<string> {
+  if (!page.published) throw new Error('Publish this page to get a short link.');
+  if (page.published.code) return page.published.code;
+  for (let attempt = 1; attempt <= 5; attempt++) {
+    const code = newShortCode();
+    // Only fills an empty code, so a link already handed out (maybe from another device) keeps working.
+    const { data, error } = await client
+      .from(TABLE)
+      .update({ short_code: code })
+      .eq('id', page.id)
+      .is('short_code', null)
+      .select('short_code');
+    if (!error && data.length) return code;
+    if (!error) {
+      const existing = await client
+        .from(TABLE)
+        .select('short_code')
+        .eq('id', page.id)
+        .maybeSingle<{ short_code: string | null }>();
+      if (existing.error) throw explain(existing.error);
+      if (existing.data?.short_code) return existing.data.short_code;
+      throw new Error('This page is no longer published.');
+    }
+    // Another page already has this code: draw again.
+    if (error.code === '23505') continue;
+    if (
+      (error.code === 'PGRST204' || error.code === '42703') &&
+      error.message.includes('short_code')
+    )
+      throw new Error('Short links are not set up yet: the database needs its latest update.');
+    throw explain(error);
+  }
+  throw new Error('Could not make a short link. Try again.');
+}
+
+/** Where a short link points: the author and the page's slug, or null when it's gone. */
+export async function resolveShortCode(
+  client: SupabaseClient,
+  code: string,
+): Promise<{ userId: string; slug: string } | null> {
+  const { data, error } = await client
+    .from(TABLE)
+    .select('user_id, slug')
+    .eq('short_code', code.toLowerCase())
+    .maybeSingle<{ user_id: string; slug: string }>();
+  if (error) throw explain(error);
+  return data && { userId: data.user_id, slug: data.slug };
+}
+
 /**
  * Publishes the page, or updates its public copy. A page keeps its first slug so
  * shared links keep working after the title changes.
@@ -76,7 +141,10 @@ export async function publishPage(
       },
       { onConflict: 'id' },
     );
-    if (!error) return { slug, at: Date.now(), ...(unlisted && { unlisted }) };
+    if (!error) {
+      const code = page.published?.code;
+      return { slug, at: Date.now(), ...(unlisted && { unlisted }), ...(code && { code }) };
+    }
     if (lacksUnlisted(error)) {
       if (unlisted) throw UNLISTED_MISSING;
       sendUnlisted = false;

@@ -35,7 +35,7 @@ export const initiativePath = (note: Linkable) => `/initiative/${linkRef(note)}`
 export const pagePath = (page: Linkable) => `/page/${linkRef(page)}`;
 export const todoPath = (todo: Linkable) => `/todo/${linkRef(todo)}`;
 
-/** Public addresses: "/@handle[/slug]", and the older "/read/<account id>[/slug]". */
+/** Public addresses: "/@handle[/slug]", short links "/s/<code>", and the older "/read/<account id>[/slug]". */
 export function isPublicPath(pathname: string): boolean {
-  return pathname.startsWith('/@') || pathname.startsWith('/read/');
+  return pathname.startsWith('/@') || pathname.startsWith('/read/') || pathname.startsWith('/s/');
 }

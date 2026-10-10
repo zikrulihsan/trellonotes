@@ -26,6 +26,7 @@ describe('short app links', () => {
   it('recognises public addresses', () => {
     expect(isPublicPath('/@zikrul/catatan-rilis')).toBe(true);
     expect(isPublicPath('/read/7f1c2a9b-41d2-4c5e-9a0b-1234567890ab')).toBe(true);
+    expect(isPublicPath('/s/k7m2xq9')).toBe(true);
     expect(isPublicPath('/pages')).toBe(false);
   });
 });

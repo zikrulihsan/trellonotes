@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Check, Copy, ExternalLink, EyeOff, MoreHorizontal, Trash2 } from 'lucide-react';
+import { Check, Copy, ExternalLink, EyeOff, Link2, MoreHorizontal, Trash2 } from 'lucide-react';
 import { useWorkspace, useWorkspaceActions } from '@/hooks/useWorkspace';
 import { useDropdown } from '@/hooks/useDropdown';
 import { Dropdown } from '@/components/ui/Dropdown';
@@ -8,7 +8,12 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { supabase } from '@/lib/supabase/client';
 import { editedLabel } from '@/lib/note-metadata';
-import { unpublishPage, writerUrl } from '@/lib/supabase/published-pages';
+import {
+  ensureShortCode,
+  shortUrl,
+  unpublishPage,
+  writerUrl,
+} from '@/lib/supabase/published-pages';
 import { findByRef, pagePath } from '@/lib/app-paths';
 import { useProfile } from './useProfile';
 import type { Page } from '@/features/workspace/types';
@@ -97,7 +102,7 @@ function PageOptions({ page }: { page: Page }) {
     { author } = useProfile(),
     navigate = useNavigate(),
     menu = useDropdown();
-  const [copied, setCopied] = useState(false),
+  const [copied, setCopied] = useState<'link' | 'short' | null>(null),
     [confirming, setConfirming] = useState(false),
     [error, setError] = useState('');
   const url = author && page.published ? writerUrl(author, page.published.slug) : null,
@@ -113,6 +118,35 @@ function PageOptions({ page }: { page: Page }) {
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'Could not unpublish this page.');
       return false;
+    }
+  }
+  /** The page's short link, made the first time it is asked for. */
+  async function shortLink() {
+    if (!supabase || !page.published) throw new Error('Publish this page to get a short link.');
+    const code = await ensureShortCode(supabase, page);
+    if (code !== page.published.code) setPagePublished(page.id, { ...page.published, code });
+    return shortUrl(code);
+  }
+  async function copy(kind: 'link' | 'short', text: Promise<string>) {
+    setError('');
+    try {
+      // Handing the clipboard a pending value keeps Safari's copy permission while the link loads.
+      if (typeof ClipboardItem !== 'undefined' && navigator.clipboard.write)
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            'text/plain': text.then((value) => new Blob([value], { type: 'text/plain' })),
+          }),
+        ]);
+      else await navigator.clipboard.writeText(await text);
+      setCopied(kind);
+      setTimeout(() => setCopied(null), 2000);
+    } catch (reason) {
+      // Prefer the reason the link couldn't be made over the clipboard's generic error.
+      const cause: unknown = await text.then(
+        () => reason,
+        (inner: unknown) => inner,
+      );
+      setError(cause instanceof Error ? cause.message : 'Could not copy the link.');
     }
   }
   async function remove() {
@@ -141,14 +175,15 @@ function PageOptions({ page }: { page: Page }) {
           <>
             <button
               onClick={() => {
-                void navigator.clipboard.writeText(url).then(() => {
-                  setCopied(true);
-                  setTimeout(() => setCopied(false), 2000);
-                });
+                void copy('link', Promise.resolve(url));
               }}
             >
-              {copied ? <Check size={15} /> : <Copy size={15} />}
-              {copied ? 'Link copied' : unlisted ? 'Copy link' : 'Copy public link'}
+              {copied === 'link' ? <Check size={15} /> : <Copy size={15} />}
+              {copied === 'link' ? 'Link copied' : unlisted ? 'Copy link' : 'Copy public link'}
+            </button>
+            <button onClick={() => void copy('short', shortLink())}>
+              {copied === 'short' ? <Check size={15} /> : <Link2 size={15} />}
+              {copied === 'short' ? 'Short link copied' : 'Copy short link'}
             </button>
             <a className="dropdown-link" href={url} target="_blank" rel="noreferrer">
               <ExternalLink size={15} />

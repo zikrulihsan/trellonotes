@@ -57,7 +57,8 @@ function isPage(value: unknown): value is Page {
       (isRecord(published) &&
         typeof published.slug === 'string' &&
         typeof published.at === 'number' &&
-        (published.unlisted === undefined || typeof published.unlisted === 'boolean'))) &&
+        (published.unlisted === undefined || typeof published.unlisted === 'boolean') &&
+        (published.code === undefined || typeof published.code === 'string'))) &&
     (value.pinnedAt === undefined || typeof value.pinnedAt === 'number')
   );
 }

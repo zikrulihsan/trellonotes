@@ -45,10 +45,10 @@ export function usePageVisibility(page: Page) {
       }, 'Could not unpublish this page.');
     const unlisted = next === 'unlisted';
     if (!page.published) return publish(unlisted);
-    const { slug, at } = page.published;
+    const { slug, at, code } = page.published;
     return run(async (client) => {
       await setPageUnlisted(client, page.id, unlisted);
-      setPagePublished(page.id, { slug, at, ...(unlisted && { unlisted }) });
+      setPagePublished(page.id, { slug, at, ...(unlisted && { unlisted }), ...(code && { code }) });
     }, 'Could not change who can see this page.');
   }
   return { shown, canPublish, busy, error, publish, choose };
