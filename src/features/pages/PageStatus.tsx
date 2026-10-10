@@ -1,13 +1,14 @@
 import type { Page } from '@/features/workspace/types';
-import { publishState, type PublishState } from './publish-state';
-
-const LABELS: Record<PublishState, string> = {
-  draft: 'Draft',
-  published: 'Published',
-  changed: 'Unpublished changes',
-};
+import { publishState, visibility, VISIBILITY_LABELS } from './publish-state';
 
 export function PageStatus({ page }: { page: Page }) {
-  const state = publishState(page);
-  return <span className={`page-status page-status-${state}`}>{LABELS[state]}</span>;
+  const shown = visibility(page);
+  return (
+    <>
+      <span className={`page-status page-status-${shown}`}>{VISIBILITY_LABELS[shown]}</span>
+      {publishState(page) === 'changed' && (
+        <span className="page-status page-status-changed">Unpublished changes</span>
+      )}
+    </>
+  );
 }
