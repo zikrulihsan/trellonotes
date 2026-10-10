@@ -57,6 +57,18 @@ export function newShortCode(length = 7): string {
   return Array.from(bytes, (byte) => CODE_ALPHABET[byte % CODE_ALPHABET.length]).join('');
 }
 
+/** A short link a writer picks: 3–40 lowercase letters or digits, with dashes between words. */
+export const SHORT_CODE_PATTERN = /^(?=.{3,40}$)[a-z0-9]+(-[a-z0-9]+)*$/;
+
+/** Turns what a writer types into a short code: "CV 2026!" → "cv-2026". */
+export const toShortCode = (text: string) => slugify(text, 40);
+
+const SHORT_LINKS_MISSING = new Error(
+  'Short links are not set up yet: the database needs its latest update.',
+);
+const lacksShortCode = (error: PostgrestError) =>
+  (error.code === 'PGRST204' || error.code === '42703') && error.message.includes('short_code');
+
 /** "/s/k7m2xq9": a short link that opens the page wherever it lives. */
 export const shortPath = (code: string) => `/s/${code}`;
 export const shortUrl = (code: string) => `${window.location.origin}${shortPath(code)}`;
@@ -90,14 +102,34 @@ export async function ensureShortCode(client: SupabaseClient, page: Page): Promi
     }
     // Another page already has this code: draw again.
     if (error.code === '23505') continue;
-    if (
-      (error.code === 'PGRST204' || error.code === '42703') &&
-      error.message.includes('short_code')
-    )
-      throw new Error('Short links are not set up yet: the database needs its latest update.');
+    if (lacksShortCode(error)) throw SHORT_LINKS_MISSING;
     throw explain(error);
   }
   throw new Error('Could not make a short link. Try again.');
+}
+
+/**
+ * Sets a short link the writer chose. The previous short link stops working, since
+ * a page has one short link at a time.
+ */
+export async function setShortCode(
+  client: SupabaseClient,
+  pageId: string,
+  code: string,
+): Promise<string> {
+  if (!SHORT_CODE_PATTERN.test(code))
+    throw new Error('Use 3–40 lowercase letters or numbers, with dashes between words.');
+  const { data, error } = await client
+    .from(TABLE)
+    .update({ short_code: code })
+    .eq('id', pageId)
+    .select('short_code');
+  if (error?.code === '23505') throw new Error(`/s/${code} is already taken.`);
+  // The older format check (random codes only) rejects dashes and other lengths.
+  if (error?.code === '23514') throw SHORT_LINKS_MISSING;
+  if (error) throw lacksShortCode(error) ? SHORT_LINKS_MISSING : explain(error);
+  if (!data.length) throw new Error('This page is no longer published.');
+  return code;
 }
 
 /** Where a short link points: the author and the page's slug, or null when it's gone. */

@@ -8,6 +8,7 @@ import {
   getPublishedPage,
   listPublishedPages,
   resolveShortCode,
+  SHORT_CODE_PATTERN,
   writerPath,
   type PublicAuthor,
 } from '@/lib/supabase/published-pages';
@@ -56,7 +57,7 @@ function parseAddress(pathname: string): Address | null {
   } catch {
     return null;
   }
-  if (parts[0] === 's' && /^[a-z0-9]{6,12}$/i.test(parts[1] ?? '') && parts.length === 2)
+  if (parts[0] === 's' && parts.length === 2 && SHORT_CODE_PATTERN.test(parts[1].toLowerCase()))
     return { code: parts[1] };
   if (parts[0]?.startsWith('@')) return { handle: parts[0].slice(1), slug: parts[1] };
   if (parts[0] === 'read' && UUID.test(parts[1] ?? '')) return { userId: parts[1], slug: parts[2] };
