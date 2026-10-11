@@ -130,3 +130,15 @@ describe('page themes', () => {
     expect(normalizeLanding({})!.theme).toBe('sketch');
   });
 });
+
+describe('section order and designs', () => {
+  it('keeps every section once, in the saved order, with known designs', () => {
+    const { layout } = normalizeLanding({
+      layout: { order: ['notes', 'notes', 'bogus', 'projects'], hero: 'banner', helps: 'zigzag' },
+    })!;
+    expect(layout.order).toEqual(['notes', 'projects', 'helps', 'working']);
+    expect(layout.hero).toBe('banner');
+    expect(layout.helps).toBe('columns');
+    expect(normalizeLanding({})!.layout.order).toEqual(['helps', 'working', 'projects', 'notes']);
+  });
+});

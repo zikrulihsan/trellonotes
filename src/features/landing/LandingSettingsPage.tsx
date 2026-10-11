@@ -11,6 +11,9 @@ import {
   ABOUT_INTRO_MAX,
   LANDING_LIMITS,
   LANDING_THEMES,
+  LANDING_SECTIONS,
+  SECTION_LAYOUTS,
+  type LandingLayout,
   saveLanding,
   socialPlatform,
   toLinkUrl,
@@ -110,6 +113,14 @@ export function LandingSettingsPage() {
     items.splice(index + by, 0, item);
     set({ [key]: items });
   }
+  const setLayout = (patch: Partial<LandingLayout>) =>
+    set({ layout: { ...draft.layout, ...patch } });
+  function moveSection(index: number, by: number) {
+    const order = [...draft!.layout.order];
+    const [id] = order.splice(index, 1);
+    order.splice(index + by, 0, id);
+    setLayout({ order });
+  }
   const setAbout = (patch: Partial<LandingAbout>) => set({ about: { ...draft.about, ...patch } });
   const dirty = JSON.stringify(draft) !== saved;
 
@@ -192,6 +203,57 @@ export function LandingSettingsPage() {
                 <strong>{theme.label}</strong>
                 <span>{theme.description}</span>
               </label>
+            ))}
+          </div>
+        </Section>
+
+        <Section
+          title="Layout"
+          hint="Put the sections of your Me page in the order you like, and pick a design for each."
+        >
+          <div className="layout-list">
+            <div className="layout-row is-fixed">
+              <span className="layout-name">Hero</span>
+              <LayoutSelect
+                label="Hero design"
+                options={SECTION_LAYOUTS.hero}
+                value={draft.layout.hero}
+                onChange={(hero) => setLayout({ hero })}
+              />
+              <span className="layout-pinned">Always first</span>
+            </div>
+            {draft.layout.order.map((id, index) => (
+              <div className="layout-row" key={id}>
+                <span className="layout-name">
+                  {LANDING_SECTIONS.find((section) => section.id === id)?.label}
+                </span>
+                <LayoutSelect
+                  label={`${LANDING_SECTIONS.find((section) => section.id === id)?.label} design`}
+                  options={SECTION_LAYOUTS[id]}
+                  value={draft.layout[id]}
+                  onChange={(value) => setLayout({ [id]: value })}
+                />
+                <span className="layout-moves">
+                  <button
+                    type="button"
+                    className="icon-button"
+                    aria-label={`Move ${LANDING_SECTIONS.find((section) => section.id === id)?.label} up`}
+                    disabled={index === 0}
+                    onClick={() => moveSection(index, -1)}
+                  >
+                    <ArrowUp size={15} />
+                  </button>
+                  <button
+                    type="button"
+                    className="icon-button"
+                    aria-label={`Move ${LANDING_SECTIONS.find((section) => section.id === id)?.label} down`}
+                    disabled={index === draft.layout.order.length - 1}
+                    onClick={() => moveSection(index, 1)}
+                  >
+                    <ArrowDown size={15} />
+                  </button>
+                </span>
+              </div>
             ))}
           </div>
         </Section>
@@ -787,6 +849,32 @@ function Header({ children }: { children?: ReactNode }) {
       </div>
       {children && <div className="board-actions">{children}</div>}
     </section>
+  );
+}
+
+function LayoutSelect<T extends string>({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: readonly { id: T; label: string }[];
+  value: T;
+  onChange: (value: T) => void;
+}) {
+  return (
+    <select
+      aria-label={label}
+      value={value}
+      onChange={(event) => onChange(event.target.value as T)}
+    >
+      {options.map((option) => (
+        <option key={option.id} value={option.id}>
+          {option.label}
+        </option>
+      ))}
+    </select>
   );
 }
 

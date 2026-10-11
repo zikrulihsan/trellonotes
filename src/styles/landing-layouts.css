@@ -1,0 +1,211 @@
+/* The designs a writer can pick for each part of the Me page. The first design of each
+   part is the one landing.css draws; these rules only describe the others. */
+
+/* Hero: left-aligned. */
+.landing-hero.is-left {
+  text-align: left;
+}
+.landing-hero.is-left .landing-tagline {
+  margin-left: 0;
+}
+.landing-hero.is-left :is(.landing-links, .landing-socials) {
+  justify-content: flex-start;
+}
+
+/* Hero: a banner, the intro set inside a tinted card. */
+.landing-hero.is-banner {
+  padding: clamp(28px, 5vw, 48px) clamp(20px, 4vw, 40px);
+  border: 1.5px solid var(--landing-ink);
+  border-radius: var(--landing-wobble);
+  background: color-mix(in srgb, var(--landing-marker) 30%, var(--landing-card));
+  box-shadow: 5px 5px 0 var(--landing-shadow);
+}
+.landing-hero.is-banner .landing-marker {
+  background-image: none;
+}
+
+/* Helps people to: cards. */
+.landing-helps.is-cards ul {
+  gap: 14px;
+}
+.landing-helps.is-cards li,
+.landing-helps.is-cards li:nth-child(3n + 1) {
+  padding: 20px;
+  border: 1.5px solid var(--landing-ink);
+  border-radius: var(--landing-wobble);
+  background: var(--landing-card);
+  box-shadow: 3px 3px 0 var(--landing-shadow);
+  text-align: left;
+}
+.landing-helps.is-cards .landing-help-number {
+  margin: 0;
+}
+
+/* Helps people to: a numbered list. */
+.landing-helps.is-list ul {
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 0;
+  max-width: 560px;
+  margin: 0 auto;
+}
+.landing-helps.is-list li,
+.landing-helps.is-list li:nth-child(3n + 1) {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  column-gap: 14px;
+  row-gap: 2px;
+  padding: 16px 0;
+  border-left: 0;
+  border-bottom: 1px dashed var(--landing-line);
+  text-align: left;
+}
+.landing-helps.is-list li:last-child {
+  border-bottom: 0;
+}
+.landing-helps.is-list .landing-help-number {
+  grid-row: span 2;
+  margin: 0;
+}
+.landing-helps.is-list li > span:last-child:not(.landing-help-number) {
+  grid-column: 2;
+}
+
+/* What I'm working on: tags. */
+.landing-working.is-chips .landing-now {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: auto;
+  max-width: none;
+}
+.landing-working.is-chips .landing-now li {
+  padding: 6px 16px;
+  border: 1.5px solid var(--landing-ink);
+  border-radius: 999px;
+  background: var(--landing-card);
+  font-size: 16px;
+}
+.landing-working.is-chips .landing-now li::before {
+  display: none;
+}
+
+/* What I'm working on: cards. */
+.landing-working.is-cards .landing-now {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  width: auto;
+  max-width: none;
+}
+.landing-working.is-cards .landing-now li {
+  padding: 18px 18px 18px 44px;
+  border: 1.5px solid var(--landing-ink);
+  border-radius: var(--landing-wobble);
+  background: var(--landing-card);
+  box-shadow: 3px 3px 0 var(--landing-shadow);
+}
+.landing-working.is-cards .landing-now li::before {
+  left: 18px;
+  top: calc(18px + 0.45em);
+}
+
+/* Projects: a grid of tiles. */
+.landing-work.is-grid .landing-projects {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.landing-work.is-grid .landing-projects li {
+  display: flex;
+}
+.landing-work.is-grid .landing-project {
+  position: relative;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+.landing-work.is-grid .landing-thumb {
+  width: 100%;
+  height: 120px;
+}
+.landing-work.is-grid .landing-project-go {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  padding: 3px;
+  border-radius: 50%;
+  background: var(--landing-card);
+}
+
+/* Projects: compact rows, without pictures. */
+.landing-work.is-compact .landing-projects {
+  gap: 0;
+}
+.landing-work.is-compact .landing-thumb {
+  display: none;
+}
+.landing-work.is-compact .landing-project,
+.landing-work.is-compact .landing-projects li:nth-child(even) .landing-project,
+.landing-work.is-compact .landing-project.is-static {
+  padding: 14px 4px;
+  border: 0;
+  border-bottom: 1px dashed var(--landing-line);
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  transform: none;
+}
+.landing-work.is-compact a.landing-project:hover {
+  box-shadow: none;
+  transform: none;
+}
+.landing-work.is-compact a.landing-project:hover strong {
+  background: linear-gradient(transparent 62%, var(--landing-marker) 62%);
+}
+
+/* Writing: titles only. */
+.landing-writing.is-compact .landing-posts {
+  gap: 0;
+}
+.landing-writing.is-compact .landing-posts a,
+.landing-writing.is-compact .landing-posts li:nth-child(even) a {
+  display: flex;
+  flex-direction: column-reverse;
+  padding: 14px 4px;
+  border: 0;
+  border-bottom: 1px dashed var(--landing-line);
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+.landing-writing.is-compact .landing-posts a:hover {
+  transform: none;
+  box-shadow: none;
+}
+.landing-writing.is-compact .landing-posts p {
+  display: none;
+}
+.landing-writing.is-compact .landing-posts h3 {
+  margin: 0 0 2px;
+}
+
+/* Writing: a grid of cards. */
+.landing-writing.is-grid .landing-posts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.landing-writing.is-grid .landing-posts p {
+  -webkit-line-clamp: 3;
+}
+
+@media (max-width: 560px) {
+  .landing-work.is-grid .landing-projects,
+  .landing-writing.is-grid .landing-posts,
+  .landing-working.is-cards .landing-now {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .landing-helps.is-cards ul {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

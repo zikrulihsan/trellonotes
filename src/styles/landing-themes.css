@@ -178,3 +178,37 @@
   font-family: var(--landing-hand);
   font-size: 12px;
 }
+
+/* Section order and designs on the Public page screen. */
+.layout-list {
+  display: grid;
+  gap: 6px;
+}
+.layout-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 170px) 76px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px 8px 14px;
+  border-radius: 10px;
+  background: #faf9fc;
+}
+.layout-name {
+  font-size: 14px;
+  font-weight: 550;
+  color: #2d2737;
+}
+.layout-moves {
+  display: flex;
+  justify-content: flex-end;
+  gap: 2px;
+}
+.layout-moves button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.layout-pinned {
+  justify-self: end;
+  font-size: 11px;
+  color: #a39dab;
+}
