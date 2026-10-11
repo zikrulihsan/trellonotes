@@ -3,14 +3,14 @@ import { describe, expect, it, vi } from 'vitest';
 import { HomeLanding } from './HomeLanding';
 
 describe('signed-out home page', () => {
-  it('says what Notis is and signs in from the top and the bottom', () => {
+  it('says what Notis is and asks how to sign in only after Start writing', () => {
     const onGoogle = vi.fn();
     const onSwegrowth = vi.fn();
     render(
       <HomeLanding redirecting={false} error="" onGoogle={onGoogle} onSwegrowth={onSwegrowth} />,
     );
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'From notes to getting noticed.',
+      'Write notes, get noticed.',
     );
     expect(
       screen.getByRole('heading', { name: 'Everything starts with a note.' }),
@@ -20,19 +20,27 @@ describe('signed-out home page', () => {
       'href',
       'https://notis.swegrowth.id/@zikrul-ihsan-md',
     );
-    const google = screen.getAllByRole('button', { name: 'Continue with Google' });
-    expect(google).toHaveLength(2);
-    fireEvent.click(google[1]);
-    fireEvent.click(screen.getAllByRole('button', { name: 'Continue with SWE Growth' })[0]);
+    expect(screen.getByRole('link', { name: 'See an example page' })).toHaveAttribute(
+      'href',
+      'https://notis.swegrowth.id/@zikrul-ihsan-md',
+    );
+    expect(screen.queryByRole('button', { name: 'Continue with Google' })).toBeNull();
+    const starts = screen.getAllByRole('button', { name: /Start writing/ });
+    expect(starts).toHaveLength(2);
+    fireEvent.click(starts[0]);
+    expect(screen.getByRole('dialog', { name: 'Start writing in Notis' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Continue with Google' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Continue with SWE Growth' }));
     expect(onGoogle).toHaveBeenCalledTimes(1);
     expect(onSwegrowth).toHaveBeenCalledTimes(1);
   });
 
-  it('shows a sign-in error', () => {
+  it('opens the sign-in choices with the error after a failed sign-in', () => {
     render(
       <HomeLanding redirecting error="Popup blocked" onGoogle={() => {}} onSwegrowth={() => {}} />,
     );
     expect(screen.getByRole('alert')).toHaveTextContent('Popup blocked');
-    expect(screen.getAllByRole('button', { name: 'Opening Google…' })[0]).toBeDisabled();
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Opening Google…' })).toBeDisabled();
   });
 });

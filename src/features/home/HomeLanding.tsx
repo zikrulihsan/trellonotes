@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
+import { Modal } from '@/components/ui/Modal';
 import {
   ArrowRight,
   CircleCheck,
@@ -114,28 +115,25 @@ const FEATURES: { icon: ReactNode; title: string; text: string }[] = [
   },
   {
     icon: <Sparkles size={18} />,
-    title: 'Start from your resume',
-    text: 'Fill your page from your CV in one step.',
+    title: 'AI from your resume',
+    text: 'Upload your CV and AI fills in your public page.',
   },
 ];
 
 /** What signed-out visitors see: what Notis is, and the way in. */
 export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeLandingProps) {
-  const signIn = (
-    <div className="home-signin">
-      <button
-        className="home-button is-primary"
-        type="button"
-        onClick={onGoogle}
-        disabled={redirecting}
-      >
-        {redirecting ? <LoaderCircle size={18} className="auth-spinner" /> : <GoogleMark />}
-        {redirecting ? 'Opening Google…' : 'Continue with Google'}
-      </button>
-      <button className="home-button" type="button" onClick={onSwegrowth} disabled={redirecting}>
-        Continue with SWE Growth
-      </button>
-    </div>
+  // The sign-in choices open only once the visitor asks to start; a failed sign-in reopens them.
+  const [asked, setAsked] = useState(false),
+    [dismissedError, setDismissedError] = useState('');
+  const signingIn = asked || Boolean(error && error !== dismissedError);
+  const setSigningIn = (open: boolean) => {
+    setAsked(open);
+    if (!open) setDismissedError(error);
+  };
+  const start = (
+    <button className="home-button is-primary" type="button" onClick={() => setSigningIn(true)}>
+      Start writing <ArrowRight size={18} />
+    </button>
   );
   return (
     <div className="home">
@@ -146,27 +144,28 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           </span>
           Notis
         </span>
-        <a className="home-nav-link" href="#start">
+        <button className="home-nav-link" type="button" onClick={() => setSigningIn(true)}>
           Sign in
-        </a>
+        </button>
       </header>
 
       <main>
         <section className="home-hero">
           <p className="eyebrow">YOUR NOTES, YOUR PUBLIC PRESENCE</p>
           <h1>
-            From notes to <mark>getting noticed</mark>.
+            Write notes,
+            <br /> <mark>get noticed</mark>.
           </h1>
           <p className="home-lead">
-            Note your plans and progress. Notis keeps a journal of what you finish each week, and
-            turns it into writing and a page of your own that gets you noticed.
+            A notes and writing app for professionals that turns everyday notes into a public
+            professional presence.
           </p>
-          {signIn}
-          {error && (
-            <p className="auth-error" role="alert">
-              {error}
-            </p>
-          )}
+          <div className="home-signin">
+            {start}
+            <a className="home-button" href={EXAMPLE_SITE} target="_blank" rel="noreferrer">
+              See an example page
+            </a>
+          </div>
           <p className="home-footnote">
             <Lock size={13} /> Private until you choose to publish.
           </p>
@@ -291,13 +290,47 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
         <section className="home-start" id="start" aria-labelledby="home-start">
           <h2 id="home-start">Start with one note.</h2>
           <p>Sign in and your first board is ready.</p>
-          {signIn}
+          <div className="home-signin">{start}</div>
         </section>
       </main>
 
+      {signingIn && (
+        <Modal
+          title="Start writing in Notis"
+          className="home-signin-dialog"
+          onClose={() => !redirecting && setSigningIn(false)}
+        >
+          <p>Sign in and your first board is ready. Nothing is public until you publish it.</p>
+          <div className="home-signin-options">
+            <button
+              className="home-button is-primary"
+              type="button"
+              onClick={onGoogle}
+              disabled={redirecting}
+            >
+              {redirecting ? <LoaderCircle size={18} className="auth-spinner" /> : <GoogleMark />}
+              {redirecting ? 'Opening Google…' : 'Continue with Google'}
+            </button>
+            <button
+              className="home-button"
+              type="button"
+              onClick={onSwegrowth}
+              disabled={redirecting}
+            >
+              Continue with SWE Growth
+            </button>
+          </div>
+          {error && (
+            <p className="auth-error" role="alert">
+              {error}
+            </p>
+          )}
+        </Modal>
+      )}
+
       <footer className="home-footer">
         <span>Notis</span>
-        <span>From notes to getting noticed.</span>
+        <span>Write notes, get noticed.</span>
       </footer>
     </div>
   );
