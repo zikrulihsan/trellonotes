@@ -237,9 +237,9 @@ export function WorkspaceProvider({ children }: PropsWithChildren) {
   }, [workspace, cloudLoaded, cloudEnabled, storageKey]);
   const actions = useMemo<WorkspaceActions>(
     () => ({
-      createBoard(title) {
+      createBoard(title, templateId) {
         if (!title.trim()) throw new Error('Give the board a name');
-        const board = createBoard(title);
+        const board = createBoard(title, templateId);
         dispatch({ type: 'board/create', board });
         return board.id;
       },

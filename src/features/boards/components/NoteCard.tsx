@@ -81,7 +81,7 @@ export function NoteCard({ note, board }: { note: Note; board: Board }) {
           <label>
             Move to
             <select
-              aria-label="Move initiative to list"
+              aria-label="Move card to list"
               value={note.listId}
               onChange={(event) => {
                 moveNote(note.id, event.target.value);
@@ -108,7 +108,7 @@ export function NoteCard({ note, board }: { note: Note; board: Board }) {
             }}
           >
             <Trash2 size={15} />
-            Delete initiative
+            Delete card
           </button>
         </Dropdown>
       </div>

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { seedWorkspace } from '@/features/workspace/seed';
+import { sampleWorkspace } from '@/test/sample-workspace';
 import type { Workspace } from '@/features/workspace/types';
 import { createWorkspaceSaver } from './workspace-saver';
 
@@ -20,8 +20,8 @@ describe('workspace saver', () => {
     const save = vi.fn((workspace: Workspace) => Promise.resolve(workspace));
     const onSaved = vi.fn();
     const saver = createWorkspaceSaver({ save, onSaved, onError: vi.fn() });
-    const first = seedWorkspace(),
-      second = seedWorkspace();
+    const first = sampleWorkspace(),
+      second = sampleWorkspace();
     saver.queue(first);
     await vi.advanceTimersByTimeAsync(300);
     saver.queue(second);
@@ -39,8 +39,8 @@ describe('workspace saver', () => {
       return done.promise.then(() => workspace);
     });
     const saver = createWorkspaceSaver({ save, onSaved: vi.fn(), onError: vi.fn() });
-    const first = seedWorkspace(),
-      second = seedWorkspace();
+    const first = sampleWorkspace(),
+      second = sampleWorkspace();
     saver.queue(first);
     saver.flush();
     saver.queue(second);
@@ -60,7 +60,7 @@ describe('workspace saver', () => {
     const onSaved = vi.fn(),
       onError = vi.fn();
     const saver = createWorkspaceSaver({ save, onSaved, onError, retryDelay: 1000 });
-    const workspace = seedWorkspace();
+    const workspace = sampleWorkspace();
     saver.queue(workspace);
     saver.flush();
     await vi.advanceTimersByTimeAsync(0);
@@ -75,11 +75,11 @@ describe('workspace saver', () => {
       .fn<(workspace: Workspace) => Promise<Workspace>>()
       .mockImplementation((workspace) => Promise.resolve(workspace));
     const saver = createWorkspaceSaver({ save, onSaved: vi.fn(), onError: vi.fn() });
-    saver.queue(seedWorkspace());
+    saver.queue(sampleWorkspace());
     await expect(saver.whenIdle()).resolves.toBe(true);
     expect(save).toHaveBeenCalledTimes(1);
     save.mockRejectedValueOnce(new Error('offline'));
-    saver.queue(seedWorkspace());
+    saver.queue(sampleWorkspace());
     await expect(saver.whenIdle()).resolves.toBe(false);
     saver.dispose();
   });

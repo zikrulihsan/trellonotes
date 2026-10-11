@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   BookOpen,
+  ExternalLink,
   Feather,
   FileText,
   Globe,
@@ -21,6 +22,8 @@ import type { Board } from '@/features/workspace/types';
 import { boardPath } from '@/lib/app-paths';
 import { useFocus } from '@/features/focus/focus-context';
 import { formatClock } from '@/features/focus/focus-timer';
+import { useProfile } from '@/features/pages/useProfile';
+import { writerPath } from '@/lib/supabase/published-pages';
 export function Sidebar({
   board,
   section,
@@ -32,6 +35,7 @@ export function Sidebar({
     { finishSync } = useWorkspaceActions(),
     focus = useFocus(),
     { user, signOut } = useAuth(),
+    { author } = useProfile(),
     [signingOut, setSigningOut] = useState(false),
     { sidebarVisible, narrowScreen, hideSidebar, closeSidebarDrawer, openDialog } = useUI(),
     navigate = useNavigate(),
@@ -129,10 +133,14 @@ export function Sidebar({
           <div className="workspace-label">
             <span className="workspace-avatar">S</span>
             <div className="sidebar-text">
-              Personal workspace<small>Your space to create</small>
+              Personal workspace<small>Note it, write it, show it</small>
             </div>
           </div>
+          {/* The main flow: note it, write it, show it. */}
           <nav className="side-links" aria-label="Sections">
+            <div className="side-section">
+              <span>NOTE</span>
+            </div>
             <button
               className={`side-link ${section === 'boards' ? 'active' : ''}`}
               aria-current={section === 'boards' ? 'page' : undefined}
@@ -143,6 +151,22 @@ export function Sidebar({
               <span className="side-count">{workspace.boards.length}</span>
             </button>
             <button
+              className={`side-link ${section === 'todos' ? 'active' : ''}`}
+              aria-current={section === 'todos' ? 'page' : undefined}
+              onClick={goTodos}
+            >
+              <ListChecks size={18} />
+              <span className="side-label">To-do lists</span>
+              <span className="side-count">{workspace.todos?.length ?? 0}</span>
+            </button>
+            <button className="side-link" onClick={freeWrite}>
+              <PenLine size={18} />
+              <span className="side-label">Free write</span>
+            </button>
+            <div className="side-section">
+              <span>WRITE</span>
+            </div>
+            <button
               className={`side-link ${section === 'pages' ? 'active' : ''}`}
               aria-current={section === 'pages' ? 'page' : undefined}
               onClick={goPages}
@@ -152,36 +176,43 @@ export function Sidebar({
               <span className="side-count">{workspace.pages?.length ?? 0}</span>
             </button>
             {cloudEnabled && (
-              <button
-                className={`side-link ${section === 'landing' ? 'active' : ''}`}
-                aria-current={section === 'landing' ? 'page' : undefined}
-                onClick={goLanding}
-              >
-                <Globe size={18} />
-                <span className="side-label">Landing page</span>
-              </button>
+              <>
+                <div className="side-section">
+                  <span>SHOW</span>
+                </div>
+                <button
+                  className={`side-link ${section === 'landing' ? 'active' : ''}`}
+                  aria-current={section === 'landing' ? 'page' : undefined}
+                  onClick={goLanding}
+                >
+                  <Globe size={18} />
+                  <span className="side-label">Public page</span>
+                </button>
+                {author?.handle && (
+                  <a
+                    className="side-link"
+                    href={writerPath(author)}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={closeSidebarDrawer}
+                  >
+                    <ExternalLink size={18} />
+                    <span className="side-label">View my page</span>
+                  </a>
+                )}
+              </>
             )}
-            <button
-              className={`side-link ${section === 'todos' ? 'active' : ''}`}
-              aria-current={section === 'todos' ? 'page' : undefined}
-              onClick={goTodos}
-            >
-              <ListChecks size={18} />
-              <span className="side-label">To-do lists</span>
-              <span className="side-count">{workspace.todos?.length ?? 0}</span>
-            </button>
-            <button className="side-link" onClick={() => openDialog({ kind: 'manage-labels' })}>
-              <Tags size={18} />
-              <span className="side-label">Labels</span>
-              <span className="side-count">{workspace.labels?.length ?? 0}</span>
-            </button>
           </nav>
           <div className="side-section">
-            <span>QUICK ACTIONS</span>
+            <span>TOOLS</span>
           </div>
-          <button className="side-link side-quick" onClick={freeWrite}>
-            <PenLine size={18} />
-            <span className="side-label">Free write</span>
+          <button
+            className="side-link side-quick"
+            onClick={() => openDialog({ kind: 'manage-labels' })}
+          >
+            <Tags size={18} />
+            <span className="side-label">Labels</span>
+            <span className="side-count">{workspace.labels?.length ?? 0}</span>
           </button>
           <button
             className="side-link side-quick"
@@ -230,9 +261,9 @@ export function Sidebar({
           <div className="sidebar-note">
             <BookOpen size={20} />
             <p>
-              Every good idea
+              Everything starts
               <br />
-              starts with a little space.
+              with a note.
             </p>
           </div>
         </div>

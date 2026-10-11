@@ -1,14 +1,14 @@
 import type { Board, Label, Note, Page, TodoList } from './types';
-export function createBoard(title: string): Board {
+import { templateById } from './templates';
+/** A new board with the lists of the chosen template (a blank board by default). */
+export function createBoard(title: string, templateId?: string): Board {
+  const template = templateById(templateId);
   return {
     id: crypto.randomUUID(),
     title: title.trim(),
-    description: 'Initiatives in progress, and the updates that move them along.',
-    color: '#a78bfa',
-    lists: ['Ideas', 'Writing', 'Keep coming back'].map((title) => ({
-      id: crypto.randomUUID(),
-      title,
-    })),
+    description: template.hint,
+    color: template.color,
+    lists: template.lists.map((title) => ({ id: crypto.randomUUID(), title })),
   };
 }
 export function createNote(boardId: string, listId: string, title: string): Note {

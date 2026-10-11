@@ -10,7 +10,8 @@ import type {
   Workspace,
 } from '@/features/workspace/types';
 export interface WorkspaceActions {
-  createBoard: (title: string) => string;
+  /** Makes a board from a template (blank when none is given); returns its id. */
+  createBoard: (title: string, templateId?: string) => string;
   renameBoard: (boardId: string, title: string) => void;
   deleteBoard: (boardId: string) => void;
   createList: (boardId: string, title: string) => void;

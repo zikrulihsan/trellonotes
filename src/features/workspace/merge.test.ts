@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { mergeWorkspaces } from './merge';
-import { seedWorkspace } from './seed';
+import { sampleWorkspace } from '@/test/sample-workspace';
 import type { Workspace } from './types';
 
 const clone = (ws: Workspace): Workspace => structuredClone(ws);
 
 describe('merging edits from two devices', () => {
   it('keeps lists and notes added on both devices', () => {
-    const base = seedWorkspace();
+    const base = sampleWorkspace();
     const local = clone(base),
       remote = clone(base);
     local.boards[0].lists.push({ id: 'local-list', title: 'Drafts' });
@@ -21,7 +21,7 @@ describe('merging edits from two devices', () => {
   });
 
   it('combines different edits to the same note and takes the newer writing on a clash', () => {
-    const base = seedWorkspace();
+    const base = sampleWorkspace();
     const local = clone(base),
       remote = clone(base);
     local.cards[0] = { ...local.cards[0], title: 'Local title', updatedAt: 200 };
@@ -38,7 +38,7 @@ describe('merging edits from two devices', () => {
   });
 
   it('applies deletions from the other device unless the item was edited here', () => {
-    const base = seedWorkspace();
+    const base = sampleWorkspace();
     const local = clone(base),
       remote = clone(base);
     remote.cards = remote.cards.filter(
@@ -53,7 +53,7 @@ describe('merging edits from two devices', () => {
   });
 
   it('restores a deleted list that still holds a note edited on this device', () => {
-    const base = seedWorkspace();
+    const base = sampleWorkspace();
     const note = base.cards[0];
     const local = clone(base),
       remote = clone(base);
@@ -66,7 +66,7 @@ describe('merging edits from two devices', () => {
   });
 
   it('keeps a note moved on this device in its new place', () => {
-    const base = seedWorkspace();
+    const base = sampleWorkspace();
     const local = clone(base),
       remote = clone(base);
     const [first] = local.cards.splice(0, 1);
@@ -78,7 +78,7 @@ describe('merging edits from two devices', () => {
   });
 
   it('keeps the newer free writing, and free writing that exists on one device only', () => {
-    const base = seedWorkspace();
+    const base = sampleWorkspace();
     const local = clone(base),
       remote = clone(base);
     local.scratch = { content: '<p>laptop</p>', updatedAt: 100 };
@@ -89,7 +89,7 @@ describe('merging edits from two devices', () => {
 
   it('keeps to-do lists added on both devices and the newer edit to the same list', () => {
     const base = {
-      ...seedWorkspace(),
+      ...sampleWorkspace(),
       todos: [{ id: 't1', title: 'Launch', content: '', updatedAt: 1 }],
     };
     const local = clone(base),
@@ -103,7 +103,7 @@ describe('merging edits from two devices', () => {
   });
 
   it('treats the cloud copy key order as unchanged', () => {
-    const base = seedWorkspace();
+    const base = sampleWorkspace();
     const reordered = JSON.parse(
       JSON.stringify(base, (_key, value: unknown) =>
         value && typeof value === 'object' && !Array.isArray(value)

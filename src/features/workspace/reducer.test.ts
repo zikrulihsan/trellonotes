@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { workspaceReducer } from './reducer';
-import { seedWorkspace } from './seed';
+import { sampleWorkspace } from '@/test/sample-workspace';
 function fixture() {
-  const state = seedWorkspace();
+  const state = sampleWorkspace();
   state.cards[0].updatedAt = 1000;
   return state;
 }
