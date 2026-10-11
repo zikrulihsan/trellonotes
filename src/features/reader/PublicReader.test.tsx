@@ -239,6 +239,37 @@ describe('public reader', () => {
     expect(screen.getByRole('link', { name: 'Blog' })).toHaveAttribute('aria-current', 'page');
   });
 
+  it('titles the Blog page and lists posts the way the writer set it up', async () => {
+    landing = {
+      blog: {
+        heading: 'Tulisan',
+        intro: 'Catatan saya',
+        layout: { header: 'left', posts: 'grid' },
+      },
+    };
+    const { container } = renderAt('/@zikrul?blog');
+    expect(await screen.findByRole('heading', { name: 'Tulisan' })).toBeInTheDocument();
+    expect(screen.getByText('Catatan saya')).toBeInTheDocument();
+    expect(container.querySelector('.landing-blog-header.is-left')).not.toBeNull();
+    expect(container.querySelector('.landing-writing.is-grid .landing-posts')).not.toBeNull();
+  });
+
+  it('puts the About sections in the order the writer picked', async () => {
+    landing = {
+      about: {
+        intro: 'Hello.',
+        stack: ['People first'],
+        now: ['Building Notis'],
+        layout: { order: ['now', 'values'], now: 'chips' },
+      },
+    };
+    const { container } = renderAt('/@zikrul?about');
+    await screen.findByRole('heading', { name: 'About' });
+    const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(headings).toEqual(["What I'm up to now", 'What I hold onto']);
+    expect(container.querySelector('.landing-working.is-chips')).not.toBeNull();
+  });
+
   it('still opens the Blog page from the older ?notes address', async () => {
     renderAt('/@zikrul?notes');
     expect(await screen.findByRole('heading', { name: 'Blog' })).toBeInTheDocument();

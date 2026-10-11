@@ -329,3 +329,266 @@
   margin: 0;
   box-shadow: 0 20px 60px rgba(20, 15, 30, 0.35);
 }
+
+/* Type scale. Sketchbook's hand faces run small and narrow, and the sizes above are set
+   for them; the plainer faces of the other themes look a size larger at the same pixels.
+   Each theme evens that out by its faces' x-height, and running text in the shared sans
+   face stays as it is everywhere. */
+[data-landing-theme='clean'],
+[data-landing-theme='midnight'],
+[data-landing-theme='editorial'] {
+  --landing-hand-adjust: 0.44;
+  --landing-display-adjust: 0.48;
+}
+[data-landing-theme] :is(.landing, .landing-nav, .reader-back) {
+  font-size-adjust: var(--landing-hand-adjust, none);
+}
+[data-landing-theme]
+  :is(
+    .landing h1,
+    .landing h2,
+    .landing-help-number,
+    span.landing-thumb,
+    .landing-byline-name,
+    .landing-story-label,
+    .landing-values li::before
+  ) {
+  font-size-adjust: var(--landing-display-adjust, none);
+}
+[data-landing-theme]
+  :is(
+    .landing-tagline,
+    .landing-posts p,
+    .landing-story > p,
+    .landing-timeline p,
+    .landing-timeline li li,
+    .landing-placeholder p,
+    .landing-placeholder-note,
+    .landing time,
+    .landing-story-meta,
+    .landing-timeline-period
+  ) {
+  font-size-adjust: none;
+}
+
+/* Headings. Each theme titles its pages and sections in its own way; the sketchbook's
+   marker stroke, sparkle and wavy underline are in landing.css. */
+
+/* Clean: a tight, heavy name over a short accent bar; section titles as small labels. */
+[data-landing-theme='clean'] .landing-marker {
+  padding: 0;
+  background: none;
+  animation: none;
+}
+[data-landing-theme='clean'] .landing-sparkle {
+  display: none;
+}
+[data-landing-theme='clean'] :is(.landing-hero, .landing-blog-header) h1 {
+  letter-spacing: -0.035em;
+}
+[data-landing-theme='clean'] :is(.landing-hero, .landing-blog-header) h1::after {
+  content: '';
+  display: block;
+  width: 56px;
+  height: 5px;
+  margin: 18px auto 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #8b6cf0, #c9b6ff);
+}
+[data-landing-theme='clean'] :is(.landing-hero, .landing-blog-header).is-left h1::after {
+  margin-left: 0;
+}
+[data-landing-theme='clean'] .landing :is(.landing-section, .landing-helps) h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--landing-marker);
+  color: #4a3a86;
+  font-family: var(--landing-sans);
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+[data-landing-theme='clean'] .landing :is(.landing-section, .landing-helps) h2::after {
+  display: none;
+}
+[data-landing-theme='clean'] .landing :is(.landing-section, .landing-helps) h2::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #7954d8;
+}
+[data-landing-theme='clean'] .landing-nav a[aria-current='page'] {
+  border-color: transparent;
+  background: #1d1b22;
+  color: #fff;
+  box-shadow: none;
+}
+[data-landing-theme='clean'] .landing-nav a:hover:not([aria-current='page']) {
+  border-color: transparent;
+  background: #f1eef7;
+}
+[data-landing-theme='clean'] .landing-button,
+[data-landing-theme='clean'] .landing-button:hover {
+  border-radius: 999px;
+  box-shadow: 0 1px 2px rgb(29 27 34 / 0.08);
+  transform: none;
+}
+[data-landing-theme='clean'] :is(.landing-help-number, .landing-tag) {
+  transform: none;
+}
+[data-landing-theme='clean'] .landing-help-number {
+  border: 0;
+  border-radius: 10px;
+  color: #4a3a86;
+}
+[data-landing-theme='clean'] .landing-tag {
+  border-color: transparent;
+}
+
+/* Editorial: a magazine masthead between rules; section titles set between hairlines. */
+[data-landing-theme='editorial'] .landing-marker {
+  padding: 0;
+  background: none;
+  animation: none;
+}
+[data-landing-theme='editorial'] .landing-sparkle {
+  display: none;
+}
+[data-landing-theme='editorial'] :is(.landing-hero, .landing-blog-header) h1 {
+  display: inline-block;
+  padding: 14px 4px 16px;
+  border-top: 4px double var(--landing-ink);
+  border-bottom: 1px solid var(--landing-ink);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+[data-landing-theme='editorial'] :is(.landing-hero, .landing-blog-header) .landing-tagline {
+  font-family: var(--landing-display);
+  font-style: italic;
+}
+[data-landing-theme='editorial'] .landing :is(.landing-section, .landing-helps) h2 {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  padding-bottom: 0;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+[data-landing-theme='editorial'] .landing :is(.landing-section, .landing-helps) h2::before,
+[data-landing-theme='editorial'] .landing :is(.landing-section, .landing-helps) h2::after {
+  content: '';
+  position: static;
+  flex: 1;
+  height: 1px;
+  background: var(--landing-line);
+  -webkit-mask: none;
+  mask: none;
+}
+[data-landing-theme='editorial'] .landing-nav a {
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  font-size: 15px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+[data-landing-theme='editorial'] .landing-nav a[aria-current='page'] {
+  border-bottom-color: var(--landing-ink);
+  background: none;
+  box-shadow: none;
+}
+[data-landing-theme='editorial'] .landing-button,
+[data-landing-theme='editorial'] .landing-button:hover {
+  box-shadow: none;
+  transform: none;
+  letter-spacing: 0.04em;
+}
+[data-landing-theme='editorial'] .landing-help-number {
+  border: 0;
+  border-bottom: 1.5px solid var(--landing-ink);
+  border-radius: 0;
+  background: none;
+  font-style: italic;
+  transform: none;
+}
+[data-landing-theme='editorial'] .landing-helps li:nth-child(even) .landing-help-number,
+[data-landing-theme='editorial'] .landing-tag,
+[data-landing-theme='editorial'] .landing-projects li:nth-child(even) .landing-tag {
+  transform: none;
+}
+[data-landing-theme='editorial'] .landing-tag {
+  background: none;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Midnight: a glowing gradient name; section titles over a short neon bar. */
+[data-landing-theme='midnight'] .landing h1 .landing-marker {
+  padding: 0;
+  background: linear-gradient(100deg, #f3f1f7 10%, #b9a6ff 55%, #ff8fd1 95%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 22px rgb(122 92 255 / 0.45));
+  animation: none;
+}
+[data-landing-theme='midnight'] .landing-sparkle {
+  fill: #b9a6ff;
+  stroke: none;
+  filter: drop-shadow(0 0 8px #7a5cff);
+}
+[data-landing-theme='midnight'] .landing :is(.landing-section, .landing-helps) h2 {
+  padding-bottom: 14px;
+  letter-spacing: -0.01em;
+}
+[data-landing-theme='midnight'] .landing :is(.landing-section, .landing-helps) h2::after {
+  left: 50%;
+  right: auto;
+  width: 44px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #7a5cff, #ff8fd1);
+  box-shadow: 0 0 12px rgb(122 92 255 / 0.8);
+  translate: -50% 0;
+  -webkit-mask: none;
+  mask: none;
+}
+[data-landing-theme='midnight'] .landing-nav a[aria-current='page'] {
+  border-color: #7a5cff;
+  background: rgb(106 79 216 / 0.35);
+  box-shadow: 0 0 16px rgb(122 92 255 / 0.45);
+}
+[data-landing-theme='midnight'] .landing-button,
+[data-landing-theme='midnight'] .landing-button:hover {
+  border-color: var(--landing-line);
+  box-shadow: none;
+  transform: none;
+}
+[data-landing-theme='midnight'] .landing-button.is-primary,
+[data-landing-theme='midnight'] .landing-button.is-primary:hover {
+  border-color: transparent;
+  background: linear-gradient(100deg, #6a4fd8, #a25ee0);
+  color: #fff;
+  box-shadow: 0 0 20px rgb(122 92 255 / 0.4);
+}
+[data-landing-theme='midnight']
+  :is(.landing-tag, .landing-projects li:nth-child(even) .landing-tag) {
+  transform: none;
+}
+[data-landing-theme='midnight'] .landing-help-number {
+  border-color: #7a5cff;
+  background: rgb(106 79 216 / 0.3);
+  box-shadow: 0 0 14px rgb(122 92 255 / 0.5);
+  transform: none;
+}
+[data-landing-theme='midnight'] .landing-tag {
+  border-color: #7a5cff;
+  background: rgb(106 79 216 / 0.25);
+}

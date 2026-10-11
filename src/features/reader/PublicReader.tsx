@@ -38,13 +38,16 @@ import {
   type PublishedPage,
 } from '@/lib/supabase/published-pages';
 import {
+  defaultBlog,
   defaultLanding,
   getLanding,
   hasAbout,
   normalizeLanding,
   socialPlatform,
+  type AboutSectionId,
   type Landing,
   type LandingAbout,
+  type LandingBlog,
   type LandingProject,
   type LandingSectionId,
   type LandingTheme,
@@ -219,7 +222,7 @@ function AuthorPage({ author }: { author: Author }) {
       {view === 'about' && about ? (
         <AboutView author={author} name={name} pages={pages} about={about} />
       ) : view === 'blog' ? (
-        <BlogView author={author} name={name} pages={pages} />
+        <BlogView author={author} name={name} pages={pages} blog={landing?.blog} />
       ) : (
         <LandingView author={author} name={name} pages={pages} landing={landing} />
       )}
@@ -236,9 +239,21 @@ export interface LandingProps {
   name: string | null;
   pages: PublishedPage[];
   landing: Landing | null;
+  /** In the editor's preview, empty sections still show, so moving them shows too. */
+  preview?: boolean;
 }
 
-export function LandingView({ author, name, pages, landing }: LandingProps) {
+/** Stands in for a section with nothing in it yet, in the editor's preview only. */
+function Placeholder({ id, heading, note }: { id: string; heading: string; note: string }) {
+  return (
+    <section data-section={id} className="landing-section landing-placeholder">
+      <h2>{heading}</h2>
+      <p>{note}</p>
+    </section>
+  );
+}
+
+export function LandingView({ author, name, pages, landing, preview }: LandingProps) {
   const content = landing ?? defaultLanding(name);
   // `pages` holds only listed pages, so an unlisted or unpublished project page never gets a link.
   const bySlug = new Map(pages.map((page) => [page.id, page.slug]));
@@ -256,6 +271,7 @@ export function LandingView({ author, name, pages, landing }: LandingProps) {
     helps: content.helps.length > 0 && (
       <section
         key="helps"
+        data-section="helps"
         className={`landing-helps is-${layout.helps}`}
         aria-labelledby="landing-helps"
       >
@@ -277,6 +293,7 @@ export function LandingView({ author, name, pages, landing }: LandingProps) {
     working: content.working.length > 0 && (
       <section
         key="working"
+        data-section="working"
         className={`landing-section landing-working is-${layout.working}`}
         aria-labelledby="landing-working"
       >
@@ -292,6 +309,7 @@ export function LandingView({ author, name, pages, landing }: LandingProps) {
     projects: content.projects.length > 0 && (
       <section
         key="projects"
+        data-section="projects"
         className={`landing-section landing-work is-${layout.projects}`}
         aria-labelledby="landing-projects"
       >
@@ -312,6 +330,7 @@ export function LandingView({ author, name, pages, landing }: LandingProps) {
     notes: shown.length > 0 && (
       <section
         key="notes"
+        data-section="notes"
         className={`landing-section landing-writing is-${layout.notes}`}
         aria-labelledby="landing-notes"
       >
@@ -323,9 +342,18 @@ export function LandingView({ author, name, pages, landing }: LandingProps) {
       </section>
     ),
   };
+  const empty: Record<LandingSectionId, [string, string]> = {
+    helps: [content.helpsHeading || 'Helps people to', 'Add what you help people with.'],
+    working: [
+      content.workingHeading || "What you're working on",
+      'Pick cards on your boards to show here.',
+    ],
+    projects: [content.projectsHeading || 'Projects', 'Add a project to show it here.'],
+    notes: [content.notesHeading || 'Writing', 'Your published pages show here.'],
+  };
   return (
     <main className="landing">
-      <header className={`landing-hero is-${layout.hero}`}>
+      <header className={`landing-hero is-${layout.hero}`} data-section="hero">
         <h1>
           <span className="landing-marker">
             {content.greeting || name || (author.handle ? `@${author.handle}` : 'Writing')}
@@ -380,8 +408,12 @@ export function LandingView({ author, name, pages, landing }: LandingProps) {
         )}
         <NextArrow className="landing-scroll-cue" />
       </header>
-      {content.layout.order.map((id) => sections[id])}
-      {!shown.length && !content.projects.length && (
+      {content.layout.order.map(
+        (id) =>
+          sections[id] ||
+          (preview && <Placeholder key={id} id={id} heading={empty[id][0]} note={empty[id][1]} />),
+      )}
+      {!preview && !shown.length && !content.projects.length && (
         <p className="landing-empty">Nothing has been published here yet.</p>
       )}
     </main>
@@ -545,7 +577,7 @@ function Sparkle() {
   );
 }
 
-type Section = 'me' | 'blog' | 'about';
+export type Section = 'me' | 'blog' | 'about';
 
 const blogPath = (author: PublicAuthor) => `${writerPath(author)}?blog`;
 
@@ -616,14 +648,16 @@ function useAuthorSite(author: PublicAuthor, enabled: boolean) {
 }
 
 /**
- * The About page: a short byline, then the writer's story told at reading width, what they
- * hold onto, what they are up to now, story pages and experience.
+ * The About page: a short byline, then the writer's story told at reading width, and the
+ * sections the writer put below it (what they hold onto, what they are up to now, story
+ * pages and experience) in their order and designs.
  */
 function AboutView({
   author,
   name,
   pages,
   about,
+  preview,
 }: Omit<LandingProps, 'landing'> & { about: LandingAbout }) {
   // Only listed pages are linked, like projects on Me.
   const bySlug = new Map(pages.map((page) => [page.id, page]));
@@ -634,105 +668,145 @@ function AboutView({
   const stories = about.stories
     .map((story) => ({ ...story, page: story.pageId ? bySlug.get(story.pageId) : undefined }))
     .filter((story) => story.page);
+  const layout = about.layout;
+  const sections: Record<AboutSectionId, ReactNode> = {
+    values: about.stack.length > 0 && (
+      <section
+        key="values"
+        data-section="values"
+        className="landing-section"
+        aria-labelledby="about-values"
+      >
+        {about.stackHeading && <h2 id="about-values">{about.stackHeading}</h2>}
+        <ol className={`landing-values is-${layout.values}`}>
+          {about.stack.map((value, index) => (
+            <li key={index}>{value}</li>
+          ))}
+        </ol>
+      </section>
+    ),
+    now: about.now.length > 0 && (
+      <section
+        key="now"
+        data-section="now"
+        className={`landing-section landing-working is-${layout.now}`}
+        aria-labelledby="about-now"
+      >
+        {about.nowHeading && <h2 id="about-now">{about.nowHeading}</h2>}
+        <ul className="landing-now">
+          {about.now.map((item, index) => (
+            <li key={index}>{item}</li>
+          ))}
+        </ul>
+      </section>
+    ),
+    stories: stories.length > 0 && (
+      <section
+        key="stories"
+        data-section="stories"
+        className="landing-section"
+        aria-labelledby="about-stories"
+      >
+        {about.storiesHeading && <h2 id="about-stories">{about.storiesHeading}</h2>}
+        <ul className={`landing-stories is-${layout.stories}`}>
+          {stories.map(({ id, label, page }) => (
+            <li key={id}>
+              <Link to={writerPath(author, page!.slug)}>
+                {label && <span className="landing-story-label">{label}</span>}
+                <strong>{page!.title}</strong>
+                <span className="landing-story-meta">{readingMinutes(page!.content)} min read</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ),
+    experience: about.experiences.length > 0 && (
+      <section
+        key="experience"
+        data-section="experience"
+        className="landing-section"
+        aria-labelledby="about-experience"
+      >
+        <h2 id="about-experience">Experience</h2>
+        <ol className={`landing-timeline is-${layout.experience}`}>
+          {about.experiences.map((job) => (
+            <li key={job.id}>
+              {job.period && <span className="landing-timeline-period">{job.period}</span>}
+              <h3>{job.title}</h3>
+              {(job.company || job.location) && (
+                <p className="landing-timeline-where">
+                  {job.company &&
+                    (job.companyUrl ? (
+                      <a href={job.companyUrl} target="_blank" rel="noreferrer">
+                        {job.company}
+                      </a>
+                    ) : (
+                      <span>{job.company}</span>
+                    ))}
+                  {job.company && job.location && ' · '}
+                  {job.location}
+                </p>
+              )}
+              {job.description && <p>{job.description}</p>}
+              {job.highlights.length > 0 && (
+                <ul>
+                  {job.highlights.map((highlight, index) => (
+                    <li key={index}>{highlight}</li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ol>
+      </section>
+    ),
+  };
+  const empty: Record<AboutSectionId, [string, string]> = {
+    values: [about.stackHeading || 'What you hold onto', 'Add principles or values, one per line.'],
+    now: [about.nowHeading || "What you're up to now", 'Add what you are up to, one per line.'],
+    stories: [
+      about.storiesHeading || 'Your story in writing',
+      'Pick published pages that tell your story.',
+    ],
+    experience: ['Experience', 'Add the places you have worked.'],
+  };
   return (
     <main className="landing landing-about">
-      <header className="landing-blog-header">
+      <header className={`landing-blog-header is-${layout.header}`} data-section="header">
         <h1>
           <span className="landing-marker">About</span>
         </h1>
         {about.subtitle && <p className="landing-tagline">{about.subtitle}</p>}
       </header>
-      <article className="landing-story">
-        {(about.photo || name || about.role) && (
-          <div className="landing-byline">
-            {about.photo && <img src={about.photo} alt={name ?? ''} />}
-            <div>
-              {name && <p className="landing-byline-name">{name}</p>}
-              {about.role && <p className="landing-byline-role">{about.role}</p>}
+      {(blocks.length > 0 || about.photo || name || about.role || preview) && (
+        <article className="landing-story" data-section="story">
+          {(about.photo || name || about.role) && (
+            <div className="landing-byline">
+              {about.photo && <img src={about.photo} alt={name ?? ''} />}
+              <div>
+                {name && <p className="landing-byline-name">{name}</p>}
+                {about.role && <p className="landing-byline-role">{about.role}</p>}
+              </div>
             </div>
-          </div>
-        )}
-        {/* A block starting with "## " is a heading that breaks a long story into parts. */}
-        {blocks.map((block, index) =>
-          block.startsWith('## ') ? (
-            <h2 key={index}>{block.slice(3).trim()}</h2>
-          ) : (
-            <p key={index}>{block}</p>
-          ),
-        )}
-      </article>
-      {about.stack.length > 0 && (
-        <section className="landing-section" aria-labelledby="about-values">
-          {about.stackHeading && <h2 id="about-values">{about.stackHeading}</h2>}
-          <ol className="landing-values">
-            {about.stack.map((value, index) => (
-              <li key={index}>{value}</li>
-            ))}
-          </ol>
-        </section>
+          )}
+          {/* A block starting with "## " is a heading that breaks a long story into parts. */}
+          {blocks.map((block, index) =>
+            block.startsWith('## ') ? (
+              <h2 key={index}>{block.slice(3).trim()}</h2>
+            ) : (
+              <p key={index}>{block}</p>
+            ),
+          )}
+          {preview && !blocks.length && (
+            <p className="landing-placeholder-note">Your story shows here.</p>
+          )}
+        </article>
       )}
-      {about.now.length > 0 && (
-        <section className="landing-section" aria-labelledby="about-now">
-          {about.nowHeading && <h2 id="about-now">{about.nowHeading}</h2>}
-          <ul className="landing-now">
-            {about.now.map((item, index) => (
-              <li key={index}>{item}</li>
-            ))}
-          </ul>
-        </section>
-      )}
-      {stories.length > 0 && (
-        <section className="landing-section" aria-labelledby="about-stories">
-          {about.storiesHeading && <h2 id="about-stories">{about.storiesHeading}</h2>}
-          <ul className="landing-stories">
-            {stories.map(({ id, label, page }) => (
-              <li key={id}>
-                <Link to={writerPath(author, page!.slug)}>
-                  {label && <span className="landing-story-label">{label}</span>}
-                  <strong>{page!.title}</strong>
-                  <span className="landing-story-meta">
-                    {readingMinutes(page!.content)} min read
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-      {about.experiences.length > 0 && (
-        <section className="landing-section" aria-labelledby="about-experience">
-          <h2 id="about-experience">Experience</h2>
-          <ol className="landing-timeline">
-            {about.experiences.map((job) => (
-              <li key={job.id}>
-                {job.period && <span className="landing-timeline-period">{job.period}</span>}
-                <h3>{job.title}</h3>
-                {(job.company || job.location) && (
-                  <p className="landing-timeline-where">
-                    {job.company &&
-                      (job.companyUrl ? (
-                        <a href={job.companyUrl} target="_blank" rel="noreferrer">
-                          {job.company}
-                        </a>
-                      ) : (
-                        <span>{job.company}</span>
-                      ))}
-                    {job.company && job.location && ' · '}
-                    {job.location}
-                  </p>
-                )}
-                {job.description && <p>{job.description}</p>}
-                {job.highlights.length > 0 && (
-                  <ul>
-                    {job.highlights.map((highlight, index) => (
-                      <li key={index}>{highlight}</li>
-                    ))}
-                  </ul>
-                )}
-              </li>
-            ))}
-          </ol>
-        </section>
+      {layout.order.map(
+        (id) =>
+          sections[id] ||
+          (preview && <Placeholder key={id} id={id} heading={empty[id][0]} note={empty[id][1]} />),
       )}
     </main>
   );
@@ -760,19 +834,39 @@ function PostList({ author, pages }: { author: PublicAuthor; pages: PublishedPag
   );
 }
 
-function BlogView({ author, name, pages }: Omit<LandingProps, 'landing'>) {
+const SAMPLE_POSTS: PublishedPage[] = [1, 2, 3].map((n) => ({
+  id: `sample-${n}`,
+  slug: `sample-${n}`,
+  title: `Example post ${n}`,
+  content: '<p>Your published pages show here, newest first, with their opening words.</p>',
+  author_name: null,
+  published_at: new Date(2026, 0, n).toISOString(),
+  updated_at: new Date(2026, 0, n).toISOString(),
+}));
+
+function BlogView({
+  author,
+  name,
+  pages,
+  blog = defaultBlog(),
+  preview,
+}: Omit<LandingProps, 'landing'> & { blog?: LandingBlog }) {
+  // Before anything is published, the preview lists examples so the chosen design shows.
+  const listed = pages.length || !preview ? pages : SAMPLE_POSTS;
   return (
     <main className="landing landing-blog">
-      <header className="landing-blog-header">
+      <header className={`landing-blog-header is-${blog.layout.header}`} data-section="header">
         <h1>
-          <span className="landing-marker">Blog</span>
+          <span className="landing-marker">{blog.heading || 'Blog'}</span>
         </h1>
         <p className="landing-tagline">
-          {name ? `Everything ${name} has written.` : 'Everything written here.'}
+          {blog.intro || (name ? `Everything ${name} has written.` : 'Everything written here.')}
         </p>
       </header>
-      {pages.length ? (
-        <PostList author={author} pages={pages} />
+      {listed.length ? (
+        <div className={`landing-writing is-${blog.layout.posts}`} data-section="posts">
+          <PostList author={author} pages={listed} />
+        </div>
       ) : (
         <p className="landing-empty">Nothing has been published here yet.</p>
       )}
@@ -923,23 +1017,36 @@ function NotFound() {
 const PREVIEW_UPDATE = 'notis:landing-preview';
 const PREVIEW_READY = 'notis:landing-preview-ready';
 
+/** What the Public page screen sends its preview: the draft, which page to draw, and what changed. */
+export interface PreviewMessage {
+  landing: Landing;
+  author: Author;
+  view: Section;
+  /** The section the writer just moved or restyled, brought into view; `focusKey` counts changes. */
+  focus?: string;
+  focusKey?: number;
+}
+
 /**
  * The live preview shown beside the Public page form (/landing-preview, in a frame). It
- * draws the Me page from the unsaved draft its parent window sends, so the frame's own
- * width decides the phone, tablet or desktop layout. Links are inert.
+ * draws the Me, Blog or About page from the unsaved draft its parent window sends, so the
+ * frame's own width decides the phone, tablet or desktop layout. Links are inert.
  */
 export function LandingPreview() {
-  const [draft, setDraft] = useState<{ landing: Landing; author: Author } | null>(null);
+  const [draft, setDraft] = useState<PreviewMessage | null>(null);
   const [pages, setPages] = useState<PublishedPage[]>([]);
   useLandingFont();
   useEffect(() => {
     const receive = (event: MessageEvent) => {
       if (event.origin !== window.location.origin || event.source !== window.parent) return;
-      const data = event.data as { type?: string; landing?: unknown; author?: Author };
+      const data = event.data as { type?: string } & Partial<PreviewMessage>;
       if (data?.type !== PREVIEW_UPDATE || !data.author) return;
       setDraft({
         landing: normalizeLanding(data.landing) ?? defaultLanding(data.author.name),
         author: data.author,
+        view: data.view === 'blog' || data.view === 'about' ? data.view : 'me',
+        focus: data.focus,
+        focusKey: data.focusKey,
       });
     };
     window.addEventListener('message', receive);
@@ -953,8 +1060,22 @@ export function LandingPreview() {
       /* The preview just shows no writing. */
     });
   }, [userId]);
+  // Moving or restyling a section scrolls the frame to it and marks it for a moment, so
+  // the change shows even when it happens below the part of the page in view.
+  const focus = draft?.focus;
+  const focusKey = draft?.focusKey;
+  useEffect(() => {
+    if (!focus || !focusKey) return;
+    const target = document.querySelector<HTMLElement>(`[data-section="${focus}"]`);
+    if (!target) return;
+    const top = target.getBoundingClientRect().top + window.scrollY - 80;
+    window.scrollTo({ top: Math.max(0, top), behavior: 'auto' });
+    target.classList.remove('is-flash');
+    void target.offsetWidth;
+    target.classList.add('is-flash');
+  }, [focus, focusKey]);
   if (!draft) return null;
-  const { landing, author } = draft;
+  const { landing, author, view } = draft;
   return (
     <div
       className="reader landing-preview"
@@ -963,8 +1084,18 @@ export function LandingPreview() {
         if ((event.target as Element).closest('a, button')) event.preventDefault();
       }}
     >
-      <PublicNav author={author} active="me" showAbout={hasAbout(landing.about)} />
-      <LandingView author={author} name={author.name} pages={pages} landing={landing} />
+      <PublicNav
+        author={author}
+        active={view}
+        showAbout={view === 'about' || hasAbout(landing.about)}
+      />
+      {view === 'about' ? (
+        <AboutView author={author} name={author.name} pages={pages} about={landing.about} preview />
+      ) : view === 'blog' ? (
+        <BlogView author={author} name={author.name} pages={pages} blog={landing.blog} preview />
+      ) : (
+        <LandingView author={author} name={author.name} pages={pages} landing={landing} preview />
+      )}
     </div>
   );
 }
