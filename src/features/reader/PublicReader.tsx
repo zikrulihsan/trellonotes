@@ -1,6 +1,7 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import {
+  ArrowLeft,
   ArrowUpRight,
   AtSign,
   Dribbble,
@@ -167,8 +168,9 @@ function AuthorPage({ author }: { author: Author }) {
   const name =
     author.name ?? (result.status === 'ready' ? result.data[0][0]?.author_name : null) ?? null;
   useEffect(() => {
-    document.title = name ?? (author.handle ? `@${author.handle}` : 'Writing');
-  }, [name, author.handle]);
+    const who = name ?? (author.handle ? `@${author.handle}` : 'Writing');
+    document.title = view === 'me' ? who : `${view === 'blog' ? 'Blog' : 'About'} · ${who}`;
+  }, [name, author.handle, view]);
   useLandingFont();
   if (result.status !== 'ready') return <Status result={result} />;
   const [pages, landing] = result.data;
@@ -226,6 +228,9 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
   return (
     <main className="landing">
       <header className="landing-hero">
+        {landing?.about.photo && (
+          <img className="landing-avatar" src={landing.about.photo} alt="" />
+        )}
         <h1>
           <span className="landing-marker">
             {content.greeting || name || (author.handle ? `@${author.handle}` : 'Writing')}
@@ -328,6 +333,7 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
                     {project.summary && <span>{project.summary}</span>}
                   </span>
                   {tag && <span className="landing-tag">{tag}</span>}
+                  {slug && <ArrowUpRight className="landing-project-go" size={18} />}
                 </>
               );
               return (
@@ -337,7 +343,7 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
                       {body}
                     </Link>
                   ) : (
-                    <div className="landing-project">{body}</div>
+                    <div className="landing-project is-static">{body}</div>
                   )}
                 </li>
               );
@@ -424,14 +430,19 @@ function PublicNav({
   );
 }
 
-/** The menu on an article page, which shows About only when the writer has filled it in. */
-function ArticleNav({ author }: { author: PublicAuthor }) {
+/** The writer's listed pages and landing page, for the menu and "Keep reading" on an article. */
+function useAuthorSite(author: PublicAuthor, enabled: boolean) {
   const result = usePublicData(
-    () => (supabase ? getLanding(supabase, author.userId) : Promise.resolve(null)),
-    [author.userId],
+    () =>
+      supabase && enabled
+        ? Promise.all([
+            listPublishedPages(supabase, author.userId),
+            getLanding(supabase, author.userId),
+          ])
+        : Promise.resolve([[], null] as [PublishedPage[], Landing | null]),
+    [author.userId, enabled],
   );
-  const landing = result.status === 'ready' ? result.data : null;
-  return <PublicNav author={author} showAbout={Boolean(landing && hasAbout(landing.about))} />;
+  return result.status === 'ready' ? result.data : null;
 }
 
 /** The About page: photo, intro, stack, what's happening now, story pages and experience. */
@@ -594,6 +605,9 @@ function ArticlePage({ author, slug }: { author: Author; slug: string }) {
     [author.userId, slug],
   );
   const page = result.status === 'ready' ? result.data : null;
+  // Unlisted pages are shared by link only, so they don't lead to the public list.
+  const listed = Boolean(page && !page.unlisted);
+  const site = useAuthorSite(author, listed);
   useEffect(() => {
     if (page) document.title = page.title;
   }, [page]);
@@ -602,21 +616,51 @@ function ArticlePage({ author, slug }: { author: Author; slug: string }) {
   const name = author.name ?? page.author_name;
   return (
     <>
-      {/* Unlisted pages are shared by link only, so they don't lead to the public list. */}
-      {!page.unlisted && <ArticleNav author={author} />}
+      {listed && (
+        <PublicNav author={author} showAbout={Boolean(site?.[1] && hasAbout(site[1].about))} />
+      )}
       <main className="reader-column">
         <article>
           <header className="reader-header">
+            {listed && (
+              <Link className="reader-back" to={blogPath(author)} aria-label="Back to Blog">
+                <ArrowLeft size={14} />
+                Blog
+              </Link>
+            )}
             <h1>{page.title}</h1>
             <p className="reader-byline">
               {name && <span>{name} · </span>}
               <time dateTime={page.published_at}>{longDate(page.published_at)}</time>
+              <span> · {readingMinutes(page.content)} min read</span>
             </p>
           </header>
           <ReadOnlyContent html={page.content} />
         </article>
+        {listed && site && (
+          <KeepReading
+            author={author}
+            pages={site[0].filter((other) => other.slug !== page.slug).slice(0, 2)}
+          />
+        )}
       </main>
     </>
+  );
+}
+
+/** More listed pages after an article, so a reader has somewhere to go next. */
+function KeepReading({ author, pages }: { author: PublicAuthor; pages: PublishedPage[] }) {
+  if (!pages.length) return null;
+  return (
+    <section className="landing landing-more" aria-labelledby="landing-more">
+      <div className="landing-section">
+        <h2 id="landing-more">Keep reading</h2>
+        <PostList author={author} pages={pages} />
+        <Link className="landing-all" to={blogPath(author)}>
+          See all <ArrowUpRight size={15} />
+        </Link>
+      </div>
+    </section>
   );
 }
 
