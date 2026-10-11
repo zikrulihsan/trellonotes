@@ -1,6 +1,6 @@
 /**
- * Finds the preview image a website shares for itself (Open Graph or Twitter card), so a
- * project linked to a site can show it. Used by the `link-image` edge function; kept free
+ * Finds a website's icon, so a project linked
+ * to a site can show it. Used by the `link-image` edge function; kept free
  * of app imports so the edge function can use it as is.
  */
 
@@ -35,30 +35,36 @@ export function isPublicWebUrl(value: string): URL | null {
 
 const ATTRIBUTE = (name: string) => new RegExp(`${name}\\s*=\\s*(["'])(.*?)\\1`, 'i');
 
-/** The page's preview image as an absolute https address, or null. */
-export function previewImage(html: string, pageUrl: string): string | null {
+/** The site's own /favicon.ico, the icon browsers fall back to. */
+export function defaultIcon(pageUrl: string) {
+  return new URL('/favicon.ico', pageUrl.replace(/^http:/i, 'https:')).href;
+}
+
+/**
+ * The page's best icon as an absolute https address: the largest one it declares (the
+ * apple-touch-icon is usually 180px), else its /favicon.ico.
+ */
+export function siteIcon(html: string, pageUrl: string): string {
   const head = html.slice(0, 200_000);
-  const found: Record<string, string> = {};
-  for (const [tag] of head.matchAll(/<meta\b[^>]*>/gi)) {
-    const key = (ATTRIBUTE('property').exec(tag) ?? ATTRIBUTE('name').exec(tag))?.[2]
-      ?.toLowerCase()
-      .trim();
-    const content = ATTRIBUTE('content').exec(tag)?.[2]?.trim();
-    if (key && content && !(key in found)) found[key] = content.replace(/&amp;/g, '&');
+  let best: { href: string; score: number } | null = null;
+  for (const [tag] of head.matchAll(/<link\b[^>]*>/gi)) {
+    const rel = ATTRIBUTE('rel').exec(tag)?.[2]?.toLowerCase() ?? '';
+    const href = ATTRIBUTE('href').exec(tag)?.[2]?.trim().replace(/&amp;/g, '&');
+    if (!href || !/(^|\s)(icon|apple-touch-icon(-precomposed)?)(\s|$)/.test(rel)) continue;
+    const sizes = ATTRIBUTE('sizes').exec(tag)?.[2]?.toLowerCase() ?? '';
+    const size = Math.max(0, ...[...sizes.matchAll(/(\d+)x\d+/g)].map((m) => Number(m[1])));
+    const score =
+      sizes === 'any' || /\.svg(\?|$)/i.test(href)
+        ? 512
+        : size || (rel.includes('apple-touch-icon') ? 180 : 16);
+    try {
+      const icon = new URL(href, pageUrl);
+      if (icon.protocol === 'http:') icon.protocol = 'https:';
+      if (icon.protocol !== 'https:') continue;
+      if (!best || score > best.score) best = { href: icon.href, score };
+    } catch {
+      /* Not a usable address. */
+    }
   }
-  const raw =
-    found['og:image:secure_url'] ??
-    found['og:image'] ??
-    found['og:image:url'] ??
-    found['twitter:image'] ??
-    found['twitter:image:src'];
-  if (!raw) return null;
-  try {
-    const image = new URL(raw, pageUrl);
-    // The page is served over https, so the image must be too.
-    if (image.protocol === 'http:') image.protocol = 'https:';
-    return image.protocol === 'https:' ? image.href : null;
-  } catch {
-    return null;
-  }
+  return best?.href ?? defaultIcon(pageUrl);
 }

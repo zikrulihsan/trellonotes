@@ -367,7 +367,7 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
 
 /**
  * A project links to its write-up when it has a listed one, otherwise to its website.
- * Without an image of its own, it borrows the website's preview image.
+ * Without an image of its own, it shows the website's icon.
  */
 function ProjectCard({
   project,
@@ -378,13 +378,20 @@ function ProjectCard({
   slug?: string;
   author: PublicAuthor;
 }) {
-  const preview = useLinkImage(project.image ? '' : project.url);
-  const image = project.image || preview;
+  const icon = useSiteIcon(project.image ? '' : project.url);
+  const image = project.image || icon;
+  const [broken, setBroken] = useState('');
   const tag = [project.category, project.year].filter(Boolean).join(' · ');
   const body = (
     <>
-      {image ? (
-        <img className="landing-thumb" src={image} alt="" loading="lazy" />
+      {image && broken !== image ? (
+        <img
+          className={project.image ? 'landing-thumb' : 'landing-thumb is-icon'}
+          src={image}
+          alt=""
+          loading="lazy"
+          onError={() => setBroken(image)}
+        />
       ) : (
         <span className="landing-thumb" aria-hidden="true">
           {project.title.replace(/^\W+/, '').charAt(0)}
@@ -415,22 +422,32 @@ function ProjectCard({
   );
 }
 
-/** A website's preview image, found by the link-image edge function and remembered. */
-function useLinkImage(url: string) {
-  const key = `link-image:${url}`;
+/** The site's /favicon.ico, used until (or unless) the link-image function finds better. */
+function faviconOf(url: string) {
+  try {
+    return new URL('/favicon.ico', url.replace(/^http:/i, 'https:')).href;
+  } catch {
+    return null;
+  }
+}
+
+/** A website's icon, found by the link-image edge function and remembered. */
+function useSiteIcon(url: string) {
+  const key = `site-icon:${url}`;
   const [found, setFound] = useState<{ url: string; image: string | null }>();
   useEffect(() => {
     if (!url || readCached(key)) return;
     let active = true;
     fetch(`/api/link-image?url=${encodeURIComponent(url)}`)
-      .then((response) => (response.ok ? response.json() : { image: null }))
-      .then((body: { image?: unknown }) => {
-        const image = typeof body.image === 'string' ? body.image : null;
-        writeCached(key, image);
-        if (active) setFound({ url, image });
+      .then((response) => (response.ok ? response.json() : null))
+      .then((body: { image?: unknown } | null) => {
+        // Only remember real answers, so a failed lookup is retried on the next visit.
+        if (typeof body?.image !== 'string') return;
+        writeCached(key, body.image);
+        if (active) setFound({ url, image: body.image });
       })
       .catch(() => {
-        /* No preview: the placeholder letter stays. */
+        /* The plain /favicon.ico stays. */
       });
     return () => {
       active = false;
@@ -438,7 +455,7 @@ function useLinkImage(url: string) {
   }, [url, key]);
   if (!url) return null;
   if (found?.url === url) return found.image;
-  return readCached<string | null>(key)?.data ?? null;
+  return readCached<string | null>(key)?.data ?? faviconOf(url);
 }
 
 const SOCIAL_ICONS: Record<SocialPlatform, LucideIcon> = {

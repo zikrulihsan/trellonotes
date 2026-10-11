@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { isPublicWebUrl, previewImage } from './link-image';
+import { isPublicWebUrl, siteIcon } from './link-image';
 
-describe('link preview images', () => {
+describe('site icons', () => {
   it('only fetches public web pages', () => {
     expect(isPublicWebUrl('https://flipcard.id')).not.toBeNull();
     for (const url of [
@@ -18,21 +18,23 @@ describe('link preview images', () => {
       expect(isPublicWebUrl(url)).toBeNull();
   });
 
-  it('reads the Open Graph image, made absolute and https', () => {
-    const html =
-      '<head><meta property="og:title" content="x"><meta property="og:image" content="/cover.png?a=1&amp;b=2"></head>';
-    expect(previewImage(html, 'https://flipcard.id/deck')).toBe(
-      'https://flipcard.id/cover.png?a=1&b=2',
+  it('picks the largest icon a page declares, made absolute and https', () => {
+    const html = `<head>
+      <link rel="icon" href="/favicon-32.png" sizes="32x32">
+      <link rel="apple-touch-icon" href="http://cdn.example.com/touch.png?a=1&amp;b=2">
+      <link rel="stylesheet" href="/site.css">
+    </head>`;
+    expect(siteIcon(html, 'https://flipcard.id/deck')).toBe(
+      'https://cdn.example.com/touch.png?a=1&b=2',
+    );
+    expect(siteIcon(`<link href='/i.svg' rel='shortcut icon'>`, 'https://a.id')).toBe(
+      'https://a.id/i.svg',
     );
   });
 
-  it('falls back to the Twitter card and ignores pages without one', () => {
-    expect(
-      previewImage(
-        `<meta content='http://cdn.example.com/c.jpg' name='twitter:image'>`,
-        'https://example.com',
-      ),
-    ).toBe('https://cdn.example.com/c.jpg');
-    expect(previewImage('<title>No image</title>', 'https://example.com')).toBeNull();
+  it("falls back to the site's /favicon.ico", () => {
+    expect(siteIcon('<title>No icon</title>', 'http://example.com/a/b')).toBe(
+      'https://example.com/favicon.ico',
+    );
   });
 });
