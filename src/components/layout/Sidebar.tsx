@@ -4,6 +4,7 @@ import {
   BookOpen,
   Feather,
   FileText,
+  Globe,
   LayoutGrid,
   ListChecks,
   PanelLeftClose,
@@ -25,7 +26,7 @@ export function Sidebar({
   section,
 }: {
   board: Board;
-  section: 'boards' | 'pages' | 'todos';
+  section: 'boards' | 'pages' | 'todos' | 'landing';
 }) {
   const { workspace, cloudEnabled, syncStatus } = useWorkspace(),
     { finishSync } = useWorkspaceActions(),
@@ -80,6 +81,10 @@ export function Sidebar({
   }
   function freeWrite() {
     navigate('/write');
+    closeSidebarDrawer();
+  }
+  function goLanding() {
+    navigate('/landing');
     closeSidebarDrawer();
   }
   function goTodos() {
@@ -146,6 +151,16 @@ export function Sidebar({
               <span className="side-label">Pages</span>
               <span className="side-count">{workspace.pages?.length ?? 0}</span>
             </button>
+            {cloudEnabled && (
+              <button
+                className={`side-link ${section === 'landing' ? 'active' : ''}`}
+                aria-current={section === 'landing' ? 'page' : undefined}
+                onClick={goLanding}
+              >
+                <Globe size={18} />
+                <span className="side-label">Landing page</span>
+              </button>
+            )}
             <button
               className={`side-link ${section === 'todos' ? 'active' : ''}`}
               aria-current={section === 'todos' ? 'page' : undefined}
