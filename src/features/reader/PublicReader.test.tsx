@@ -76,22 +76,20 @@ describe('public reader', () => {
   it('moves older account-id links to the handle address', async () => {
     renderAt(`/read/${AUTHOR}/catatan-rilis`);
     expect(await screen.findByText('Isi tulisan.')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /More from Zikrul Ihsan/ })).toHaveAttribute(
-      'href',
-      '/@zikrul',
-    );
+    expect(screen.getByRole('link', { name: 'Me' })).toHaveAttribute('href', '/@zikrul');
+    expect(screen.getByRole('link', { name: 'Blog' })).toHaveAttribute('href', '/@zikrul?blog');
   });
 
   it('does not lead from an unlisted page to the public list', async () => {
     renderAt('/@zikrul/rahasia');
     expect(await screen.findByText('Isi tulisan.')).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: /More from/ })).toBeNull();
+    expect(screen.queryByRole('navigation')).toBeNull();
   });
 
   it('opens the page a short link points to, keeping the short address', async () => {
     renderAt('/s/k7m2xq9');
     expect(await screen.findByText('Isi tulisan.')).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: /More from/ })).toBeNull();
+    expect(screen.queryByRole('navigation')).toBeNull();
   });
 
   it('says so when a short link points nowhere', async () => {
@@ -148,8 +146,9 @@ describe('public reader', () => {
     expect(screen.queryByRole('link', { name: /How Folio was built/ })).toBeNull();
     expect(screen.getByRole('link', { name: /All notes/ })).toHaveAttribute(
       'href',
-      '/@zikrul?notes',
+      '/@zikrul?blog',
     );
+    expect(screen.getByRole('link', { name: 'Me' })).toHaveAttribute('aria-current', 'page');
   });
 
   it('greets by name and lists notes when no landing page is set up', async () => {
@@ -159,15 +158,16 @@ describe('public reader', () => {
     expect(screen.getByRole('link', { name: /How Folio was built/ })).toBeInTheDocument();
   });
 
-  it('lists every listed page under All notes', async () => {
-    renderAt('/@zikrul?notes');
-    expect(
-      await screen.findByRole('heading', { name: 'Writing by Zikrul Ihsan' }),
-    ).toBeInTheDocument();
+  it('lists every listed page on the Blog page', async () => {
+    renderAt('/@zikrul?blog');
+    expect(await screen.findByRole('heading', { name: 'Blog' })).toBeInTheDocument();
+    expect(screen.getByText('Everything Zikrul Ihsan has written.')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'How Folio was built' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Back to Zikrul Ihsan/ })).toHaveAttribute(
-      'href',
-      '/@zikrul',
-    );
+    expect(screen.getByRole('link', { name: 'Blog' })).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('still opens the Blog page from the older ?notes address', async () => {
+    renderAt('/@zikrul?notes');
+    expect(await screen.findByRole('heading', { name: 'Blog' })).toBeInTheDocument();
   });
 });

@@ -1,6 +1,6 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, ArrowUpRight, Feather } from 'lucide-react';
+import { ArrowUpRight, Feather } from 'lucide-react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import { supabase } from '@/lib/supabase/client';
 import { plainText } from '@/lib/text';
@@ -124,7 +124,9 @@ export function PublicReader() {
 
 function AuthorPage({ author }: { author: Author }) {
   const { search } = useLocation();
-  const allNotes = new URLSearchParams(search).has('notes');
+  // `?notes` is the older address of the Blog page.
+  const params = new URLSearchParams(search);
+  const blog = params.has('blog') || params.has('notes');
   const result = usePublicData(
     () =>
       supabase
@@ -143,8 +145,16 @@ function AuthorPage({ author }: { author: Author }) {
   useLandingFont();
   if (result.status !== 'ready') return <Status result={result} />;
   const [pages, landing] = result.data;
-  if (allNotes) return <AllNotes author={author} name={name} pages={pages} />;
-  return <LandingView author={author} name={name} pages={pages} landing={landing} />;
+  return (
+    <>
+      <PublicNav author={author} active={blog ? 'blog' : 'me'} />
+      {blog ? (
+        <BlogView author={author} name={name} pages={pages} />
+      ) : (
+        <LandingView author={author} name={name} pages={pages} landing={landing} />
+      )}
+    </>
+  );
 }
 
 /** The handwritten face of the landing page, loaded only for public visitors. */
@@ -294,7 +304,7 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
               </li>
             ))}
           </ul>
-          <Link className="landing-all" to={`${writerPath(author)}?notes`}>
+          <Link className="landing-all" to={blogPath(author)}>
             All notes <ArrowUpRight size={14} />
           </Link>
         </section>
@@ -317,31 +327,53 @@ function Sparkle() {
   );
 }
 
-function AllNotes({ author, name, pages }: Omit<LandingProps, 'landing'>) {
+const blogPath = (author: PublicAuthor) => `${writerPath(author)}?blog`;
+
+/** The two public sections: Me (the landing page with projects) and Blog (every listed page). */
+function PublicNav({ author, active }: { author: PublicAuthor; active?: 'me' | 'blog' }) {
+  useLandingFont();
   return (
-    <main className="reader-column">
-      <Link className="reader-back" to={writerPath(author)}>
-        <ArrowLeft size={15} />
-        {name ? `Back to ${name}` : 'Back'}
+    <nav className="landing-nav" aria-label="Sections">
+      <Link to={writerPath(author)} aria-current={active === 'me' ? 'page' : undefined}>
+        Me
       </Link>
-      <header className="reader-header">
-        <p className="eyebrow">{author.handle ? `@${author.handle}` : 'WRITING'}</p>
-        <h1>{name ? `Writing by ${name}` : 'Writing'}</h1>
+      <Link to={blogPath(author)} aria-current={active === 'blog' ? 'page' : undefined}>
+        Blog
+      </Link>
+    </nav>
+  );
+}
+
+function BlogView({ author, name, pages }: Omit<LandingProps, 'landing'>) {
+  return (
+    <main className="landing landing-blog">
+      <header className="landing-blog-header">
+        <h1>
+          <span className="landing-marker">Blog</span>
+        </h1>
+        <p className="landing-tagline">
+          {name ? `Everything ${name} has written.` : 'Everything written here.'}
+        </p>
       </header>
       {pages.length ? (
-        <ul className="reader-list">
-          {pages.map((page) => (
-            <li key={page.id}>
-              <Link to={writerPath(author, page.slug)}>
-                <time dateTime={page.published_at}>{longDate(page.published_at)}</time>
-                <h2>{page.title}</h2>
-                <p>{plainText(page.content).slice(0, 220)}</p>
-              </Link>
-            </li>
-          ))}
+        <ul className="landing-posts">
+          {pages.map((page) => {
+            const excerpt = plainText(page.content).slice(0, 180);
+            return (
+              <li key={page.id}>
+                <Link to={writerPath(author, page.slug)}>
+                  <time dateTime={page.published_at}>
+                    {longDate(page.published_at)} · {readingMinutes(page.content)} min
+                  </time>
+                  <h2>{page.title}</h2>
+                  {excerpt && <p>{excerpt}</p>}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       ) : (
-        <p className="reader-empty">Nothing has been published here yet.</p>
+        <p className="landing-empty">Nothing has been published here yet.</p>
       )}
     </main>
   );
@@ -360,25 +392,22 @@ function ArticlePage({ author, slug }: { author: Author; slug: string }) {
   if (!page) return <NotFound />;
   const name = author.name ?? page.author_name;
   return (
-    <main className="reader-column">
+    <>
       {/* Unlisted pages are shared by link only, so they don't lead to the public list. */}
-      {!page.unlisted && (
-        <Link className="reader-back" to={writerPath(author)}>
-          <ArrowLeft size={15} />
-          {name ? `More from ${name}` : 'More writing'}
-        </Link>
-      )}
-      <article>
-        <header className="reader-header">
-          <h1>{page.title}</h1>
-          <p className="reader-byline">
-            {name && <span>{name} · </span>}
-            <time dateTime={page.published_at}>{longDate(page.published_at)}</time>
-          </p>
-        </header>
-        <ReadOnlyContent html={page.content} />
-      </article>
-    </main>
+      {!page.unlisted && <PublicNav author={author} />}
+      <main className="reader-column">
+        <article>
+          <header className="reader-header">
+            <h1>{page.title}</h1>
+            <p className="reader-byline">
+              {name && <span>{name} · </span>}
+              <time dateTime={page.published_at}>{longDate(page.published_at)}</time>
+            </p>
+          </header>
+          <ReadOnlyContent html={page.content} />
+        </article>
+      </main>
+    </>
   );
 }
 
