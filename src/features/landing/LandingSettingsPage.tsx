@@ -452,7 +452,7 @@ export function LandingSettingsPage() {
               onChange={(event) => setAbout({ subtitle: event.target.value })}
             />
           </Field>
-          <Field label="Photo link (https://…)">
+          <Field label="Photo link, shown on About (https://…)">
             <input
               value={draft.about.photo}
               maxLength={500}

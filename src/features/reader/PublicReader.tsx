@@ -248,9 +248,6 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
   return (
     <main className="landing">
       <header className="landing-hero">
-        {landing?.about.photo && (
-          <img className="landing-avatar" src={landing.about.photo} alt="" />
-        )}
         <h1>
           <span className="landing-marker">
             {content.greeting || name || (author.handle ? `@${author.handle}` : 'Writing')}
