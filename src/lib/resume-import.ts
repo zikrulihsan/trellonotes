@@ -41,7 +41,9 @@ export async function readResume(client: SupabaseClient, input: ResumeInput): Pr
     error?: string;
   } | null;
   if (!response.ok || !result?.resume)
-    throw new Error(result?.error ?? 'Could not read the resume. Try again.');
+    throw new Error(
+      result?.error ?? `The resume import failed (${response.status}). Try again in a moment.`,
+    );
   return result.resume;
 }
 
