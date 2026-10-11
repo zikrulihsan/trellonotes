@@ -8,6 +8,7 @@ import { writerPath } from '@/lib/supabase/published-pages';
 import {
   defaultLanding,
   getLanding,
+  ABOUT_INTRO_MAX,
   LANDING_LIMITS,
   saveLanding,
   socialPlatform,
@@ -451,7 +452,7 @@ export function LandingSettingsPage() {
               onChange={(event) => setAbout({ subtitle: event.target.value })}
             />
           </Field>
-          <Field label="Photo link (https://…)">
+          <Field label="Photo link, shown on About (https://…)">
             <input
               value={draft.about.photo}
               maxLength={500}
@@ -467,21 +468,31 @@ export function LandingSettingsPage() {
               onChange={(event) => setAbout({ role: event.target.value })}
             />
           </Field>
-          <Field label="About you (leave a blank line between paragraphs)">
+          <Field label="Your story (blank line between paragraphs; start a line with ## for a heading)">
             <textarea
-              rows={7}
+              rows={16}
               value={draft.about.intro}
-              maxLength={2500}
+              maxLength={ABOUT_INTRO_MAX}
               onChange={(event) => setAbout({ intro: event.target.value })}
             />
           </Field>
-          <Field label="Tools you love (separate with commas)">
+        </Section>
+
+        <Section title="What you hold onto" hint="Principles or values, one per line.">
+          <Field label="Heading">
             <input
-              value={draft.about.stack.join(', ')}
-              placeholder="React, TypeScript, Supabase"
-              onChange={(event) => setAbout({ stack: event.target.value.split(/,\s*/) })}
+              value={draft.about.stackHeading}
+              maxLength={80}
+              onChange={(event) => setAbout({ stackHeading: event.target.value })}
             />
           </Field>
+          <textarea
+            aria-label="What you hold onto"
+            rows={4}
+            value={draft.about.stack.join('\n')}
+            placeholder={'Good software starts with people, not code\nShare what you learn'}
+            onChange={(event) => setAbout({ stack: event.target.value.split('\n') })}
+          />
         </Section>
 
         <Section title="What you're up to now" hint="One item per line.">
