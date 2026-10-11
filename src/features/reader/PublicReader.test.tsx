@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { clearCached } from '@/lib/public-cache';
+import { clearCached, writeCached } from '@/lib/public-cache';
 import { PublicReader } from './PublicReader';
 
 const AUTHOR = '0d4278c6-6483-4035-bbe5-fb027b17ac7f';
@@ -71,6 +71,27 @@ const renderAt = (path: string) =>
 
 describe('public reader', () => {
   beforeEach(() => clearCached());
+
+  it('still opens when this browser kept a copy from before the page had a layout', async () => {
+    // Saved by an older version: no theme, layout or working list.
+    const old = {
+      greeting: 'Hi, Old Copy',
+      tagline: '',
+      links: [],
+      socials: [],
+      helpsHeading: 'Helps People to:',
+      helps: [{ title: 'Build things', subtitle: '' }],
+      projectsHeading: '',
+      projects: [],
+      notesHeading: '',
+      notesCount: 5,
+      about: { intro: '', stack: [], now: [], stories: [], experiences: [] },
+    };
+    writeCached(`site:${JSON.stringify([AUTHOR, true])}`, [LISTED, old]);
+    landing = { greeting: 'Hi, Fresh Copy' };
+    renderAt('/@zikrul');
+    expect(await screen.findByRole('heading', { name: 'Hi, Fresh Copy' })).toBeInTheDocument();
+  });
 
   it('shows a published page at its handle address, without running scripts', async () => {
     renderAt('/@zikrul/catatan-rilis');

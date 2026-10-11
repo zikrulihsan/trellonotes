@@ -2,6 +2,7 @@ import {
   createContext,
   useContext,
   useEffect,
+  useMemo,
   useState,
   type CSSProperties,
   type MouseEvent,
@@ -40,6 +41,7 @@ import {
   defaultLanding,
   getLanding,
   hasAbout,
+  normalizeLanding,
   socialPlatform,
   type Landing,
   type LandingAbout,
@@ -199,17 +201,7 @@ function AuthorPage({ author }: { author: Author }) {
     : params.has('blog') || params.has('notes')
       ? 'blog'
       : 'me';
-  const result = usePublicData(
-    () =>
-      supabase
-        ? Promise.all([
-            listPublishedPages(supabase, author.userId),
-            getLanding(supabase, author.userId),
-          ])
-        : Promise.resolve([[], null] as [PublishedPage[], Landing | null]),
-    [author.userId, true],
-    'site',
-  );
+  const result = useSiteData(author, true);
   const name =
     author.name ?? (result.status === 'ready' ? result.data[0][0]?.author_name : null) ?? null;
   useEffect(() => {
@@ -587,7 +579,14 @@ function PublicNav({
 }
 
 /** The writer's listed pages and landing page, for the menu and "Keep reading" on an article. */
-function useAuthorSite(author: PublicAuthor, enabled: boolean) {
+/**
+ * The writer's listed pages and landing page. The landing page is normalized again on the
+ * way out: a copy this browser kept from an older version may lack fields added since.
+ */
+function useSiteData(
+  author: PublicAuthor,
+  enabled: boolean,
+): Load<[PublishedPage[], Landing | null]> {
   const result = usePublicData(
     () =>
       supabase && enabled
@@ -599,6 +598,20 @@ function useAuthorSite(author: PublicAuthor, enabled: boolean) {
     [author.userId, enabled],
     'site',
   );
+  const data = result.status === 'ready' ? result.data : null;
+  const site = useMemo(
+    () =>
+      data &&
+      ([data[0], data[1] && normalizeLanding(data[1])] as [PublishedPage[], Landing | null]),
+    [data],
+  );
+  return site
+    ? { status: 'ready', data: site }
+    : (result as Load<[PublishedPage[], Landing | null]>);
+}
+
+function useAuthorSite(author: PublicAuthor, enabled: boolean) {
+  const result = useSiteData(author, enabled);
   return result.status === 'ready' ? result.data : null;
 }
 
