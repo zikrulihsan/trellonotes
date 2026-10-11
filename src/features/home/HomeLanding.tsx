@@ -155,7 +155,8 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
         <section className="home-hero">
           <p className="eyebrow">YOUR NOTES, YOUR PUBLIC PRESENCE</p>
           <h1>
-            Write notes, <mark>get noticed</mark>.
+            Write notes,
+            <br /> <mark>get noticed</mark>.
           </h1>
           <p className="home-lead">
             A notes and writing app for professionals that turns everyday notes into a public
