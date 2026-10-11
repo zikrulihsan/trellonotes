@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import {
   ArrowRight,
   CircleCheck,
+  ExternalLink,
   Feather,
   FileText,
   Globe,
@@ -21,34 +22,52 @@ interface HomeLandingProps {
   onSwegrowth: () => void;
 }
 
+/** The everyday loop: each moment of work, and what you do with it in Notis. */
 const STEPS = [
-  ['Have a plan?', 'Note it.'],
-  ['Making progress?', 'Note it.'],
-  ['Got a result?', 'Note it.'],
-  ['Then', 'publish it.'],
+  { moment: 'Plan', action: 'Note it', example: '“Ship the pricing page by Friday.”' },
+  { moment: 'Progress', action: 'Note it', example: '“Design done, copy in review.”' },
+  { moment: 'Result', action: 'Note it', example: '“Shipped. 40 sign-ups on day one.”' },
+  { moment: 'Share', action: 'Publish it', example: 'A post on your own website.' },
 ] as const;
 
-const PILLARS: { icon: ReactNode; title: string; text: string }[] = [
+const PILLARS: { icon: ReactNode; title: string; text: string; where: string }[] = [
   {
     icon: <KanbanSquare size={20} />,
     title: 'Note',
-    text: 'Plans on boards, steps on to-do lists, thoughts on a free writing sheet. All of it private, for you.',
+    text: 'Write down plans, progress and results as you work. Private, only for you.',
+    where: 'Boards · To-do lists · Free write',
   },
   {
     icon: <NotebookPen size={20} />,
     title: 'Look back',
-    text: 'Your work journal gathers what you finished each week, so you never start from a blank page.',
+    text: 'Each week, see everything you finished in one place, without having to remember it.',
+    where: 'Work journal',
   },
   {
     icon: <PenLine size={20} />,
     title: 'Write',
-    text: 'Turn what you noted into a page in a calm, focused editor, when it is worth telling.',
+    text: 'Turn a week, a project or a lesson into a post, starting from what you already noted.',
+    where: 'Pages',
   },
   {
     icon: <Globe size={20} />,
     title: 'Show',
-    text: 'Publish to your own page at /@you, with Me, Blog and About, so people see what you do.',
+    text: 'Publish it to your personal website at /@you for anyone to read.',
+    where: 'Public page',
   },
+];
+
+/** A real Notis website to point visitors at. */
+const EXAMPLE_SITE = 'https://notis.swegrowth.id/@zikrul-ihsan-md';
+
+const SITE_PARTS: { title: string; text: string }[] = [
+  {
+    title: 'Me',
+    text: 'Who you are, what you help with, what you are working on and your projects.',
+  },
+  { title: 'Blog', text: 'Every page you publish, in one list people can follow.' },
+  { title: 'About', text: 'Your longer story, your experience and the things you hold onto.' },
+  { title: 'Short links', text: 'A tidy link for any post, ready for LinkedIn or your CV.' },
 ];
 
 const COMPARE: { kind: string; text: string; ours?: boolean }[] = [
@@ -179,26 +198,70 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
 
         <section className="home-flow" aria-labelledby="home-flow">
           <h2 id="home-flow">Everything starts with a note.</h2>
+          <p className="home-section-lead">
+            Whatever moment of work you are in, the move is the same: note it. When it is worth
+            telling, publish it.
+          </p>
           <ol>
-            {STEPS.map(([ask, answer]) => (
-              <li key={ask}>
-                <span>{ask}</span>
-                <strong>{answer}</strong>
+            {STEPS.map((step) => (
+              <li key={step.moment}>
+                <strong>{step.moment}</strong>
+                <span className="home-flow-action">
+                  <ArrowRight size={14} /> {step.action}
+                </span>
+                <span className="home-flow-example">{step.example}</span>
               </li>
             ))}
           </ol>
           <p>And along the way, you build a public presence.</p>
         </section>
 
-        <section className="home-pillars" aria-label="How Notis works">
-          {PILLARS.map((pillar, index) => (
-            <article key={pillar.title}>
-              <span className="home-pillar-icon">{pillar.icon}</span>
-              <span className="home-pillar-step">0{index + 1}</span>
-              <h3>{pillar.title}</h3>
-              <p>{pillar.text}</p>
-            </article>
-          ))}
+        <section className="home-how" aria-labelledby="home-how">
+          <h2 id="home-how">How it works in Notis</h2>
+          <p className="home-section-lead">Four steps, each with its own place in the app.</p>
+          <div className="home-pillars">
+            {PILLARS.map((pillar, index) => (
+              <article key={pillar.title}>
+                <span className="home-pillar-icon">{pillar.icon}</span>
+                <span className="home-pillar-step">0{index + 1}</span>
+                <h3>{pillar.title}</h3>
+                <p>{pillar.text}</p>
+                <span className="home-pillar-where">In Notis: {pillar.where}</span>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="home-site" aria-labelledby="home-site">
+          <p className="eyebrow">YOUR PUBLIC PRESENCE</p>
+          <h2 id="home-site">
+            A personal website, <mark>built from your notes</mark>.
+          </h2>
+          <p className="home-section-lead">
+            Every Notis account comes with its own website at notis.swegrowth.id/@you. No code, no
+            hosting, no design work. Publish a page and it is live.
+          </p>
+          <div className="home-site-grid">
+            <SiteSketch />
+            <div className="home-site-parts">
+              <ul>
+                {SITE_PARTS.map((part) => (
+                  <li key={part.title}>
+                    <strong>{part.title}</strong>
+                    <span>{part.text}</span>
+                  </li>
+                ))}
+              </ul>
+              <a
+                className="home-button is-primary"
+                href={EXAMPLE_SITE}
+                target="_blank"
+                rel="noreferrer"
+              >
+                See a real one: @zikrul-ihsan-md <ExternalLink size={16} />
+              </a>
+            </div>
+          </div>
         </section>
 
         <section className="home-features" aria-labelledby="home-features">
@@ -270,6 +333,44 @@ function JournalSketch() {
       <span className="home-journal-draft">
         <PenLine size={14} /> Draft a page from this week
       </span>
+    </div>
+  );
+}
+
+/** A personal website made with Notis: the Me page, with projects and writing. */
+function SiteSketch() {
+  return (
+    <div className="home-site-sketch" aria-hidden="true">
+      <div className="home-site-bar">
+        <span className="home-site-dots">
+          <i />
+          <i />
+          <i />
+        </span>
+        <span className="home-site-url">notis.swegrowth.id/@ayu</span>
+      </div>
+      <div className="home-site-body">
+        <nav className="home-site-nav">
+          <b>Ayu Lestari</b>
+          <span className="is-active">Me</span>
+          <span>Blog</span>
+          <span>About</span>
+        </nav>
+        <strong className="home-site-hello">
+          Hi, I'm Ayu. I build <mark>payment systems</mark>.
+        </strong>
+        <span className="home-site-label">Working on</span>
+        <span className="home-site-now">Leading the checkout rewrite · Learning Rust</span>
+        <span className="home-site-label">Projects</span>
+        <div className="home-site-projects">
+          <span>Checkout v2</span>
+          <span>Fraud alerts</span>
+          <span>Open-source SDK</span>
+        </div>
+        <span className="home-site-label">Writing</span>
+        <span className="home-site-post">What I learned shipping checkout v2</span>
+        <span className="home-site-post">My week: 5 things finished</span>
+      </div>
     </div>
   );
 }

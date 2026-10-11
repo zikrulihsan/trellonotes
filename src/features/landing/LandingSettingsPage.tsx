@@ -22,6 +22,7 @@ import { useProfile } from '@/features/pages/useProfile';
 import { visibility } from '@/features/pages/publish-state';
 import { PublicAddress } from '@/features/pages/PublicAddress';
 import { applyResume } from '@/lib/resume-import';
+import { nowTitles } from '@/features/journal/journal';
 import { ResumeImport } from './ResumeImport';
 
 type ListKey = 'links' | 'helps' | 'projects';
@@ -123,7 +124,11 @@ export function LandingSettingsPage() {
       // The landing page lives on the profile, which also holds the public address. A known
       // profile skips that round trip, so saving is a single request.
       if (!profile && !(await ensure())) throw new Error('Public addresses are not set up yet.');
-      const clean = await saveLanding(supabase, userId, draft);
+      // The "working on" list follows the cards picked on the boards, not this form.
+      const clean = await saveLanding(supabase, userId, {
+        ...draft,
+        working: nowTitles(workspace),
+      });
       setDraft(clean);
       setSaved(JSON.stringify(clean));
       setStatus({ done: true });
@@ -132,6 +137,7 @@ export function LandingSettingsPage() {
     }
   }
 
+  const working = nowTitles(workspace);
   const pageTitle = (project: LandingProject) =>
     workspace.pages?.find((page) => page.id === project.pageId)?.title;
 
@@ -290,6 +296,28 @@ export function LandingSettingsPage() {
               <Plus size={15} />
               Add column
             </Button>
+          )}
+        </Section>
+
+        <Section
+          title="What you're working on"
+          hint="Pick cards on your boards to show here: open a card's menu and choose Show on my page. Only the card title goes public, and it leaves this list once the card reaches a done list."
+        >
+          <Field label="Heading">
+            <input
+              value={draft.workingHeading}
+              maxLength={80}
+              onChange={(event) => set({ workingHeading: event.target.value })}
+            />
+          </Field>
+          {working.length ? (
+            <ul className="landing-admin-working">
+              {working.map((title, index) => (
+                <li key={index}>{title}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="landing-admin-note">No cards picked yet.</p>
           )}
         </Section>
 

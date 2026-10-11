@@ -14,6 +14,8 @@ export interface Note {
   cover?: string;
   /** When the note last arrived in a list that counts as done; cleared when it leaves. */
   doneAt?: number;
+  /** When the card was put on the public "Now" list; never counts as an edit. */
+  nowAt?: number;
 }
 export interface BoardList {
   id: string;

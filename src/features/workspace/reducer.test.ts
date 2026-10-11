@@ -174,4 +174,14 @@ describe('writing workspace invariants', () => {
       }),
     ).toBe(second);
   });
+  it('puts a card on the Now list without counting it as an edit', () => {
+    const picked = workspaceReducer(fixture(), { type: 'note/set-now', noteId: 'small', nowAt: 5 });
+    expect(picked.cards[0]).toMatchObject({ nowAt: 5, updatedAt: 1000 });
+    const dropped = workspaceReducer(picked, {
+      type: 'note/set-now',
+      noteId: 'small',
+      nowAt: undefined,
+    });
+    expect('nowAt' in dropped.cards[0]).toBe(false);
+  });
 });

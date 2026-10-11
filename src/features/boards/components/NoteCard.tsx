@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { FileText, MoreHorizontal, Trash2 } from 'lucide-react';
+import { FileText, MoreHorizontal, Radio, Trash2 } from 'lucide-react';
 import type { Board, Note } from '@/features/workspace/types';
 import { useWorkspace, useWorkspaceActions } from '@/hooks/useWorkspace';
 import { useUI } from '@/hooks/useUI';
@@ -10,14 +10,17 @@ import { taskProgress } from '@/lib/tasks';
 import { TaskCount } from '@/components/ui/TaskCount';
 import { initiativePath } from '@/lib/app-paths';
 import { editedLabel, labelColorValue, noteLabel } from '@/lib/note-metadata';
+import { isDoneList } from '@/features/journal/journal';
 import { useBoardDrag } from '../useBoardDrag';
 export function NoteCard({ note, board }: { note: Note; board: Board }) {
   const navigate = useNavigate(),
-    { moveNote } = useWorkspaceActions(),
-    label = noteLabel(useWorkspace().workspace, note),
+    { moveNote, setNoteNow } = useWorkspaceActions(),
+    { workspace, cloudEnabled } = useWorkspace(),
+    label = noteLabel(workspace, note),
     { openDialog } = useUI(),
     menu = useDropdown(),
     drag = useBoardDrag();
+  const list = board.lists.find((item) => item.id === note.listId) ?? { id: '', title: '' };
   return (
     <article
       className={`note-card ${drag.dragId === note.id ? 'dragging' : ''}`}
@@ -52,6 +55,14 @@ export function NoteCard({ note, board }: { note: Note; board: Board }) {
             </span>
           )}
           <h3>{note.title || 'Untitled'}</h3>
+          {cloudEnabled && note.nowAt !== undefined && !isDoneList(list) && (
+            <span
+              className="card-now"
+              title="Shown on your public page under what you're working on"
+            >
+              <Radio size={12} /> On my page
+            </span>
+          )}
           <div className="card-meta">
             {/* A checklist shows its progress instead of a word count. */}
             {taskProgress(note.content).total ? (
@@ -95,6 +106,18 @@ export function NoteCard({ note, board }: { note: Note; board: Board }) {
               ))}
             </select>
           </label>
+          {cloudEnabled && (
+            <button
+              aria-pressed={note.nowAt !== undefined}
+              onClick={() => {
+                setNoteNow(note.id, note.nowAt === undefined);
+                menu.close();
+              }}
+            >
+              <Radio size={15} />
+              {note.nowAt === undefined ? 'Show on my page' : 'Remove from my page'}
+            </button>
+          )}
           <button
             className="danger"
             onClick={() => {

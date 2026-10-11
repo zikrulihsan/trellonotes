@@ -162,3 +162,24 @@
   display: inline-flex;
   color: #2f9e6a;
 }
+/* A card whose title shows on the public "working on" list. */
+.card-now {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+  margin-top: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: #6a46c9;
+  background: #f0eaff;
+  font-size: 11px;
+  font-weight: 600;
+}
+.landing-admin-working {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+  font-size: 14px;
+}

@@ -244,21 +244,49 @@
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.85);
 }
-.home-flow li span {
-  color: var(--home-muted);
-  font-size: 15px;
-}
 .home-flow li strong {
   font-family: 'Literata', Georgia, serif;
-  font-size: 22px;
+  font-size: 30px;
   font-weight: 500;
+  line-height: 1.1;
+}
+.home-flow-action {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 5px;
+  margin-top: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  color: var(--purple);
+  background: #f0eaff;
+  font-size: 13px;
+  font-weight: 600;
+}
+.home-flow-example {
+  margin-top: 8px;
+  color: var(--home-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.home-flow li:last-child .home-flow-action {
+  color: var(--home-ink);
+  background: var(--home-marker);
 }
 .home-flow li:last-child {
   border-color: var(--home-ink);
   background: #fffbe6;
   box-shadow: 3px 3px 0 var(--home-ink);
 }
-.home-flow > p {
+.home-section-lead {
+  max-width: 36rem;
+  margin: 12px auto 0;
+  color: var(--home-muted);
+  font-size: 17px;
+  line-height: 1.6;
+  text-align: center;
+}
+.home-flow > p:last-child {
   margin: 20px 0 0;
   color: var(--home-muted);
   text-align: center;
@@ -266,6 +294,7 @@
 
 .home-pillars {
   display: grid;
+  margin-top: 32px;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
 }
@@ -298,7 +327,12 @@
   margin: 20px 0 8px;
   font-size: 24px;
 }
+.home-pillars article {
+  display: flex;
+  flex-direction: column;
+}
 .home-pillars p {
+  flex: 1;
   margin: 0;
   color: var(--home-muted);
   font-size: 15px;
@@ -420,7 +454,7 @@
     padding: 16px;
   }
   .home-flow li strong {
-    font-size: 19px;
+    font-size: 24px;
   }
   .home-private {
     padding: 20px;
@@ -558,5 +592,157 @@
   }
   .home-journal {
     transform: none;
+  }
+}
+
+.home-pillar-where {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #efedf3;
+  color: var(--purple);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* The personal website every account gets. */
+.home-site {
+  text-align: center;
+}
+.home-site-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 40px;
+  margin-top: 36px;
+  text-align: left;
+}
+.home-site-sketch {
+  overflow: hidden;
+  border: 1px solid #e3e1ea;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 18px 50px rgba(42, 33, 59, 0.1);
+}
+.home-site-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #ecebf0;
+  background: #f6f5f9;
+}
+.home-site-dots {
+  display: flex;
+  gap: 5px;
+}
+.home-site-dots i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #dcd9e3;
+}
+.home-site-url {
+  flex: 1;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: #fff;
+  color: #85858f;
+  font-size: 12px;
+}
+.home-site-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 22px 26px 26px;
+}
+.home-site-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+  color: #92919c;
+  font-size: 13px;
+}
+.home-site-nav b {
+  flex: 1;
+  color: var(--home-ink);
+  font-weight: 600;
+}
+.home-site-nav .is-active {
+  color: var(--home-ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.home-site-hello {
+  font-family: 'Literata', Georgia, serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+.home-site-label {
+  margin-top: 12px;
+  color: #92919c;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+.home-site-now {
+  font-size: 14px;
+}
+.home-site-projects {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.home-site-projects span {
+  padding: 26px 10px 10px;
+  border: 1px solid #ecebf0;
+  border-radius: 8px;
+  background: linear-gradient(#f3effc 0 22px, #fff 22px);
+  font-size: 12px;
+  font-weight: 600;
+}
+.home-site-post {
+  padding: 8px 0;
+  border-bottom: 1px solid #f0eff4;
+  font-size: 14px;
+}
+.home-site-parts ul {
+  display: grid;
+  gap: 16px;
+  margin: 0 0 24px;
+  padding: 0;
+  list-style: none;
+}
+.home-site-parts li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 14px;
+  border-left: 3px solid #d7cff0;
+}
+.home-site-parts strong {
+  font-size: 16px;
+  font-weight: 600;
+}
+.home-site-parts li span {
+  color: var(--home-muted);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.home-site-parts .home-button {
+  text-decoration: none;
+}
+@media (max-width: 760px) {
+  .home-site-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .home-site-body {
+    padding: 18px;
+  }
+  .home-site-hello {
+    font-size: 20px;
   }
 }

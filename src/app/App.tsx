@@ -5,6 +5,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { BoardPage } from '@/features/boards/BoardPage';
 import { WorkspaceDialogs } from '@/features/workspace/WorkspaceDialogs';
 import { useBoardTools } from '@/integrations/useBoardTools';
+import { useNowSync } from '@/features/landing/useNowSync';
 import { PagesPage } from '@/features/pages/PagesPage';
 import { LandingSettingsPage } from '@/features/landing/LandingSettingsPage';
 import { TodoListsPage } from '@/features/todo/TodoListsPage';
@@ -18,6 +19,7 @@ const TodoListPage = lazy(() => import('@/features/todo/TodoListPage'));
 export function App() {
   const { workspace } = useWorkspace();
   useBoardTools();
+  useNowSync();
   return (
     <>
       <Routes>

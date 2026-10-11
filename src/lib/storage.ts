@@ -42,7 +42,8 @@ function isNote(value: unknown): value is Note {
     Number.isFinite(value.updatedAt) &&
     (value.labelColor === undefined || typeof value.labelColor === 'string') &&
     (value.labelId === undefined || typeof value.labelId === 'string') &&
-    (value.doneAt === undefined || typeof value.doneAt === 'number')
+    (value.doneAt === undefined || typeof value.doneAt === 'number') &&
+    (value.nowAt === undefined || typeof value.nowAt === 'number')
   );
 }
 function isLabel(value: unknown): value is Label {

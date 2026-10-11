@@ -25,6 +25,8 @@ export interface WorkspaceActions {
   updateNote: (noteId: string, patch: NotePatch) => void;
   moveNote: (noteId: string, listId: string, beforeId?: string) => void;
   deleteNote: (noteId: string) => void;
+  /** Puts a card's title on the public "Now" list, or takes it off; does not count as an edit. */
+  setNoteNow: (noteId: string, now: boolean) => void;
   createLabel: (name: string, color: string) => string;
   updateLabel: (labelId: string, patch: LabelPatch) => void;
   deleteLabel: (labelId: string) => void;

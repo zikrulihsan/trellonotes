@@ -156,10 +156,14 @@ describe('public reader', () => {
       ],
       notesHeading: 'Want to know what i think of?',
       notesCount: 5,
+      working: ['Building Notis', ''],
+      workingHeading: "What I'm working on",
     };
     renderAt('/@zikrul');
     expect(await screen.findByRole('heading', { name: 'Hi, Zikrul Here' })).toBeInTheDocument();
     expect(screen.getByText('Delivering Impact Through Software')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: "What I'm working on" })).toBeInTheDocument();
+    expect(screen.getByText('Building Notis')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Contact' })).toHaveAttribute(
       'href',
       'mailto:me@example.com',
