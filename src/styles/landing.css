@@ -903,3 +903,101 @@ a.landing-project:hover {
     animation: none;
   }
 }
+
+/* Design pass: one heading style, a menu that stays in reach, calmer cards, themed articles. */
+.landing h2 {
+  font-family: var(--landing-display);
+  font-size: clamp(24px, 3vw, 30px);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+.reader:has(.landing-nav) {
+  background-color: #fffdf8;
+  background-image: radial-gradient(circle, #e4dfd4 1px, transparent 1.2px);
+  background-size: 22px 22px;
+}
+.landing-nav {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  max-width: none;
+  padding-bottom: 10px;
+  background: rgb(255 253 248 / 0.88);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+.landing-avatar {
+  display: block;
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 22px;
+  border: 2px solid var(--landing-ink);
+  border-radius: 52% 48% 50% 50% / 48% 52% 48% 52%;
+  object-fit: cover;
+  box-shadow: 4px 4px 0 var(--landing-marker);
+  transform: rotate(-3deg);
+}
+.landing-project.is-static {
+  box-shadow: 3px 3px 0 var(--landing-line);
+  border-color: #8e8a94;
+}
+.landing-project-go {
+  flex-shrink: 0;
+  margin-left: -4px;
+  color: var(--landing-muted);
+  transition: transform 0.15s ease;
+}
+a.landing-project:hover .landing-project-go {
+  color: var(--landing-ink);
+  transform: translate(2px, -2px);
+}
+.landing-posts p {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+/* Articles share the sketchbook paper and end with more to read. */
+.reader:has(.landing-nav) .reader-column {
+  padding-top: clamp(32px, 6vw, 64px);
+}
+.reader:has(.landing-nav) .reader-header h1 {
+  color: var(--landing-ink, #1f1d22);
+}
+.reader:has(.landing-nav) .reader-back {
+  margin-bottom: 20px;
+  padding: 3px 12px 3px 8px;
+  border: 1.5px solid #1f1d22;
+  border-radius: 16px 12px 18px 10px / 10px 18px 12px 16px;
+  color: #1f1d22;
+  font-family: 'Patrick Hand', 'Segoe Print', cursive;
+  font-size: 16px;
+  box-shadow: 2px 2px 0 #1f1d22;
+}
+.reader:has(.landing-nav) .reader-back:hover {
+  background: #ffe36e;
+  color: #1f1d22;
+}
+.reader .landing.landing-more {
+  max-width: none;
+  margin-top: 56px;
+  padding: 40px 0 0;
+  border-top: 1.5px dashed #c9c6ce;
+}
+.landing-more .landing-section {
+  margin-top: 0;
+}
+@media (max-width: 560px) {
+  .landing-avatar {
+    width: 84px;
+    height: 84px;
+  }
+  .reader .landing.landing-more {
+    padding-inline: 0;
+  }
+}
+
+.landing-now {
+  width: fit-content;
+}

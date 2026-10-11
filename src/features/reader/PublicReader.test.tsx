@@ -90,6 +90,28 @@ describe('public reader', () => {
     expect(screen.queryByRole('navigation')).toBeNull();
   });
 
+  it('ends a listed page with more to read and a way back to the Blog', async () => {
+    renderAt('/@zikrul/catatan-rilis');
+    expect(await screen.findByRole('heading', { name: 'Keep reading' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /How Folio was built/ })).toHaveAttribute(
+      'href',
+      '/@zikrul/folio-story',
+    );
+    // The page being read isn't suggested again.
+    expect(screen.queryByRole('link', { name: /Catatan rilis/ })).toBeNull();
+    expect(screen.getByRole('link', { name: 'Back to Blog' })).toHaveAttribute(
+      'href',
+      '/@zikrul?blog',
+    );
+  });
+
+  it('keeps an unlisted page to itself, without suggestions', async () => {
+    renderAt('/@zikrul/rahasia');
+    expect(await screen.findByText('Isi tulisan.')).toBeInTheDocument();
+    expect(screen.queryByText('Keep reading')).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Back to Blog' })).toBeNull();
+  });
+
   it('opens the page a short link points to, keeping the short address', async () => {
     renderAt('/s/k7m2xq9');
     expect(await screen.findByText('Isi tulisan.')).toBeInTheDocument();
