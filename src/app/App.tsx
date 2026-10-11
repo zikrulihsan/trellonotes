@@ -8,6 +8,7 @@ import { useBoardTools } from '@/integrations/useBoardTools';
 import { PagesPage } from '@/features/pages/PagesPage';
 import { LandingSettingsPage } from '@/features/landing/LandingSettingsPage';
 import { TodoListsPage } from '@/features/todo/TodoListsPage';
+import { JournalPage } from '@/features/journal/JournalPage';
 import { boardPath } from '@/lib/app-paths';
 import { FocusPanel } from '@/features/focus/FocusPanel';
 const EditorPage = lazy(() => import('@/features/editor/EditorPage'));
@@ -82,6 +83,7 @@ export function App() {
             }
           />
           <Route path="todos" element={<TodoListsPage />} />
+          <Route path="journal" element={<JournalPage />} />
           {/* The single to-do list lived at /todo before To-do lists. */}
           <Route path="todo" element={<Navigate to="/todos" replace />} />
           <Route

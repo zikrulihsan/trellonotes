@@ -8,6 +8,7 @@ import {
   Globe,
   LayoutGrid,
   ListChecks,
+  NotebookPen,
   PanelLeftClose,
   PenLine,
   Plus,
@@ -29,7 +30,7 @@ export function Sidebar({
   section,
 }: {
   board: Board;
-  section: 'boards' | 'pages' | 'todos' | 'landing';
+  section: 'boards' | 'pages' | 'todos' | 'landing' | 'journal';
 }) {
   const { workspace, cloudEnabled, syncStatus } = useWorkspace(),
     { finishSync } = useWorkspaceActions(),
@@ -91,6 +92,10 @@ export function Sidebar({
     navigate('/landing');
     closeSidebarDrawer();
   }
+  function goJournal() {
+    navigate('/journal');
+    closeSidebarDrawer();
+  }
   function goTodos() {
     navigate('/todos');
     closeSidebarDrawer();
@@ -136,7 +141,7 @@ export function Sidebar({
               Personal workspace<small>Note it, write it, show it</small>
             </div>
           </div>
-          {/* The main flow: note it, write it, show it. */}
+          {/* The main flow: note it, look back, write it, show it. */}
           <nav className="side-links" aria-label="Sections">
             <div className="side-section">
               <span>NOTE</span>
@@ -162,6 +167,17 @@ export function Sidebar({
             <button className="side-link" onClick={freeWrite}>
               <PenLine size={18} />
               <span className="side-label">Free write</span>
+            </button>
+            <div className="side-section">
+              <span>LOOK BACK</span>
+            </div>
+            <button
+              className={`side-link ${section === 'journal' ? 'active' : ''}`}
+              aria-current={section === 'journal' ? 'page' : undefined}
+              onClick={goJournal}
+            >
+              <NotebookPen size={18} />
+              <span className="side-label">Work journal</span>
             </button>
             <div className="side-section">
               <span>WRITE</span>
