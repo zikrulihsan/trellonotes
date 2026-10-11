@@ -278,6 +278,18 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
             })}
           </ul>
         )}
+        <span className="landing-scroll-cue" aria-hidden="true">
+          <svg viewBox="0 0 24 32" width="22" height="30">
+            <path
+              d="M12 3c-.6 8 .5 16 0 24M5 20c3 3 5 5 7 7 2-2 4-5 7-8"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </span>
       </header>
       {content.helps.length > 0 && (
         <section className="landing-helps" aria-labelledby="landing-helps">

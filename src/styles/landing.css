@@ -859,3 +859,47 @@ a.landing-project:hover {
     text-align: center;
   }
 }
+
+/* On phones the hero fills the first screen on its own; the rest starts after a scroll. */
+.landing-scroll-cue {
+  display: none;
+}
+@media (max-width: 560px) {
+  .reader:has(.landing-hero) .landing {
+    padding-top: 0;
+  }
+  .landing-hero {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 62px);
+    min-height: calc(100svh - 62px);
+    padding: 24px 0 64px;
+    margin-bottom: 24px;
+  }
+  .landing-scroll-cue {
+    position: absolute;
+    bottom: 18px;
+    left: 50%;
+    display: block;
+    color: var(--landing-muted);
+    translate: -50% 0;
+    animation: landing-cue 1.8s ease-in-out infinite;
+  }
+}
+@keyframes landing-cue {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-scroll-cue {
+    animation: none;
+  }
+}
