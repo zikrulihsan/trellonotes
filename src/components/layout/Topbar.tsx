@@ -76,7 +76,7 @@ export function Topbar({
           <span className="small-logo">
             <Feather size={14} />
           </span>
-          folio
+          notis
           <span className="topbar-local">
             {cloudEnabled
               ? syncStatus === 'error'

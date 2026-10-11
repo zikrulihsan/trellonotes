@@ -8,7 +8,7 @@ const APP_HTML = `<!doctype html>
       name="description"
       content="A home for your ideas."
     />
-    <title>Folio — Your writing room</title>
+    <title>Notis — From notes to getting noticed</title>
   </head>
   <body><div id="root"></div></body>
 </html>`;
@@ -27,7 +27,7 @@ describe('link previews', () => {
     );
     expect(html).toContain('<meta name="description" content="Isi tulisan." />');
     expect(html).toContain('<meta name="twitter:card" content="summary" />');
-    expect(html).not.toContain('Your writing room');
+    expect(html).not.toContain('From notes to getting noticed');
     expect(html).not.toContain('A home for your ideas');
   });
 

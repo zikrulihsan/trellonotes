@@ -67,8 +67,8 @@ async function findPreview(url: URL): Promise<Preview | null> {
     if (parts.length === 1) {
       const name = profile.display_name;
       return {
-        title: name ? `Writing by ${name}` : `${parts[0]} on Folio`,
-        description: `Everything ${name ?? parts[0]} has published on Folio.`,
+        title: name ? `Writing by ${name}` : `${parts[0]} on Notis`,
+        description: `Everything ${name ?? parts[0]} has published on Notis.`,
         url: href,
         type: 'profile',
       };
