@@ -54,15 +54,15 @@ const PILLARS: { icon: ReactNode; title: string; text: string }[] = [
 const COMPARE: { kind: string; text: string; ours?: boolean }[] = [
   {
     kind: 'Task apps',
-    text: 'Move a card to Done and it is gone. By review time, you have forgotten half of what you did.',
+    text: 'Finished work disappears into a Done column. A month later, nobody remembers it, not even you.',
   },
   {
-    kind: 'Notes apps',
-    text: 'A place to write, but an empty page. You still have to remember it all and piece it together.',
+    kind: 'Blogs and notes apps',
+    text: 'You have to stop, remember and write it all from scratch. So it never gets written.',
   },
   {
     kind: 'Notis',
-    text: 'Remembers every week you finished something, and turns it into a page you can share.',
+    text: 'Work, document and publish in one flow. Every week of your work becomes professional history you can share.',
     ours: true,
   },
 ];
@@ -154,27 +154,15 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           <HeroSketch />
         </section>
 
-        <section className="home-flow" aria-labelledby="home-flow">
-          <h2 id="home-flow">Everything starts with a note.</h2>
-          <ol>
-            {STEPS.map(([ask, answer]) => (
-              <li key={ask}>
-                <span>{ask}</span>
-                <strong>{answer}</strong>
-              </li>
-            ))}
-          </ol>
-          <p>And along the way, you build a public presence.</p>
-        </section>
-
         <section className="home-different" aria-labelledby="home-different">
           <p className="eyebrow">WHAT MAKES NOTIS DIFFERENT</p>
           <h2 id="home-different">
-            Your work, <mark>remembered</mark>.
+            Your work deserves to be <mark>seen</mark>.
           </h2>
           <p className="home-different-lead">
-            Every card you move to Done lands in your work journal. At the end of the week, you see
-            what you got done, and with one click it becomes a draft you can publish.
+            Don't wait until you find time to write about it. As you work, Notis keeps a journal of
+            what you finish, and turns each week into a page for your public profile. A brag
+            document that writes itself.
           </p>
           <div className="home-different-grid">
             <ul className="home-compare">
@@ -187,6 +175,19 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             </ul>
             <JournalSketch />
           </div>
+        </section>
+
+        <section className="home-flow" aria-labelledby="home-flow">
+          <h2 id="home-flow">Everything starts with a note.</h2>
+          <ol>
+            {STEPS.map(([ask, answer]) => (
+              <li key={ask}>
+                <span>{ask}</span>
+                <strong>{answer}</strong>
+              </li>
+            ))}
+          </ol>
+          <p>And along the way, you build a public presence.</p>
         </section>
 
         <section className="home-pillars" aria-label="How Notis works">
