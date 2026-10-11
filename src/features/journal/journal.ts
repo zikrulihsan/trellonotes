@@ -100,3 +100,24 @@ export function weekDraft(workspace: Workspace, week: JournalWeek, title: string
   ].join('');
   return { title, content: content || '<p></p>' };
 }
+
+/** Most cards the public "Now" list shows. */
+export const NOW_LIMIT = 8;
+
+/**
+ * Titles of the cards the writer put on their public "Now" list and has not finished,
+ * oldest pick first. Only the titles go public; the cards themselves stay private.
+ */
+export function nowTitles(workspace: Workspace): string[] {
+  const doneLists = new Set(
+    workspace.boards.flatMap((board) =>
+      board.lists.filter(isDoneList).map((list) => `${board.id}/${list.id}`),
+    ),
+  );
+  return workspace.cards
+    .filter((note) => note.nowAt !== undefined && !doneLists.has(`${note.boardId}/${note.listId}`))
+    .sort((a, b) => (a.nowAt ?? 0) - (b.nowAt ?? 0))
+    .map((note) => note.title.trim())
+    .filter(Boolean)
+    .slice(0, NOW_LIMIT);
+}

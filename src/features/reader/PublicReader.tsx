@@ -319,6 +319,17 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
           <NextArrow />
         </section>
       )}
+      {content.working.length > 0 && (
+        <section className="landing-section" aria-labelledby="landing-working">
+          {content.workingHeading && <h2 id="landing-working">{content.workingHeading}</h2>}
+          <ul className="landing-now">
+            {content.working.map((item, index) => (
+              <li key={index}>{item}</li>
+            ))}
+          </ul>
+          <NextArrow />
+        </section>
+      )}
       {content.projects.length > 0 && (
         <section className="landing-section" aria-labelledby="landing-projects">
           {content.projectsHeading && <h2 id="landing-projects">{content.projectsHeading}</h2>}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { sampleWorkspace } from '@/test/sample-workspace';
-import { isDoneList, journalWeek, shiftWeek, weekDraft, weekId } from './journal';
+import { isDoneList, journalWeek, nowTitles, shiftWeek, weekDraft, weekId } from './journal';
 
 const wednesday = new Date(2026, 9, 7, 15).getTime();
 
@@ -36,5 +36,17 @@ describe('work journal', () => {
     expect(weekDraft(workspace, week, 'Week of Oct 5').content).toBe(
       '<p>A good week.</p><p>More soon.</p><h2>What I finished</h2><h3>The writing room</h3><ul><li><p>Ship &lt;the&gt; page</p></li></ul>',
     );
+  });
+  it('shows picked cards on the Now list until they are finished', () => {
+    const workspace = sampleWorkspace();
+    const pick = (id: string, at: number) =>
+      (workspace.cards.find((note) => note.id === id)!.nowAt = at);
+    pick('attention', 2);
+    pick('small', 1);
+    pick('slow', 3); // in Published, a done list
+    expect(nowTitles(workspace)).toEqual([
+      'The beauty of small beginnings',
+      'On the art of paying attention',
+    ]);
   });
 });

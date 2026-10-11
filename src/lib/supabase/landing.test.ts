@@ -112,3 +112,13 @@ describe('about page', () => {
     expect(hasAbout(about)).toBe(true);
   });
 });
+
+describe('what the writer is working on', () => {
+  it('keeps short titles, defaults the heading, and is empty for older pages', () => {
+    const landing = normalizeLanding({ working: ['  Building Notis ', '', 'x'.repeat(200)] })!;
+    expect(landing.working).toEqual(['Building Notis', 'x'.repeat(120)]);
+    expect(landing.workingHeading).toBe("What I'm working on");
+    expect(normalizeLanding({})!.working).toEqual([]);
+    expect(normalizeLanding({ workingHeading: '' })!.workingHeading).toBe('');
+  });
+});

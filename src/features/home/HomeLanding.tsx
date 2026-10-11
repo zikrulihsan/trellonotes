@@ -63,7 +63,7 @@ const EXAMPLE_SITE = 'https://notis.swegrowth.id/@zikrul-ihsan-md';
 const SITE_PARTS: { title: string; text: string }[] = [
   {
     title: 'Me',
-    text: 'Who you are, what you help with, your projects and what you are up to now.',
+    text: 'Who you are, what you help with, what you are working on and your projects.',
   },
   { title: 'Blog', text: 'Every page you publish, in one list people can follow.' },
   { title: 'About', text: 'Your longer story, your experience and the things you hold onto.' },
@@ -359,7 +359,7 @@ function SiteSketch() {
         <strong className="home-site-hello">
           Hi, I'm Ayu. I build <mark>payment systems</mark>.
         </strong>
-        <span className="home-site-label">Now</span>
+        <span className="home-site-label">Working on</span>
         <span className="home-site-now">Leading the checkout rewrite · Learning Rust</span>
         <span className="home-site-label">Projects</span>
         <div className="home-site-projects">

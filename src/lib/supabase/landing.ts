@@ -76,6 +76,9 @@ export interface Landing {
   projects: LandingProject[];
   notesHeading: string;
   notesCount: number;
+  /** Titles of the board cards the writer is working on, kept in step by the app. */
+  working: string[];
+  workingHeading: string;
   about: LandingAbout;
 }
 
@@ -105,6 +108,7 @@ export const LANDING_LIMITS = {
   stories: 8,
   experiences: 8,
   highlights: 5,
+  working: 8,
 } as const;
 
 export const defaultAbout = (): LandingAbout => ({
@@ -134,6 +138,8 @@ export function defaultLanding(name: string | null): Landing {
     projects: [],
     notesHeading: 'Want to know what i think of?',
     notesCount: 5,
+    working: [],
+    workingHeading: "What I'm working on",
     about: defaultAbout(),
   };
 }
@@ -313,6 +319,11 @@ export function normalizeLanding(value: unknown): Landing | null {
     notesCount: Number.isInteger(count)
       ? Math.min(Math.max(count, 1), LANDING_LIMITS.notes)
       : fallback.notesCount,
+    working: strings(raw.working, LANDING_LIMITS.working, 120),
+    workingHeading:
+      typeof raw.workingHeading === 'string'
+        ? text(raw.workingHeading, 80)
+        : fallback.workingHeading,
     about: normalizeAbout(raw.about),
   };
 }
