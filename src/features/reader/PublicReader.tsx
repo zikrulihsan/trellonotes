@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useEffect, useState, type CSSProperties, type MouseEvent } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -300,18 +300,7 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
             })}
           </ul>
         )}
-        <span className="landing-scroll-cue" aria-hidden="true">
-          <svg viewBox="0 0 24 32" width="22" height="30">
-            <path
-              d="M12 3c-.6 8 .5 16 0 24M5 20c3 3 5 5 7 7 2-2 4-5 7-8"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </span>
+        <NextArrow className="landing-scroll-cue" />
       </header>
       {content.helps.length > 0 && (
         <section className="landing-helps" aria-labelledby="landing-helps">
@@ -327,6 +316,7 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
               </li>
             ))}
           </ul>
+          <NextArrow />
         </section>
       )}
       {content.projects.length > 0 && (
@@ -342,6 +332,7 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
               />
             ))}
           </ul>
+          <NextArrow />
         </section>
       )}
       {shown.length > 0 ? (
@@ -358,6 +349,32 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
         )
       )}
     </main>
+  );
+}
+
+/**
+ * On phones, an arrow at the foot of the hero and of each section that scrolls to the next
+ * one. The last section's arrow is hidden by CSS, as there is nothing below it.
+ */
+function NextArrow({ className = 'landing-next' }: { className?: string }) {
+  const next = (event: MouseEvent<HTMLButtonElement>) => {
+    const target = event.currentTarget.closest('header, section')?.nextElementSibling;
+    const still = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    target?.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
+  };
+  return (
+    <button type="button" className={className} aria-label="Next section" onClick={next}>
+      <svg viewBox="0 0 24 32" width="22" height="30" aria-hidden="true">
+        <path
+          d="M12 3c-.6 8 .5 16 0 24M5 20c3 3 5 5 7 7 2-2 4-5 7-8"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </button>
   );
 }
 
