@@ -294,7 +294,7 @@ export function LandingSettingsPage() {
 
         <Section
           title="Projects"
-          hint="Link a project to one of your published pages to give it a detail page. Unlisted pages can't be picked, since they stay off your public page."
+          hint="Link a project to one of your published pages to give it a detail page, or to a website when there's no write-up; the site's preview image is shown when you don't add one. Unlisted pages can't be picked, since they stay off your public page."
         >
           <Field label="Heading">
             <input
@@ -343,13 +343,6 @@ export function LandingSettingsPage() {
                   placeholder={String(new Date().getFullYear())}
                   onChange={(event) => edit('projects', index, { year: event.target.value })}
                 />
-                <input
-                  aria-label="Image link"
-                  value={project.image}
-                  maxLength={500}
-                  placeholder="Image link (https://…), optional"
-                  onChange={(event) => edit('projects', index, { image: event.target.value })}
-                />
                 <select
                   aria-label="Detail page"
                   value={project.pageId ?? ''}
@@ -372,6 +365,23 @@ export function LandingSettingsPage() {
                     </option>
                   ))}
                 </select>
+                <input
+                  aria-label="Project link"
+                  value={project.url}
+                  maxLength={500}
+                  placeholder={
+                    project.pageId ? 'Link (used without a detail page)' : 'Link, e.g. flipcard.id'
+                  }
+                  onChange={(event) => edit('projects', index, { url: event.target.value })}
+                />
+                <input
+                  className="landing-row-full"
+                  aria-label="Image link"
+                  value={project.image}
+                  maxLength={500}
+                  placeholder="Image link (https://…), optional. Without one, the link's preview image is used."
+                  onChange={(event) => edit('projects', index, { image: event.target.value })}
+                />
                 {hidden && (
                   <p className="landing-admin-warning">
                     This page isn&apos;t on your public list anymore, so the project won&apos;t link
@@ -395,6 +405,7 @@ export function LandingSettingsPage() {
                       year: String(new Date().getFullYear()),
                       image: '',
                       pageId: null,
+                      url: '',
                     },
                   ],
                 })

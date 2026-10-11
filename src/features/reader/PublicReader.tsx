@@ -36,9 +36,11 @@ import {
   socialPlatform,
   type Landing,
   type LandingAbout,
+  type LandingProject,
   type SocialPlatform,
 } from '@/lib/supabase/landing';
 import { getProfile } from '@/lib/supabase/profiles';
+import { readCached, writeCached } from '@/lib/public-cache';
 import { writingExtensions } from '@/features/editor/extensions';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -48,21 +50,31 @@ const longDate = (iso: string) =>
 type Load<T> =
   { status: 'loading' } | { status: 'error'; message: string } | { status: 'ready'; data: T };
 
-/** Loads public data for the current route; `null` data means not found. */
-function usePublicData<T>(load: () => Promise<T>, deps: unknown[]): Load<T> {
+/**
+ * Loads public data for the current route; `null` data means not found. With a `name`,
+ * the last copy shows at once while a fresh one loads (see public-cache).
+ */
+function usePublicData<T>(load: () => Promise<T>, deps: unknown[], name?: string): Load<T> {
   const [state, setState] = useState<Load<T> & { key: string }>({ status: 'loading', key: '' });
   const key = JSON.stringify(deps);
+  const cacheKey = name && `${name}:${key}`;
+  const cached = cacheKey ? readCached<T>(cacheKey) : undefined;
   useEffect(() => {
     let active = true;
     load().then(
-      (data) => active && setState({ status: 'ready', data, key }),
-      (reason: unknown) =>
-        active &&
+      (data) => {
+        if (cacheKey) writeCached(cacheKey, data);
+        if (active) setState({ status: 'ready', data, key });
+      },
+      (reason: unknown) => {
+        // A copy from earlier beats an error, say while offline.
+        if (!active || (cacheKey && readCached(cacheKey))) return;
         setState({
           status: 'error',
           message: reason instanceof Error ? reason.message : 'Could not load this page.',
           key,
-        }),
+        });
+      },
     );
     return () => {
       active = false;
@@ -70,7 +82,8 @@ function usePublicData<T>(load: () => Promise<T>, deps: unknown[]): Load<T> {
     // `key` captures the inputs `load` depends on.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
-  return state.key === key ? state : { status: 'loading' };
+  if (state.key === key) return state;
+  return cached ? { status: 'ready', data: cached.data } : { status: 'loading' };
 }
 
 type Address =
@@ -125,9 +138,16 @@ export function PublicReader() {
   const result = usePublicData(
     () => (address ? resolveAuthor(address) : Promise.resolve(null)),
     [pathname],
+    'author',
   );
   let body;
-  if (result.status !== 'ready') body = <Status result={result} />;
+  if (result.status !== 'ready')
+    body = (
+      <Status
+        result={result}
+        kind={address && 'slug' in address && address.slug ? 'article' : 'page'}
+      />
+    );
   else if (!result.data || !address) body = <NotFound />;
   else if (result.data.slug)
     body = <ArticlePage author={result.data.author} slug={result.data.slug} />;
@@ -163,7 +183,8 @@ function AuthorPage({ author }: { author: Author }) {
             getLanding(supabase, author.userId),
           ])
         : Promise.resolve([[], null] as [PublishedPage[], Landing | null]),
-    [author.userId],
+    [author.userId, true],
+    'site',
   );
   const name =
     author.name ?? (result.status === 'ready' ? result.data[0][0]?.author_name : null) ?? null;
@@ -172,7 +193,7 @@ function AuthorPage({ author }: { author: Author }) {
     document.title = view === 'me' ? who : `${view === 'blog' ? 'Blog' : 'About'} · ${who}`;
   }, [name, author.handle, view]);
   useLandingFont();
-  if (result.status !== 'ready') return <Status result={result} />;
+  if (result.status !== 'ready') return <Status result={result} kind="page" />;
   const [pages, landing] = result.data;
   const about = landing && hasAbout(landing.about) ? landing.about : null;
   return (
@@ -316,38 +337,14 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
         <section className="landing-section" aria-labelledby="landing-projects">
           {content.projectsHeading && <h2 id="landing-projects">{content.projectsHeading}</h2>}
           <ul className="landing-projects">
-            {content.projects.map((project) => {
-              const slug = project.pageId ? bySlug.get(project.pageId) : undefined;
-              const tag = [project.category, project.year].filter(Boolean).join(' · ');
-              const body = (
-                <>
-                  {project.image ? (
-                    <img className="landing-thumb" src={project.image} alt="" />
-                  ) : (
-                    <span className="landing-thumb" aria-hidden="true">
-                      {project.title.replace(/^\W+/, '').charAt(0)}
-                    </span>
-                  )}
-                  <span className="landing-project-text">
-                    <strong>{project.title}</strong>
-                    {project.summary && <span>{project.summary}</span>}
-                  </span>
-                  {tag && <span className="landing-tag">{tag}</span>}
-                  {slug && <ArrowUpRight className="landing-project-go" size={18} />}
-                </>
-              );
-              return (
-                <li key={project.id}>
-                  {slug ? (
-                    <Link className="landing-project" to={writerPath(author, slug)}>
-                      {body}
-                    </Link>
-                  ) : (
-                    <div className="landing-project is-static">{body}</div>
-                  )}
-                </li>
-              );
-            })}
+            {content.projects.map((project) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                slug={project.pageId ? bySlug.get(project.pageId) : undefined}
+                author={author}
+              />
+            ))}
           </ul>
         </section>
       )}
@@ -366,6 +363,82 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
       )}
     </main>
   );
+}
+
+/**
+ * A project links to its write-up when it has a listed one, otherwise to its website.
+ * Without an image of its own, it borrows the website's preview image.
+ */
+function ProjectCard({
+  project,
+  slug,
+  author,
+}: {
+  project: LandingProject;
+  slug?: string;
+  author: PublicAuthor;
+}) {
+  const preview = useLinkImage(project.image ? '' : project.url);
+  const image = project.image || preview;
+  const tag = [project.category, project.year].filter(Boolean).join(' · ');
+  const body = (
+    <>
+      {image ? (
+        <img className="landing-thumb" src={image} alt="" loading="lazy" />
+      ) : (
+        <span className="landing-thumb" aria-hidden="true">
+          {project.title.replace(/^\W+/, '').charAt(0)}
+        </span>
+      )}
+      <span className="landing-project-text">
+        <strong>{project.title}</strong>
+        {project.summary && <span>{project.summary}</span>}
+      </span>
+      {tag && <span className="landing-tag">{tag}</span>}
+      {(slug || project.url) && <ArrowUpRight className="landing-project-go" size={18} />}
+    </>
+  );
+  return (
+    <li>
+      {slug ? (
+        <Link className="landing-project" to={writerPath(author, slug)}>
+          {body}
+        </Link>
+      ) : project.url ? (
+        <a className="landing-project" href={project.url} target="_blank" rel="noreferrer">
+          {body}
+        </a>
+      ) : (
+        <div className="landing-project is-static">{body}</div>
+      )}
+    </li>
+  );
+}
+
+/** A website's preview image, found by the link-image edge function and remembered. */
+function useLinkImage(url: string) {
+  const key = `link-image:${url}`;
+  const [found, setFound] = useState<{ url: string; image: string | null }>();
+  useEffect(() => {
+    if (!url || readCached(key)) return;
+    let active = true;
+    fetch(`/api/link-image?url=${encodeURIComponent(url)}`)
+      .then((response) => (response.ok ? response.json() : { image: null }))
+      .then((body: { image?: unknown }) => {
+        const image = typeof body.image === 'string' ? body.image : null;
+        writeCached(key, image);
+        if (active) setFound({ url, image });
+      })
+      .catch(() => {
+        /* No preview: the placeholder letter stays. */
+      });
+    return () => {
+      active = false;
+    };
+  }, [url, key]);
+  if (!url) return null;
+  if (found?.url === url) return found.image;
+  return readCached<string | null>(key)?.data ?? null;
 }
 
 const SOCIAL_ICONS: Record<SocialPlatform, LucideIcon> = {
@@ -441,6 +514,7 @@ function useAuthorSite(author: PublicAuthor, enabled: boolean) {
           ])
         : Promise.resolve([[], null] as [PublishedPage[], Landing | null]),
     [author.userId, enabled],
+    'site',
   );
   return result.status === 'ready' ? result.data : null;
 }
@@ -603,6 +677,7 @@ function ArticlePage({ author, slug }: { author: Author; slug: string }) {
   const result = usePublicData(
     () => (supabase ? getPublishedPage(supabase, author.userId, slug) : Promise.resolve(null)),
     [author.userId, slug],
+    'page',
   );
   const page = result.status === 'ready' ? result.data : null;
   // Unlisted pages are shared by link only, so they don't lead to the public list.
@@ -611,7 +686,7 @@ function ArticlePage({ author, slug }: { author: Author; slug: string }) {
   useEffect(() => {
     if (page) document.title = page.title;
   }, [page]);
-  if (result.status !== 'ready') return <Status result={result} />;
+  if (result.status !== 'ready') return <Status result={result} kind="article" />;
   if (!page) return <NotFound />;
   const name = author.name ?? page.author_name;
   return (
@@ -681,11 +756,49 @@ function ReadOnlyContent({ html }: { html: string }) {
   return <EditorContent editor={editor} />;
 }
 
-function Status({ result }: { result: Load<unknown> }) {
+function Status({ result, kind }: { result: Load<unknown>; kind: 'page' | 'article' }) {
+  if (result.status === 'error')
+    return (
+      <main className="reader-column reader-status" role="status">
+        {result.message}
+      </main>
+    );
+  return <Skeleton kind={kind} />;
+}
+
+/** A sketch of the page that is on its way, in place of a bare "Loading…". */
+function Skeleton({ kind }: { kind: 'page' | 'article' }) {
+  useLandingFont();
   return (
-    <main className="reader-column reader-status" role="status">
-      {result.status === 'error' ? result.message : 'Loading…'}
-    </main>
+    <div className="landing-skeleton" role="status" aria-busy="true">
+      <span className="sr-only">Loading…</span>
+      <div className="skeleton-nav">
+        <span className="skeleton" />
+        <span className="skeleton" />
+        <span className="skeleton" />
+      </div>
+      {kind === 'page' ? (
+        <div className="skeleton-page">
+          <span className="skeleton skeleton-title" />
+          <span className="skeleton skeleton-line" />
+          <div className="skeleton-buttons">
+            <span className="skeleton" />
+            <span className="skeleton" />
+          </div>
+          {[0, 1, 2].map((index) => (
+            <span key={index} className="skeleton skeleton-card" />
+          ))}
+        </div>
+      ) : (
+        <div className="skeleton-article">
+          <span className="skeleton skeleton-heading" />
+          <span className="skeleton skeleton-byline" />
+          {[100, 96, 92, 98, 60].map((width, index) => (
+            <span key={index} className="skeleton skeleton-text" style={{ width: `${width}%` }} />
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 

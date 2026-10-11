@@ -22,6 +22,8 @@ export interface LandingProject {
   image: string;
   /** The published page that tells the project's story, if any. */
   pageId: string | null;
+  /** A web link for projects without a write-up; its preview image stands in for `image`. */
+  url: string;
 }
 
 export interface LandingExperience {
@@ -255,6 +257,12 @@ const list = <T>(value: unknown, max: number, item: (raw: Record<string, unknown
  * drops empty entries and links that aren't web, mail or phone links, and caps
  * list lengths. Returns null for anything that isn't a landing page.
  */
+/** A web address (completing a bare domain), or empty for anything else. */
+function webLink(value: unknown) {
+  const url = toLinkUrl(text(value, 500));
+  return /^https?:\/\//i.test(url) ? url : '';
+}
+
 export function normalizeLanding(value: unknown): Landing | null {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) return null;
   const raw = value as Record<string, unknown>;
@@ -291,6 +299,7 @@ export function normalizeLanding(value: unknown): Landing | null {
         year: text(project.year, 12),
         image,
         pageId: pageId || null,
+        url: webLink(project.url),
       };
     }),
     notesHeading: text(raw.notesHeading, 80),

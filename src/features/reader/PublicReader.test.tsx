@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { clearCached } from '@/lib/public-cache';
 import { PublicReader } from './PublicReader';
 
 const AUTHOR = '0d4278c6-6483-4035-bbe5-fb027b17ac7f';
@@ -69,6 +70,8 @@ const renderAt = (path: string) =>
   );
 
 describe('public reader', () => {
+  beforeEach(() => clearCached());
+
   it('shows a published page at its handle address, without running scripts', async () => {
     renderAt('/@zikrul/catatan-rilis');
     expect(await screen.findByText('Isi tulisan.')).toBeInTheDocument();
@@ -249,5 +252,26 @@ describe('public reader', () => {
     renderAt('/@zikrul');
     expect(await screen.findByRole('link', { name: 'Me' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'About' })).toBeNull();
+  });
+
+  it('links a project without a write-up to its website', async () => {
+    landing = {
+      projects: [{ id: 'f', title: 'flipcard.id', url: 'flipcard.id', pageId: null }],
+    };
+    renderAt('/@zikrul');
+    const card = await screen.findByRole('link', { name: /flipcard\.id/ });
+    expect(card).toHaveAttribute('href', 'https://flipcard.id');
+    expect(card).toHaveAttribute('target', '_blank');
+  });
+
+  it('shows the last copy of a page at once when coming back', async () => {
+    landing = null;
+    const first = renderAt('/@zikrul?blog');
+    expect(await screen.findByRole('heading', { name: 'Blog' })).toBeInTheDocument();
+    first.unmount();
+    renderAt('/@zikrul?blog');
+    // No loading sketch in between: the remembered copy renders straight away.
+    expect(screen.getByRole('heading', { name: 'Blog' })).toBeInTheDocument();
+    expect(screen.queryByText('Loading…')).toBeNull();
   });
 });
