@@ -10,7 +10,7 @@ describe('signed-out home page', () => {
       <HomeLanding redirecting={false} error="" onGoogle={onGoogle} onSwegrowth={onSwegrowth} />,
     );
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'From notes to getting noticed.',
+      'Getting noticed, from daily notes.',
     );
     expect(
       screen.getByRole('heading', { name: 'Everything starts with a note.' }),

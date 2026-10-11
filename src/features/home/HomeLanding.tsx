@@ -155,11 +155,11 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
         <section className="home-hero">
           <p className="eyebrow">YOUR NOTES, YOUR PUBLIC PRESENCE</p>
           <h1>
-            From notes to <mark>getting noticed</mark>.
+            <mark>Getting noticed</mark>, from daily notes.
           </h1>
           <p className="home-lead">
-            Note your plans and progress. Notis keeps a journal of what you finish each week, and
-            turns it into writing and a page of your own that gets you noticed.
+            A notes and writing app for professionals that turns everyday notes into a public
+            professional presence.
           </p>
           {signIn}
           {error && (
@@ -297,7 +297,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
 
       <footer className="home-footer">
         <span>Notis</span>
-        <span>From notes to getting noticed.</span>
+        <span>Getting noticed, from daily notes.</span>
       </footer>
     </div>
   );
