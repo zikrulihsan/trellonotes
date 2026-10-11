@@ -104,10 +104,24 @@
   font: inherit;
   font-size: 15px;
   font-weight: 600;
+  text-decoration: none;
   cursor: pointer;
   transition:
     border-color 0.15s ease,
     transform 0.15s ease;
+}
+.home-signin-options {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
+.home-signin-dialog {
+  max-width: 100%;
+  text-align: center;
+}
+.home .home-signin-dialog h2 {
+  margin-bottom: 8px;
+  font-size: 26px;
 }
 .home-button:hover {
   border-color: #c9c4d2;
@@ -127,7 +141,7 @@
   outline: 2px solid var(--purple);
   outline-offset: 2px;
 }
-.home-hero .auth-error {
+.home-signin-dialog .auth-error {
   margin-top: 12px;
 }
 .home-footnote {
