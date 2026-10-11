@@ -61,6 +61,7 @@ export interface LandingAbout {
   storiesHeading: string;
   stories: LandingStory[];
   experiences: LandingExperience[];
+  layout: AboutLayout;
 }
 
 /** How the public page looks; the writer picks one, since tastes differ. */
@@ -83,13 +84,15 @@ export const LANDING_SECTIONS = [
 ] as const;
 export type LandingSectionId = (typeof LANDING_SECTIONS)[number]['id'];
 
+const HEADER_LAYOUTS = [
+  { id: 'center', label: 'Centered' },
+  { id: 'left', label: 'Left-aligned' },
+  { id: 'banner', label: 'Banner' },
+] as const;
+
 /** The designs each part of the Me page can take; the first is the default. */
 export const SECTION_LAYOUTS = {
-  hero: [
-    { id: 'center', label: 'Centered' },
-    { id: 'left', label: 'Left-aligned' },
-    { id: 'banner', label: 'Banner' },
-  ],
+  hero: HEADER_LAYOUTS,
   helps: [
     { id: 'columns', label: 'Columns' },
     { id: 'cards', label: 'Cards' },
@@ -116,6 +119,61 @@ export type LandingLayout = { order: LandingSectionId[] } & {
   [K in LayoutPart]: (typeof SECTION_LAYOUTS)[K][number]['id'];
 };
 
+/** The About page's sections below the story, in the writer's order. */
+export const ABOUT_SECTIONS = [
+  { id: 'values', label: 'What you hold onto' },
+  { id: 'now', label: "What you're up to now" },
+  { id: 'stories', label: 'Your story in writing' },
+  { id: 'experience', label: 'Experience' },
+] as const;
+export type AboutSectionId = (typeof ABOUT_SECTIONS)[number]['id'];
+
+/** The designs each part of the About page can take; the first is the default. */
+export const ABOUT_LAYOUTS = {
+  header: HEADER_LAYOUTS,
+  values: [
+    { id: 'cards', label: 'Cards' },
+    { id: 'list', label: 'Numbered list' },
+  ],
+  now: [
+    { id: 'list', label: 'List' },
+    { id: 'chips', label: 'Tags' },
+    { id: 'cards', label: 'Cards' },
+  ],
+  stories: [
+    { id: 'cards', label: 'Cards' },
+    { id: 'list', label: 'List' },
+  ],
+  experience: [
+    { id: 'timeline', label: 'Timeline' },
+    { id: 'cards', label: 'Cards' },
+  ],
+} as const;
+export type AboutLayout = { order: AboutSectionId[] } & {
+  [K in keyof typeof ABOUT_LAYOUTS]: (typeof ABOUT_LAYOUTS)[K][number]['id'];
+};
+
+/** The designs the Blog page can take; the first is the default. */
+export const BLOG_LAYOUTS = {
+  header: HEADER_LAYOUTS,
+  posts: [
+    { id: 'cards', label: 'Cards' },
+    { id: 'compact', label: 'Titles only' },
+    { id: 'grid', label: 'Grid' },
+  ],
+} as const;
+export type BlogLayout = {
+  [K in keyof typeof BLOG_LAYOUTS]: (typeof BLOG_LAYOUTS)[K][number]['id'];
+};
+
+/** The Blog page (/@handle?blog): every listed page under a heading of the writer's. */
+export interface LandingBlog {
+  heading: string;
+  /** Empty for the default line, "Everything <name> has written." */
+  intro: string;
+  layout: BlogLayout;
+}
+
 export const defaultLayout = (): LandingLayout => ({
   order: LANDING_SECTIONS.map((section) => section.id),
   hero: 'center',
@@ -125,29 +183,75 @@ export const defaultLayout = (): LandingLayout => ({
   notes: 'cards',
 });
 
+export const defaultAboutLayout = (): AboutLayout => ({
+  order: ABOUT_SECTIONS.map((section) => section.id),
+  header: 'center',
+  values: 'cards',
+  now: 'list',
+  stories: 'cards',
+  experience: 'timeline',
+});
+
+export const defaultBlog = (): LandingBlog => ({
+  heading: 'Blog',
+  intro: '',
+  layout: { header: 'center', posts: 'cards' },
+});
+
+const record = (value: unknown) =>
+  (typeof value === 'object' && value !== null && !Array.isArray(value) ? value : {}) as Record<
+    string,
+    unknown
+  >;
+
+/** Each part's design from `raw` when it is one of the part's options, else the fallback's. */
+function pickDesigns<T extends object>(
+  raw: Record<string, unknown>,
+  options: { [K in keyof T]?: readonly { id: string }[] },
+  fallback: T,
+): T {
+  const picked = { ...fallback };
+  for (const [part, choices] of Object.entries(options) as [keyof T, readonly { id: string }[]][])
+    if (choices.some((option) => option.id === raw[part as string]))
+      picked[part] = raw[part as string] as T[keyof T];
+  return picked;
+}
+
+/** Every known section once: the saved order first, then any the saved order lacks. */
+function normalizeOrder<T extends string>(value: unknown, known: readonly T[]): T[] {
+  const order = (Array.isArray(value) ? value : []).filter(
+    (id, index, all): id is T => known.includes(id as T) && all.indexOf(id) === index,
+  );
+  for (const id of known) if (!order.includes(id)) order.push(id);
+  return order;
+}
+
 /** A layout read from storage: every section once, in a known order, with known designs. */
 function normalizeLayout(value: unknown): LandingLayout {
-  const raw = (typeof value === 'object' && value !== null ? value : {}) as Record<string, unknown>;
+  const raw = record(value);
   const fallback = defaultLayout();
-  const known = new Set<string>(fallback.order);
-  const order = (Array.isArray(raw.order) ? raw.order : []).filter(
-    (id, index, all): id is LandingSectionId =>
-      typeof id === 'string' && known.has(id) && all.indexOf(id) === index,
-  );
-  for (const id of fallback.order) if (!order.includes(id)) order.push(id);
-  const pick = <K extends LayoutPart>(part: K): LandingLayout[K] => {
-    const options: readonly { id: string }[] = SECTION_LAYOUTS[part];
-    return (
-      options.some((option) => option.id === raw[part]) ? raw[part] : fallback[part]
-    ) as LandingLayout[K];
-  };
   return {
-    order,
-    hero: pick('hero'),
-    helps: pick('helps'),
-    working: pick('working'),
-    projects: pick('projects'),
-    notes: pick('notes'),
+    ...pickDesigns(raw, SECTION_LAYOUTS, fallback),
+    order: normalizeOrder(raw.order, fallback.order),
+  };
+}
+
+function normalizeAboutLayout(value: unknown): AboutLayout {
+  const raw = record(value);
+  const fallback = defaultAboutLayout();
+  return {
+    ...pickDesigns(raw, ABOUT_LAYOUTS, fallback),
+    order: normalizeOrder(raw.order, fallback.order),
+  };
+}
+
+function normalizeBlog(value: unknown): LandingBlog {
+  const raw = record(value);
+  const fallback = defaultBlog();
+  return {
+    heading: typeof raw.heading === 'string' ? text(raw.heading, 80) : fallback.heading,
+    intro: text(raw.intro, 200),
+    layout: pickDesigns(record(raw.layout), BLOG_LAYOUTS, fallback.layout),
   };
 }
 
@@ -170,6 +274,7 @@ export interface Landing {
   working: string[];
   workingHeading: string;
   about: LandingAbout;
+  blog: LandingBlog;
 }
 
 /** True when the About page has something to show, so the menu can leave it out otherwise. */
@@ -213,6 +318,7 @@ export const defaultAbout = (): LandingAbout => ({
   storiesHeading: 'Learn about my growth',
   stories: [],
   experiences: [],
+  layout: defaultAboutLayout(),
 });
 
 export function defaultLanding(name: string | null): Landing {
@@ -233,6 +339,7 @@ export function defaultLanding(name: string | null): Landing {
     working: [],
     workingHeading: "What I'm working on",
     about: defaultAbout(),
+    blog: defaultBlog(),
   };
 }
 
@@ -308,10 +415,7 @@ const httpsImage = (value: unknown) => {
 };
 
 function normalizeAbout(value: unknown): LandingAbout {
-  const raw =
-    typeof value === 'object' && value !== null && !Array.isArray(value)
-      ? (value as Record<string, unknown>)
-      : {};
+  const raw = record(value);
   const fallback = defaultAbout();
   const heading = (key: string, fallbackText: string) =>
     typeof raw[key] === 'string' ? text(raw[key], 80) : fallbackText;
@@ -347,6 +451,7 @@ function normalizeAbout(value: unknown): LandingAbout {
         highlights: strings(job.highlights, LANDING_LIMITS.highlights, 160),
       };
     }),
+    layout: normalizeAboutLayout(raw.layout),
   };
 }
 
@@ -419,6 +524,7 @@ export function normalizeLanding(value: unknown): Landing | null {
         ? text(raw.workingHeading, 80)
         : fallback.workingHeading,
     about: normalizeAbout(raw.about),
+    blog: normalizeBlog(raw.blog),
   };
 }
 

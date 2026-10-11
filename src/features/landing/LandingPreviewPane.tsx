@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Monitor, Smartphone, Tablet, X } from 'lucide-react';
 import type { Landing } from '@/lib/supabase/landing';
 import type { PublicAuthor } from '@/lib/supabase/published-pages';
+import type { Section } from '@/features/reader/PublicReader';
 
 const DEVICES = [
   { id: 'desktop', label: 'Desktop', width: 1280, icon: Monitor },
@@ -11,16 +12,24 @@ const DEVICES = [
 type Device = (typeof DEVICES)[number]['id'];
 
 /**
- * The Me page as visitors will see it, drawn live from the unsaved draft in a frame at a
- * real device width and scaled down to fit. `onClose` is set when it shows as an overlay.
+ * The Me, Blog or About page as visitors will see it, drawn live from the unsaved draft in a
+ * frame at a real device width and scaled down to fit. `focus` names the section the writer
+ * just moved or restyled, which the frame brings into view each time `focusKey` changes.
+ * `onClose` is set when it shows as an overlay.
  */
 export function LandingPreviewPane({
   landing,
   author,
+  view,
+  focus,
+  focusKey,
   onClose,
 }: {
   landing: Landing;
   author: PublicAuthor & { name: string | null };
+  view: Section;
+  focus?: string;
+  focusKey?: number;
   onClose?: () => void;
 }) {
   const [device, setDevice] = useState<Device>('desktop');
@@ -53,10 +62,10 @@ export function LandingPreviewPane({
   useEffect(() => {
     if (!ready) return;
     frame.current?.contentWindow?.postMessage(
-      { type: 'notis:landing-preview', landing, author },
+      { type: 'notis:landing-preview', landing, author, view, focus, focusKey },
       window.location.origin,
     );
-  }, [ready, landing, author]);
+  }, [ready, landing, author, view, focus, focusKey]);
 
   const scale = box.width ? Math.min(1, box.width / width) : 1;
   return (

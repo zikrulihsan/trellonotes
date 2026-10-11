@@ -142,3 +142,35 @@ describe('section order and designs', () => {
     expect(normalizeLanding({})!.layout.order).toEqual(['helps', 'working', 'projects', 'notes']);
   });
 });
+
+describe('About and Blog designs', () => {
+  it('keeps the About sections once, in the saved order, with known designs', () => {
+    const { about } = normalizeLanding({
+      about: { layout: { order: ['experience', 'now', 'now', 'bogus'], values: 'list', now: 'x' } },
+    })!;
+    expect(about.layout.order).toEqual(['experience', 'now', 'values', 'stories']);
+    expect(about.layout.values).toBe('list');
+    expect(about.layout.now).toBe('list');
+    expect(about.layout.header).toBe('center');
+  });
+
+  it('defaults the Blog heading and designs, and keeps what the writer set', () => {
+    expect(normalizeLanding({})!.blog).toEqual({
+      heading: 'Blog',
+      intro: '',
+      layout: { header: 'center', posts: 'cards' },
+    });
+    const { blog } = normalizeLanding({
+      blog: {
+        heading: ' Tulisan ',
+        intro: 'Catatan saya',
+        layout: { header: 'left', posts: 'mosaic' },
+      },
+    })!;
+    expect(blog).toEqual({
+      heading: 'Tulisan',
+      intro: 'Catatan saya',
+      layout: { header: 'left', posts: 'cards' },
+    });
+  });
+});

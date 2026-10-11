@@ -1,26 +1,26 @@
 /* The designs a writer can pick for each part of the Me page. The first design of each
    part is the one landing.css draws; these rules only describe the others. */
 
-/* Hero: left-aligned. */
-.landing-hero.is-left {
+/* Hero, and the Blog and About headings: left-aligned. */
+:is(.landing-hero, .landing-blog-header).is-left {
   text-align: left;
 }
-.landing-hero.is-left .landing-tagline {
+:is(.landing-hero, .landing-blog-header).is-left .landing-tagline {
   margin-left: 0;
 }
 .landing-hero.is-left :is(.landing-links, .landing-socials) {
   justify-content: flex-start;
 }
 
-/* Hero: a banner, the intro set inside a tinted card. */
-.landing-hero.is-banner {
+/* Hero, and the Blog and About headings: a banner, the intro set inside a tinted card. */
+:is(.landing-hero, .landing-blog-header).is-banner {
   padding: clamp(28px, 5vw, 48px) clamp(20px, 4vw, 40px);
   border: 1.5px solid var(--landing-ink);
   border-radius: var(--landing-wobble);
   background: color-mix(in srgb, var(--landing-marker) 30%, var(--landing-card));
   box-shadow: 5px 5px 0 var(--landing-shadow);
 }
-.landing-hero.is-banner .landing-marker {
+:is(.landing-hero, .landing-blog-header).is-banner .landing-marker {
   background-image: none;
 }
 
@@ -197,6 +197,112 @@
 }
 .landing-writing.is-grid .landing-posts p {
   -webkit-line-clamp: 3;
+}
+
+/* About, what I hold onto: a numbered list. */
+.landing-values.is-list {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  max-width: 600px;
+}
+.landing-values.is-list li {
+  padding: 16px 0 16px 52px;
+  border: 0;
+  border-bottom: 1px dashed var(--landing-line);
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+.landing-values.is-list li:last-child {
+  border-bottom: 0;
+}
+.landing-values.is-list li::before {
+  left: 4px;
+  top: 12px;
+}
+
+/* About, story pages: a plain list of titles. */
+.landing-stories.is-list {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+.landing-stories.is-list a,
+.landing-stories.is-list a:hover {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 14px;
+  padding: 14px 4px;
+  border: 0;
+  border-bottom: 1px dashed var(--landing-line);
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  transform: none;
+}
+.landing-stories.is-list li:last-child a {
+  border-bottom: 0;
+}
+.landing-stories.is-list .landing-story-label {
+  flex-shrink: 0;
+  font-size: 18px;
+}
+.landing-stories.is-list strong {
+  flex: 1;
+}
+.landing-stories.is-list .landing-story-meta {
+  margin-top: 0;
+}
+.landing-stories.is-list a:hover strong {
+  background: linear-gradient(transparent 62%, var(--landing-marker) 62%);
+}
+
+/* About, experience: one card per job instead of a timeline. */
+.landing-timeline.is-cards {
+  display: grid;
+  gap: 14px;
+  padding: 0;
+}
+.landing-timeline.is-cards::before,
+.landing-timeline.is-cards > li::before {
+  display: none;
+}
+.landing-timeline.is-cards > li,
+.landing-timeline.is-cards > li:last-child {
+  padding: 18px 20px;
+  border: 1.5px solid var(--landing-ink);
+  border-radius: var(--landing-wobble);
+  background: var(--landing-card);
+  box-shadow: 3px 3px 0 var(--landing-shadow);
+}
+
+/* The editor's preview: sections with nothing in them yet, and a mark on the one just changed. */
+.landing-placeholder {
+  padding: 28px 20px;
+  border: 1.5px dashed var(--landing-line);
+  border-radius: var(--landing-wobble);
+  text-align: center;
+}
+.landing-placeholder p,
+.landing-placeholder-note {
+  margin: 0;
+  font-family: var(--landing-sans);
+  font-size: 14px;
+  color: var(--landing-muted);
+}
+.landing-preview .is-flash {
+  animation: landing-flash 1.4s ease-out;
+}
+@keyframes landing-flash {
+  0%,
+  35% {
+    outline: 3px solid #7954d8;
+    outline-offset: 10px;
+    border-radius: 12px;
+  }
+  100% {
+    outline: 3px solid transparent;
+    outline-offset: 10px;
+  }
 }
 
 @media (max-width: 560px) {

@@ -851,3 +851,42 @@
   font-size: 14px;
   resize: vertical;
 }
+
+/* Public page screen: one tab per page of the public menu. */
+.landing-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  gap: 4px;
+  margin: 4px 0 -4px;
+  padding: 4px;
+  border: 1px solid #ebe8f0;
+  border-radius: 12px;
+  background: #f6f4f9;
+}
+.landing-tabs button {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 9px;
+  color: #6f6a79;
+  font-size: 14px;
+  font-weight: 600;
+}
+.landing-tabs button:hover {
+  color: #2d2737;
+}
+.landing-tabs button.is-active {
+  color: #2d2737;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(42, 33, 59, 0.12);
+}
+.landing-tabs button:focus-visible {
+  outline: 2px solid #7954d8;
+  outline-offset: 1px;
+}
+.landing-tab-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
