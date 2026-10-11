@@ -78,15 +78,37 @@ export default async function resumeImport(request: Request) {
           temperature: 0.3,
           responseMimeType: 'application/json',
           responseSchema: RESUME_SCHEMA,
+          // Thinking makes 2.5 Flash slow enough to hit Netlify's response time limit.
+          ...(model.startsWith('gemini-2.5-flash') && { thinkingConfig: { thinkingBudget: 0 } }),
         },
       }),
-      signal: AbortSignal.timeout(60000),
+      signal: AbortSignal.timeout(35000),
     },
-  ).catch(() => null);
-  if (!response?.ok) return reply(502, { error: 'Gemini could not read the resume. Try again.' });
+  ).catch((reason: unknown) =>
+    reason instanceof Error && reason.name === 'TimeoutError' ? 'timeout' : null,
+  );
+  if (response === 'timeout')
+    return reply(504, { error: 'Gemini took too long. Try a shorter resume, or paste its text.' });
+  if (!response) return reply(502, { error: 'Could not reach Gemini. Try again.' });
+  if (!response.ok) {
+    // Say why, so a wrong key, a retired model or a used-up quota can be fixed.
+    const failure = (await response.json().catch(() => null)) as {
+      error?: { status?: string; message?: string };
+    } | null;
+    const why = failure?.error?.message ?? response.statusText;
+    console.error('Gemini error', response.status, model, why);
+    return reply(502, {
+      error: `Gemini could not read the resume (${[response.status, failure?.error?.status].filter(Boolean).join(' ')}): ${why}`,
+    });
+  }
   const result = (await response.json()) as {
-    candidates?: { content?: { parts?: { text?: string }[] } }[];
+    candidates?: { content?: { parts?: { text?: string }[] }; finishReason?: string }[];
+    promptFeedback?: { blockReason?: string };
   };
+  if (result.promptFeedback?.blockReason)
+    return reply(422, {
+      error: `Gemini declined the resume (${result.promptFeedback.blockReason}).`,
+    });
   const answer = result.candidates?.[0]?.content?.parts?.map((part) => part.text ?? '').join('');
   try {
     return reply(200, { resume: JSON.parse(answer ?? '') });
