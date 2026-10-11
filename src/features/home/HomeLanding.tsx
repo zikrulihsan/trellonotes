@@ -115,7 +115,7 @@ const FEATURES: { icon: ReactNode; title: string; text: string }[] = [
   {
     icon: <Sparkles size={18} />,
     title: 'AI from your resume',
-    text: 'Upload your CV and AI fills in your whole page.',
+    text: 'Upload your CV and AI fills in your public page.',
   },
 ];
 
@@ -158,11 +158,8 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             <mark>Getting noticed</mark>, from daily notes.
           </h1>
           <p className="home-lead">
-            An AI-powered notes and writing app for professionals that turns everyday notes into a
-            public professional presence.
-          </p>
-          <p className="home-ai">
-            <Sparkles size={16} /> Upload your resume, AI builds your page.
+            A notes and writing app for professionals that turns everyday notes into a public
+            professional presence.
           </p>
           {signIn}
           {error && (
