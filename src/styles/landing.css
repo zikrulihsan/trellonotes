@@ -589,40 +589,34 @@ a.landing-project:hover {
   }
 }
 
-/* Social links under the hero buttons */
+/* Social links under the hero buttons: small, quiet icons */
 .landing-socials {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 10px;
-  margin: 20px 0 0;
+  gap: 4px;
+  margin: 18px 0 0;
   padding: 0;
   list-style: none;
 }
 .landing-socials a {
   display: grid;
   place-items: center;
-  width: 42px;
-  height: 42px;
-  border: 1.5px solid var(--landing-ink);
-  border-radius: 55% 45% 50% 50% / 50% 55% 45% 50%;
-  background: var(--landing-paper);
-  color: var(--landing-ink);
-  box-shadow: 2px 2px 0 var(--landing-ink);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: var(--landing-muted);
   transition:
-    transform 0.15s ease,
+    color 0.15s ease,
     background 0.15s ease,
-    box-shadow 0.15s ease;
-}
-.landing-socials li:nth-child(even) a {
-  border-radius: 45% 55% 50% 50% / 55% 45% 50% 50%;
+    transform 0.15s ease;
 }
 .landing-socials a:hover {
+  color: var(--landing-ink);
   background: var(--landing-marker);
-  transform: translate(-1px, -1px) rotate(-6deg);
-  box-shadow: 3px 3px 0 var(--landing-ink);
+  transform: rotate(-6deg);
 }
 .landing-socials a:focus-visible {
   outline: 2px solid #7954d8;
-  outline-offset: 2px;
+  outline-offset: 1px;
 }

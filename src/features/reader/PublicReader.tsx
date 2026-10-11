@@ -357,7 +357,7 @@ const SOCIAL_ICONS: Record<SocialPlatform, LucideIcon> = {
 
 function SocialIcon({ platform }: { platform: SocialPlatform }) {
   const Icon = SOCIAL_ICONS[platform];
-  return <Icon size={19} strokeWidth={1.8} />;
+  return <Icon size={17} strokeWidth={1.75} />;
 }
 
 /** A hand-drawn sparkle beside the greeting. */
