@@ -73,11 +73,11 @@ async function findPreview(url: URL): Promise<Preview | null> {
       }).catch(() => null);
       const tagline = landing?.landing?.tagline;
       return {
-        title: name ?? `${parts[0]} on Folio`,
+        title: name ?? `${parts[0]} on Notis`,
         description:
           typeof tagline === 'string' && tagline.trim()
             ? tagline.trim()
-            : `Everything ${name ?? parts[0]} has published on Folio.`,
+            : `Everything ${name ?? parts[0]} has published on Notis.`,
         url: href,
         type: 'profile',
       };

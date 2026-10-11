@@ -1,6 +1,8 @@
-# TrelloNotes
+# Notis
 
-A Trello-style board whose cards open into full-page free-writing notes. Soft gray scrollable lists, white cards, purple accents, and a charcoal sidebar frame the board; Tiptap powers the spacious writing editor.
+**From notes to getting noticed: manage your professional presence.**
+
+Notis is a board whose cards open into full-page free-writing notes. Soft gray scrollable lists, white cards, purple accents, and a charcoal sidebar frame the board; Tiptap powers the spacious writing editor.
 
 ## Stack
 
