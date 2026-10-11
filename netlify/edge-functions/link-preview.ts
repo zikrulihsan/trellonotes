@@ -66,9 +66,18 @@ async function findPreview(url: URL): Promise<Preview | null> {
     if (!profile) return null;
     if (parts.length === 1) {
       const name = profile.display_name;
+      // Asked separately so previews still work on a database without landing pages.
+      const landing = await one<{ landing: { tagline?: unknown } | null }>('trellonotes_profiles', {
+        select: 'landing',
+        user_id: `eq.${profile.user_id}`,
+      }).catch(() => null);
+      const tagline = landing?.landing?.tagline;
       return {
-        title: name ? `Writing by ${name}` : `${parts[0]} on Folio`,
-        description: `Everything ${name ?? parts[0]} has published on Folio.`,
+        title: name ?? `${parts[0]} on Folio`,
+        description:
+          typeof tagline === 'string' && tagline.trim()
+            ? tagline.trim()
+            : `Everything ${name ?? parts[0]} has published on Folio.`,
         url: href,
         type: 'profile',
       };

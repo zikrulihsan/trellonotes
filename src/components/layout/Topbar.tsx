@@ -2,6 +2,7 @@ import {
   ChevronRight,
   Feather,
   FileText,
+  Globe,
   LayoutGrid,
   ListChecks,
   Menu,
@@ -18,7 +19,7 @@ export function Topbar({
   section,
 }: {
   board: Board;
-  section: 'boards' | 'pages' | 'todos';
+  section: 'boards' | 'pages' | 'todos' | 'landing';
 }) {
   const { sidebarVisible, narrowScreen, toggleSidebar, showSidebar } = useUI();
   // One toggle for every screen size: it docks or hides the sidebar on wide
@@ -62,6 +63,11 @@ export function Topbar({
           <>
             <FileText size={16} />
             <span>Pages</span>
+          </>
+        ) : section === 'landing' ? (
+          <>
+            <Globe size={16} />
+            <span>Landing page</span>
           </>
         ) : (
           <>

@@ -6,6 +6,7 @@ import { BoardPage } from '@/features/boards/BoardPage';
 import { WorkspaceDialogs } from '@/features/workspace/WorkspaceDialogs';
 import { useBoardTools } from '@/integrations/useBoardTools';
 import { PagesPage } from '@/features/pages/PagesPage';
+import { LandingSettingsPage } from '@/features/landing/LandingSettingsPage';
 import { TodoListsPage } from '@/features/todo/TodoListsPage';
 import { boardPath } from '@/lib/app-paths';
 import { FocusPanel } from '@/features/focus/FocusPanel';
@@ -51,6 +52,7 @@ export function App() {
             }
           />
           <Route path="pages" element={<PagesPage />} />
+          <Route path="landing" element={<LandingSettingsPage />} />
           <Route
             path="page/:pageRef"
             element={

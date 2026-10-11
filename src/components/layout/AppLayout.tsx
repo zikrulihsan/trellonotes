@@ -15,13 +15,14 @@ export function AppLayout() {
     todoRoute = useMatch('/todo/:ref'),
     pagesRoute = useMatch('/pages'),
     todosRoute = useMatch('/todos'),
+    landingRoute = useMatch('/landing'),
     boardRoute = useMatch('/board/:ref');
   const note = findByRef(workspace.cards, noteRoute?.params.ref);
   const board =
     (note
       ? workspace.boards.find((board) => board.id === note.boardId)
       : findByRef(workspace.boards, boardRoute?.params.ref)) ?? workspace.boards[0];
-  const section = pagesRoute ? 'pages' : todosRoute ? 'todos' : 'boards';
+  const section = pagesRoute ? 'pages' : todosRoute ? 'todos' : landingRoute ? 'landing' : 'boards';
   const writing = Boolean(noteRoute || pageRoute || freeWriteRoute || todoRoute);
   return (
     <div

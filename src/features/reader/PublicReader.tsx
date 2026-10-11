@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, Feather } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, Feather } from 'lucide-react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import { supabase } from '@/lib/supabase/client';
 import { plainText } from '@/lib/text';
@@ -11,7 +11,9 @@ import {
   SHORT_CODE_PATTERN,
   writerPath,
   type PublicAuthor,
+  type PublishedPage,
 } from '@/lib/supabase/published-pages';
+import { defaultLanding, getLanding, type Landing } from '@/lib/supabase/landing';
 import { getProfile } from '@/lib/supabase/profiles';
 import { writingExtensions } from '@/features/editor/extensions';
 
@@ -121,25 +123,191 @@ export function PublicReader() {
 }
 
 function AuthorPage({ author }: { author: Author }) {
+  const { search } = useLocation();
+  const allNotes = new URLSearchParams(search).has('notes');
   const result = usePublicData(
-    () => (supabase ? listPublishedPages(supabase, author.userId) : Promise.resolve([])),
+    () =>
+      supabase
+        ? Promise.all([
+            listPublishedPages(supabase, author.userId),
+            getLanding(supabase, author.userId),
+          ])
+        : Promise.resolve([[], null] as [PublishedPage[], Landing | null]),
     [author.userId],
   );
   const name =
-    author.name ?? (result.status === 'ready' ? result.data[0]?.author_name : null) ?? null;
+    author.name ?? (result.status === 'ready' ? result.data[0][0]?.author_name : null) ?? null;
   useEffect(() => {
-    document.title = name ? `Writing by ${name}` : 'Writing';
-  }, [name]);
+    document.title = name ?? (author.handle ? `@${author.handle}` : 'Writing');
+  }, [name, author.handle]);
+  useLandingFont();
   if (result.status !== 'ready') return <Status result={result} />;
+  const [pages, landing] = result.data;
+  if (allNotes) return <AllNotes author={author} name={name} pages={pages} />;
+  return <LandingView author={author} name={name} pages={pages} landing={landing} />;
+}
+
+/** The handwritten face of the landing page, loaded only for public visitors. */
+function useLandingFont() {
+  useEffect(() => {
+    const id = 'landing-font';
+    if (document.getElementById(id)) return;
+    const link = document.createElement('link');
+    link.id = id;
+    link.rel = 'stylesheet';
+    link.href =
+      'https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Patrick+Hand&family=JetBrains+Mono:wght@400&display=swap';
+    document.head.appendChild(link);
+  }, []);
+}
+
+const monthYear = (iso: string) =>
+  new Date(iso).toLocaleDateString('en', { month: 'short', year: 'numeric' });
+
+/** Minutes to read at about 200 words a minute. */
+const readingMinutes = (html: string) =>
+  Math.max(1, Math.round(plainText(html).split(/\s+/).filter(Boolean).length / 200));
+
+interface LandingProps {
+  author: Author;
+  name: string | null;
+  pages: PublishedPage[];
+  landing: Landing | null;
+}
+
+function LandingView({ author, name, pages, landing }: LandingProps) {
+  const content = landing ?? defaultLanding(name);
+  // `pages` holds only listed pages, so an unlisted or unpublished project page never gets a link.
+  const bySlug = new Map(pages.map((page) => [page.id, page.slug]));
+  const projectPages = new Set(
+    content.projects.map((project) => project.pageId).filter((id) => id && bySlug.has(id)),
+  );
+  // Project write-ups have their own spot, so the notes list shows the other writing.
+  const notes = pages.filter((page) => !projectPages.has(page.id));
+  const shown = landing ? notes.slice(0, content.notesCount) : notes.slice(0, 10);
+  const internal = (url: string) => url.startsWith('/');
+  return (
+    <main className="landing">
+      <header className="landing-hero">
+        <h1>{content.greeting || name || (author.handle ? `@${author.handle}` : 'Writing')}</h1>
+        {content.tagline && <p className="landing-tagline">{content.tagline}</p>}
+        {content.links.length > 0 && (
+          <div className="landing-links">
+            {content.links.map((link, index) =>
+              internal(link.url) ? (
+                <Link
+                  key={index}
+                  to={link.url}
+                  className={`landing-button ${index === 0 ? 'is-primary' : ''}`}
+                >
+                  {link.label}
+                </Link>
+              ) : (
+                <a
+                  key={index}
+                  href={link.url}
+                  target={link.url.startsWith('http') ? '_blank' : undefined}
+                  rel="noreferrer"
+                  className={`landing-button ${index === 0 ? 'is-primary' : ''}`}
+                >
+                  {link.label}
+                </a>
+              ),
+            )}
+          </div>
+        )}
+      </header>
+      {content.helps.length > 0 && (
+        <section className="landing-helps" aria-labelledby="landing-helps">
+          {content.helpsHeading && <h2 id="landing-helps">{content.helpsHeading}</h2>}
+          <ul style={{ '--landing-columns': Math.min(content.helps.length, 3) } as CSSProperties}>
+            {content.helps.map((help, index) => (
+              <li key={index}>
+                <strong>{help.title}</strong>
+                {help.subtitle && <span>{help.subtitle}</span>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {content.projects.length > 0 && (
+        <section className="landing-section" aria-labelledby="landing-projects">
+          {content.projectsHeading && <h2 id="landing-projects">{content.projectsHeading}</h2>}
+          <ul className="landing-projects">
+            {content.projects.map((project) => {
+              const slug = project.pageId ? bySlug.get(project.pageId) : undefined;
+              const tag = [project.category, project.year].filter(Boolean).join(' · ');
+              const body = (
+                <>
+                  {project.image ? (
+                    <img className="landing-thumb" src={project.image} alt="" />
+                  ) : (
+                    <span className="landing-thumb" aria-hidden="true" />
+                  )}
+                  <span className="landing-project-text">
+                    <strong>{project.title}</strong>
+                    {project.summary && <span>{project.summary}</span>}
+                  </span>
+                  {tag && <span className="landing-tag">{tag}</span>}
+                </>
+              );
+              return (
+                <li key={project.id}>
+                  {slug ? (
+                    <Link className="landing-project" to={writerPath(author, slug)}>
+                      {body}
+                    </Link>
+                  ) : (
+                    <div className="landing-project">{body}</div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
+      {shown.length > 0 ? (
+        <section className="landing-section" aria-labelledby="landing-notes">
+          {content.notesHeading && <h2 id="landing-notes">{content.notesHeading}</h2>}
+          <ul className="landing-notes">
+            {shown.map((page) => (
+              <li key={page.id}>
+                <Link to={writerPath(author, page.slug)}>
+                  <span>{page.title}</span>
+                  <time dateTime={page.published_at}>
+                    {monthYear(page.published_at)} · {readingMinutes(page.content)} min
+                  </time>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <Link className="landing-all" to={`${writerPath(author)}?notes`}>
+            All notes <ArrowUpRight size={14} />
+          </Link>
+        </section>
+      ) : (
+        !content.projects.length && (
+          <p className="landing-empty">Nothing has been published here yet.</p>
+        )
+      )}
+    </main>
+  );
+}
+
+function AllNotes({ author, name, pages }: Omit<LandingProps, 'landing'>) {
   return (
     <main className="reader-column">
+      <Link className="reader-back" to={writerPath(author)}>
+        <ArrowLeft size={15} />
+        {name ? `Back to ${name}` : 'Back'}
+      </Link>
       <header className="reader-header">
         <p className="eyebrow">{author.handle ? `@${author.handle}` : 'WRITING'}</p>
         <h1>{name ? `Writing by ${name}` : 'Writing'}</h1>
       </header>
-      {result.data.length ? (
+      {pages.length ? (
         <ul className="reader-list">
-          {result.data.map((page) => (
+          {pages.map((page) => (
             <li key={page.id}>
               <Link to={writerPath(author, page.slug)}>
                 <time dateTime={page.published_at}>{longDate(page.published_at)}</time>
