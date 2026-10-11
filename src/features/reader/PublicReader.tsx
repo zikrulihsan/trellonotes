@@ -116,7 +116,7 @@ export function PublicReader() {
       {body}
       <footer className="reader-footer">
         <Feather size={13} />
-        Written with folio
+        Written with Notis
       </footer>
     </div>
   );
