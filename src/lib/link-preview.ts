@@ -51,7 +51,7 @@ export function withPreview(html: string, preview: Preview): string {
     description = escape(preview.description);
   const tags = [
     `<meta property="og:type" content="${preview.type}" />`,
-    `<meta property="og:site_name" content="Notece" />`,
+    `<meta property="og:site_name" content="Notis" />`,
     `<meta property="og:title" content="${title}" />`,
     `<meta property="og:description" content="${description}" />`,
     `<meta property="og:url" content="${escape(preview.url)}" />`,

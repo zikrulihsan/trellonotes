@@ -8,7 +8,7 @@ const APP_HTML = `<!doctype html>
       name="description"
       content="A home for your ideas."
     />
-    <title>Notece — From notes to getting noticed</title>
+    <title>Notis — From notes to getting noticed</title>
   </head>
   <body><div id="root"></div></body>
 </html>`;
