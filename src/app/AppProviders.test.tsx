@@ -17,7 +17,7 @@ function Probe() {
       <span data-testid="dialog">{dialog?.kind ?? 'none'}</span>
       <button onClick={() => openDialog({ kind: 'create-board' })}>open</button>
       <button onClick={() => navigate('/pages')}>pages</button>
-      <button onClick={() => navigate('/board/writing-room')}>board</button>
+      <button onClick={() => navigate('/board/first-board')}>board</button>
     </>
   );
 }

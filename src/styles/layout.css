@@ -176,6 +176,17 @@
   letter-spacing: 1.2px;
   color: #80808d;
 }
+/* The note, write, show groups sit closer together than the sections below them. */
+.side-links .side-section {
+  margin: 18px 10px 6px 14px;
+}
+.side-links .side-section:first-child {
+  margin-top: 6px;
+}
+a.side-link {
+  color: inherit;
+  text-decoration: none;
+}
 .side-section button {
   color: #95959f;
   display: grid;

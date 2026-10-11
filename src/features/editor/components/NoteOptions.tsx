@@ -15,7 +15,7 @@ export function NoteOptions({ note, board }: { note: Note; board: Board }) {
     <div className="menu-anchor" data-menu-id={menu.id}>
       <button
         className="icon-button"
-        aria-label="Initiative options"
+        aria-label="Card options"
         aria-expanded={menu.open}
         onClick={() => menu.toggle()}
       >
@@ -26,7 +26,7 @@ export function NoteOptions({ note, board }: { note: Note; board: Board }) {
         <label>
           List
           <select
-            aria-label="Move initiative to list"
+            aria-label="Move card to list"
             value={note.listId}
             onChange={(event) => moveNote(note.id, event.target.value)}
           >
@@ -43,7 +43,7 @@ export function NoteOptions({ note, board }: { note: Note; board: Board }) {
             <span className="label-dot" style={{ background: labelColorValue(label.color) }} />
           )}
           <select
-            aria-label="Initiative label"
+            aria-label="Card label"
             value={note.labelId ?? ''}
             onChange={(event) => updateNote(note.id, { labelId: event.target.value || undefined })}
           >
@@ -78,7 +78,7 @@ export function NoteOptions({ note, board }: { note: Note; board: Board }) {
             }}
           >
             <Trash2 size={15} />
-            Delete initiative
+            Delete card
           </button>
         </div>
       </Dropdown>

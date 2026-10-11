@@ -40,7 +40,7 @@ export function BoardPage() {
           </div>
           <div className="board-footnote">
             <GripVertical size={14} />
-            Drag initiatives between lists.<span>Click one to write its updates</span>
+            Drag cards between lists.<span>Open one to note its progress</span>
           </div>
         </div>
       </BoardDragProvider>

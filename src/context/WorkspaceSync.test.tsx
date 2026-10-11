@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { seedWorkspace } from '@/features/workspace/seed';
+import { sampleWorkspace } from '@/test/sample-workspace';
 import type { Workspace } from '@/features/workspace/types';
 import { useWorkspace, useWorkspaceActions } from '@/hooks/useWorkspace';
 import {
@@ -58,7 +58,7 @@ describe('cloud sync', () => {
   });
 
   it('saves a newly created list to the cloud', async () => {
-    cloud.set(seedWorkspace());
+    cloud.set(sampleWorkspace());
     const hook = render();
     await waitFor(() => expect(hook.result.current.syncStatus).toBe('synced'));
     act(() => hook.result.current.createList('writing-room', 'Drafts'));
@@ -69,9 +69,9 @@ describe('cloud sync', () => {
   });
 
   it('keeps edits the cloud never received instead of loading the older cloud copy', async () => {
-    cloud.set(seedWorkspace());
-    saveSyncBase(key, { workspace: seedWorkspace(), version: cloud.row!.version });
-    const local = seedWorkspace();
+    cloud.set(sampleWorkspace());
+    saveSyncBase(key, { workspace: sampleWorkspace(), version: cloud.row!.version });
+    const local = sampleWorkspace();
     local.cards[0].content = '<p>Written just before closing the tab.</p>';
     saveWorkspace(local, localStorage, key);
     setUnsyncedChanges(key, true);
@@ -88,11 +88,11 @@ describe('cloud sync', () => {
   });
 
   it('merges with edits another device saved in the meantime', async () => {
-    cloud.set(seedWorkspace());
+    cloud.set(sampleWorkspace());
     const hook = render();
     await waitFor(() => expect(hook.result.current.syncStatus).toBe('synced'));
     // Another device adds a list after this one loaded.
-    const other = seedWorkspace();
+    const other = sampleWorkspace();
     other.boards[0].lists.push({ id: 'phone-list', title: 'From my phone' });
     cloud.set(other);
     act(() => hook.result.current.createList('writing-room', 'From my laptop'));
@@ -111,10 +111,10 @@ describe('cloud sync', () => {
   });
 
   it('loads the cloud copy when this device has nothing unsynced', async () => {
-    const remote = seedWorkspace();
+    const remote = sampleWorkspace();
     remote.cards[0].title = 'Edited on another device';
     cloud.set(remote);
-    saveWorkspace(seedWorkspace(), localStorage, key);
+    saveWorkspace(sampleWorkspace(), localStorage, key);
     const hook = render();
     await waitFor(() => expect(hook.result.current.syncStatus).toBe('synced'));
     expect(hook.result.current.workspace.cards[0].title).toBe('Edited on another device');
@@ -122,10 +122,10 @@ describe('cloud sync', () => {
   });
 
   it('picks up other devices’ edits when the tab is shown again', async () => {
-    cloud.set(seedWorkspace());
+    cloud.set(sampleWorkspace());
     const hook = render();
     await waitFor(() => expect(hook.result.current.syncStatus).toBe('synced'));
-    const remote = seedWorkspace();
+    const remote = sampleWorkspace();
     remote.cards[0].title = 'Written on my phone';
     cloud.set(remote);
     act(() => void window.dispatchEvent(new Event('focus')));
@@ -144,7 +144,7 @@ describe('cloud sync', () => {
   });
 
   it('waits for pending edits before reporting that it is safe to sign out', async () => {
-    cloud.set(seedWorkspace());
+    cloud.set(sampleWorkspace());
     const hook = render();
     await waitFor(() => expect(hook.result.current.syncStatus).toBe('synced'));
     act(() => hook.result.current.createList('writing-room', 'Last thought'));

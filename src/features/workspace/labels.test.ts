@@ -2,25 +2,25 @@ import { describe, expect, it } from 'vitest';
 import { legacyLabelId, withLabels } from './labels';
 import { mergeWorkspaces } from './merge';
 import { workspaceReducer } from './reducer';
-import { seedWorkspace } from './seed';
+import { sampleWorkspace } from '@/test/sample-workspace';
 
 describe('labels', () => {
   it('turns legacy note tags into managed labels with the same ids on every device', () => {
-    const legacy = seedWorkspace();
+    const legacy = sampleWorkspace();
     legacy.cards[0].labelColor = 'coral';
     const migrated = withLabels(legacy);
     const essay = migrated.labels?.find((label) => label.name === legacy.cards[0].tag);
     expect(essay).toMatchObject({ id: legacyLabelId(legacy.cards[0].tag), color: 'coral' });
     expect(migrated.cards[0].labelId).toBe(essay?.id);
     // Another device migrating the same notes arrives at the same label ids.
-    expect(withLabels(seedWorkspace()).labels?.map((label) => label.id)).toEqual(
+    expect(withLabels(sampleWorkspace()).labels?.map((label) => label.id)).toEqual(
       migrated.labels?.map((label) => label.id),
     );
     expect(withLabels(migrated)).toBe(migrated);
   });
 
   it('removes a deleted label from its notes', () => {
-    const state = withLabels(seedWorkspace());
+    const state = withLabels(sampleWorkspace());
     const labelId = state.cards[0].labelId!;
     const next = workspaceReducer(state, { type: 'label/delete', labelId });
     expect(next.labels?.some((label) => label.id === labelId)).toBe(false);
@@ -28,7 +28,7 @@ describe('labels', () => {
   });
 
   it('renames a label everywhere at once and ignores blank names', () => {
-    const state = withLabels(seedWorkspace());
+    const state = withLabels(sampleWorkspace());
     const labelId = state.cards[0].labelId!;
     const renamed = workspaceReducer(state, {
       type: 'label/update',
@@ -42,7 +42,7 @@ describe('labels', () => {
   });
 
   it('merges labels and pages created on different devices', () => {
-    const base = withLabels(seedWorkspace());
+    const base = withLabels(sampleWorkspace());
     const local = workspaceReducer(base, {
       type: 'label/create',
       label: { id: 'weekly', name: 'Weekly', color: 'blue' },

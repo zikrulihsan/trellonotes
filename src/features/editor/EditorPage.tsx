@@ -20,8 +20,8 @@ export default function EditorPage() {
   if (!note || !board)
     return (
       <div className="editor-placeholder">
-        <h1>Initiative not found</h1>
-        <p>This initiative may have been deleted.</p>
+        <h1>Card not found</h1>
+        <p>This card may have been deleted.</p>
         <Button onClick={() => navigate(boardPath(workspace.boards[0]))}>Open my board</Button>
       </div>
     );

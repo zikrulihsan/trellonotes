@@ -19,7 +19,7 @@ describe('workspace context', () => {
     });
     let noteId = '';
     act(() => {
-      noteId = first.result.current.createNote('writing-room', 'ideas', 'A new note').id;
+      noteId = first.result.current.createNote('first-board', 'todo', 'A new note').id;
     });
     act(() =>
       first.result.current.updateNote(noteId, { content: '<p>Something to remember.</p>' }),
@@ -42,8 +42,11 @@ describe('workspace context', () => {
         wrapper: TestProviders,
       });
       await waitFor(() => expect(hook.result.current.saveError).toBe(true));
-      act(() => hook.result.current.updateNote('small', { title: 'Still editable' }));
-      expect(hook.result.current.workspace.cards.find((note) => note.id === 'small')?.title).toBe(
+      let noteId = '';
+      act(() => {
+        noteId = hook.result.current.createNote('first-board', 'todo', 'Still editable').id;
+      });
+      expect(hook.result.current.workspace.cards.find((note) => note.id === noteId)?.title).toBe(
         'Still editable',
       );
     } finally {

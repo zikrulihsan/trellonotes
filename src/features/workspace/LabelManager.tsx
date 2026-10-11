@@ -34,7 +34,7 @@ export function LabelManager({ onClose }: { onClose: () => void }) {
           ))}
         </ul>
       ) : (
-        <p>No labels yet. Labels help you tell initiatives apart at a glance.</p>
+        <p>No labels yet. Labels help you tell cards apart at a glance.</p>
       )}
       <form className="label-add" onSubmit={add}>
         <span className="label-dot" style={{ background: nextColor.value }} />
@@ -92,9 +92,7 @@ function LabelRow({ label, uses }: { label: Label; uses: number }) {
         type="button"
         className="icon-button"
         aria-label={`Delete label ${label.name}`}
-        title={
-          uses ? `Delete (removes it from ${uses} initiative${uses === 1 ? '' : 's'})` : 'Delete'
-        }
+        title={uses ? `Delete (removes it from ${uses} card${uses === 1 ? '' : 's'})` : 'Delete'}
         onClick={() => deleteLabel(label.id)}
       >
         <Trash2 size={15} />

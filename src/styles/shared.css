@@ -216,3 +216,78 @@ button svg {
 .tag {
   font-size: 12px;
 }
+
+/* Starting a board: pick a template, then name it. */
+.modal.board-create {
+  width: min(100%, 560px);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+}
+.board-templates {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.board-templates legend {
+  margin-bottom: 8px;
+  padding: 0;
+  font-size: 13px;
+}
+.modal .board-templates label {
+  position: relative;
+  display: grid;
+  grid-template-columns: 10px 1fr;
+  column-gap: 10px;
+  row-gap: 2px;
+  margin: 0;
+  padding: 11px 12px;
+  border: 1px solid #e3e0ea;
+  border-radius: 9px;
+  cursor: pointer;
+}
+.modal .board-templates label:hover {
+  border-color: #c9c2d8;
+}
+.modal .board-templates label.is-selected {
+  border-color: #875fd0;
+  background: #f7f3ff;
+  box-shadow: 0 0 0 1px #875fd0;
+}
+.modal .board-templates input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.board-templates label:has(input:focus-visible) {
+  outline: 2px solid #875fd0;
+  outline-offset: 2px;
+}
+.board-template-dot {
+  align-self: center;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.board-templates strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+.board-templates small {
+  grid-column: 2;
+  color: #8b8596;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.modal .board-template-lists {
+  margin: 12px 0 18px;
+  font-size: 13px;
+}
+@media (max-width: 560px) {
+  .board-templates {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
