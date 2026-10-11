@@ -119,8 +119,9 @@ export function LandingSettingsPage() {
     if (badSocial) return setStatus({ error: `"${badSocial}" isn't a link to a profile.` });
     setStatus({ busy: true });
     try {
-      // The landing page lives on the profile, which also holds the public address.
-      if (!(await ensure())) throw new Error('Public addresses are not set up yet.');
+      // The landing page lives on the profile, which also holds the public address. A known
+      // profile skips that round trip, so saving is a single request.
+      if (!profile && !(await ensure())) throw new Error('Public addresses are not set up yet.');
       const clean = await saveLanding(supabase, userId, draft);
       setDraft(clean);
       setSaved(JSON.stringify(clean));
@@ -671,9 +672,8 @@ export function LandingSettingsPage() {
               {status.error}
             </p>
           )}
-          {status.done && !dirty && <p className="landing-admin-note">Saved.</p>}
           <Button type="submit" variant="primary" disabled={status.busy || !dirty}>
-            {status.busy ? 'Saving…' : 'Save landing page'}
+            {status.busy ? 'Saving…' : dirty ? 'Save landing page' : 'Saved'}
           </Button>
         </div>
       </form>
