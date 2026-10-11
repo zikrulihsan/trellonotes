@@ -20,6 +20,8 @@ import {
 import { useProfile } from '@/features/pages/useProfile';
 import { visibility } from '@/features/pages/publish-state';
 import { PublicAddress } from '@/features/pages/PublicAddress';
+import { applyResume } from '@/lib/resume-import';
+import { ResumeImport } from './ResumeImport';
 
 type ListKey = 'links' | 'helps' | 'projects';
 
@@ -145,6 +147,14 @@ export function LandingSettingsPage() {
           </a>
         )}
       </Header>
+      <div className="landing-form landing-form-top">
+        <ResumeImport
+          onRead={(resume) => {
+            setDraft(applyResume(draft, resume));
+            setStatus({});
+          }}
+        />
+      </div>
       <form className="landing-form" onSubmit={submit}>
         <Section title="Hero">
           <Field label="Greeting">
