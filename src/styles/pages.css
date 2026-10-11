@@ -744,3 +744,12 @@
     align-self: flex-end;
   }
 }
+.landing-social-row .landing-row-fields {
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+.landing-social-kind {
+  min-width: 80px;
+  font-size: 13px;
+  color: #8a8593;
+}

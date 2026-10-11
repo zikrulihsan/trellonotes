@@ -110,6 +110,7 @@ describe('public reader', () => {
         { label: 'Contact', url: 'mailto:me@example.com' },
         { label: 'CV', url: '/s/cv' },
       ],
+      socials: ['https://github.com/zikrul', 'mailto:me@example.com'],
       helpsHeading: 'Helps People to:',
       helps: [{ title: 'Build Impactful Software', subtitle: 'as engineer' }],
       projectsHeading: 'Curious on what i did?',
@@ -135,6 +136,14 @@ describe('public reader', () => {
       'mailto:me@example.com',
     );
     expect(screen.getByRole('link', { name: 'CV' })).toHaveAttribute('href', '/s/cv');
+    expect(screen.getByRole('link', { name: 'GitHub' })).toHaveAttribute(
+      'href',
+      'https://github.com/zikrul',
+    );
+    expect(screen.getByRole('link', { name: 'Email' })).toHaveAttribute(
+      'href',
+      'mailto:me@example.com',
+    );
     expect(screen.getByRole('link', { name: /Folio/ })).toHaveAttribute(
       'href',
       '/@zikrul/folio-story',
@@ -144,10 +153,7 @@ describe('public reader', () => {
     // The project's write-up isn't repeated in the notes list.
     expect(screen.getByRole('link', { name: /Catatan rilis/ })).toHaveTextContent('3 min');
     expect(screen.queryByRole('link', { name: /How Folio was built/ })).toBeNull();
-    expect(screen.getByRole('link', { name: /All notes/ })).toHaveAttribute(
-      'href',
-      '/@zikrul?blog',
-    );
+    expect(screen.getByRole('link', { name: /See all/ })).toHaveAttribute('href', '/@zikrul?blog');
     expect(screen.getByRole('link', { name: 'Me' })).toHaveAttribute('aria-current', 'page');
   });
 

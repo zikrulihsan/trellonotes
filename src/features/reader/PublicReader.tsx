@@ -1,6 +1,21 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
-import { ArrowUpRight, Feather } from 'lucide-react';
+import {
+  ArrowUpRight,
+  AtSign,
+  Dribbble,
+  Facebook,
+  Feather,
+  Github,
+  Globe,
+  Instagram,
+  Linkedin,
+  Mail,
+  Music2,
+  Twitter,
+  Youtube,
+  type LucideIcon,
+} from 'lucide-react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import { supabase } from '@/lib/supabase/client';
 import { plainText } from '@/lib/text';
@@ -13,7 +28,13 @@ import {
   type PublicAuthor,
   type PublishedPage,
 } from '@/lib/supabase/published-pages';
-import { defaultLanding, getLanding, type Landing } from '@/lib/supabase/landing';
+import {
+  defaultLanding,
+  getLanding,
+  socialPlatform,
+  type Landing,
+  type SocialPlatform,
+} from '@/lib/supabase/landing';
 import { getProfile } from '@/lib/supabase/profiles';
 import { writingExtensions } from '@/features/editor/extensions';
 
@@ -171,9 +192,6 @@ function useLandingFont() {
   }, []);
 }
 
-const monthYear = (iso: string) =>
-  new Date(iso).toLocaleDateString('en', { month: 'short', year: 'numeric' });
-
 /** Minutes to read at about 200 words a minute. */
 const readingMinutes = (html: string) =>
   Math.max(1, Math.round(plainText(html).split(/\s+/).filter(Boolean).length / 200));
@@ -230,6 +248,26 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
               ),
             )}
           </div>
+        )}
+        {content.socials.length > 0 && (
+          <ul className="landing-socials" aria-label="Social links">
+            {content.socials.map((url) => {
+              const { platform, label } = socialPlatform(url);
+              return (
+                <li key={url}>
+                  <a
+                    href={url}
+                    target={url.startsWith('http') ? '_blank' : undefined}
+                    rel="noreferrer me"
+                    aria-label={label}
+                    title={label}
+                  >
+                    <SocialIcon platform={platform} />
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
         )}
       </header>
       {content.helps.length > 0 && (
@@ -289,23 +327,9 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
       {shown.length > 0 ? (
         <section className="landing-section" aria-labelledby="landing-notes">
           {content.notesHeading && <h2 id="landing-notes">{content.notesHeading}</h2>}
-          <ul className="landing-notes">
-            {shown.map((page) => (
-              <li key={page.id}>
-                <Link to={writerPath(author, page.slug)}>
-                  <span>{page.title}</span>
-                  <span className="landing-note-arrow" aria-hidden="true">
-                    →
-                  </span>
-                  <time dateTime={page.published_at}>
-                    {monthYear(page.published_at)} · {readingMinutes(page.content)} min
-                  </time>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <PostList author={author} pages={shown} />
           <Link className="landing-all" to={blogPath(author)}>
-            All notes <ArrowUpRight size={14} />
+            See all <ArrowUpRight size={15} />
           </Link>
         </section>
       ) : (
@@ -315,6 +339,25 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
       )}
     </main>
   );
+}
+
+const SOCIAL_ICONS: Record<SocialPlatform, LucideIcon> = {
+  github: Github,
+  linkedin: Linkedin,
+  instagram: Instagram,
+  youtube: Youtube,
+  x: Twitter,
+  facebook: Facebook,
+  tiktok: Music2,
+  threads: AtSign,
+  dribbble: Dribbble,
+  email: Mail,
+  website: Globe,
+};
+
+function SocialIcon({ platform }: { platform: SocialPlatform }) {
+  const Icon = SOCIAL_ICONS[platform];
+  return <Icon size={19} strokeWidth={1.8} />;
 }
 
 /** A hand-drawn sparkle beside the greeting. */
@@ -344,6 +387,28 @@ function PublicNav({ author, active }: { author: PublicAuthor; active?: 'me' | '
   );
 }
 
+/** Published pages as cards: date, reading time, title and the opening words. */
+function PostList({ author, pages }: { author: PublicAuthor; pages: PublishedPage[] }) {
+  return (
+    <ul className="landing-posts">
+      {pages.map((page) => {
+        const excerpt = plainText(page.content).slice(0, 180);
+        return (
+          <li key={page.id}>
+            <Link to={writerPath(author, page.slug)}>
+              <time dateTime={page.published_at}>
+                {longDate(page.published_at)} · {readingMinutes(page.content)} min
+              </time>
+              <h3>{page.title}</h3>
+              {excerpt && <p>{excerpt}</p>}
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 function BlogView({ author, name, pages }: Omit<LandingProps, 'landing'>) {
   return (
     <main className="landing landing-blog">
@@ -356,22 +421,7 @@ function BlogView({ author, name, pages }: Omit<LandingProps, 'landing'>) {
         </p>
       </header>
       {pages.length ? (
-        <ul className="landing-posts">
-          {pages.map((page) => {
-            const excerpt = plainText(page.content).slice(0, 180);
-            return (
-              <li key={page.id}>
-                <Link to={writerPath(author, page.slug)}>
-                  <time dateTime={page.published_at}>
-                    {longDate(page.published_at)} · {readingMinutes(page.content)} min
-                  </time>
-                  <h2>{page.title}</h2>
-                  {excerpt && <p>{excerpt}</p>}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+        <PostList author={author} pages={pages} />
       ) : (
         <p className="landing-empty">Nothing has been published here yet.</p>
       )}

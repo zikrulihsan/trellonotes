@@ -525,9 +525,12 @@ a.landing-project:hover {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  margin: var(--landing-gap) 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
+}
+.landing-blog .landing-posts {
+  margin-top: var(--landing-gap);
 }
 .landing-posts a {
   display: block;
@@ -558,19 +561,14 @@ a.landing-project:hover {
   font-size: 13px;
   color: var(--landing-muted);
 }
-.landing-posts h2 {
+.landing-posts h3 {
   margin: 6px 0 6px;
   font-family: var(--landing-hand);
   font-size: clamp(22px, 2.6vw, 26px);
   font-weight: 400;
   line-height: 1.25;
-  text-align: left;
-  letter-spacing: 0;
 }
-.landing-posts h2::after {
-  content: none;
-}
-.landing-posts a:hover h2 {
+.landing-posts a:hover h3 {
   background: linear-gradient(transparent 62%, var(--landing-marker) 62%);
   width: fit-content;
 }
@@ -589,4 +587,42 @@ a.landing-project:hover {
     padding: 14px 16px 16px;
     box-shadow: 3px 3px 0 var(--landing-ink);
   }
+}
+
+/* Social links under the hero buttons */
+.landing-socials {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.landing-socials a {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1.5px solid var(--landing-ink);
+  border-radius: 55% 45% 50% 50% / 50% 55% 45% 50%;
+  background: var(--landing-paper);
+  color: var(--landing-ink);
+  box-shadow: 2px 2px 0 var(--landing-ink);
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.landing-socials li:nth-child(even) a {
+  border-radius: 45% 55% 50% 50% / 55% 45% 50% 50%;
+}
+.landing-socials a:hover {
+  background: var(--landing-marker);
+  transform: translate(-1px, -1px) rotate(-6deg);
+  box-shadow: 3px 3px 0 var(--landing-ink);
+}
+.landing-socials a:focus-visible {
+  outline: 2px solid #7954d8;
+  outline-offset: 2px;
 }

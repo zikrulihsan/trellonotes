@@ -10,6 +10,7 @@ import {
   getLanding,
   LANDING_LIMITS,
   saveLanding,
+  socialPlatform,
   toLinkUrl,
   type Landing,
   type LandingProject,
@@ -109,6 +110,8 @@ export function LandingSettingsPage() {
       return setStatus({
         error: `The "${badLink.label}" button needs a web address, email or phone number.`,
       });
+    const badSocial = draft.socials.find((url) => url.trim() && !toLinkUrl(url));
+    if (badSocial) return setStatus({ error: `"${badSocial}" isn't a link to a profile.` });
     setStatus({ busy: true });
     try {
       // The landing page lives on the profile, which also holds the public address.
@@ -185,6 +188,51 @@ export function LandingSettingsPage() {
             <Button onClick={() => set({ links: [...draft.links, { label: '', url: '' }] })}>
               <Plus size={15} />
               Add button
+            </Button>
+          )}
+        </Section>
+
+        <Section
+          title="Social links"
+          hint="Paste your profile links. They show as icons under the buttons: GitHub, LinkedIn, Instagram, X, YouTube, TikTok and more are recognised, anything else shows as a website."
+        >
+          {draft.socials.map((url, index) => {
+            const known = toLinkUrl(url);
+            return (
+              <div className="landing-row landing-social-row" key={index}>
+                <div className="landing-row-fields">
+                  <input
+                    aria-label={`Social link ${index + 1}`}
+                    value={url}
+                    maxLength={500}
+                    placeholder="linkedin.com/in/you"
+                    onChange={(event) => {
+                      const socials = [...draft.socials];
+                      socials[index] = event.target.value;
+                      set({ socials });
+                    }}
+                  />
+                  <span className="landing-social-kind">
+                    {known ? socialPlatform(known).label : url.trim() ? 'Not a link' : ''}
+                  </span>
+                </div>
+                <div className="landing-row-actions">
+                  <button
+                    type="button"
+                    className="icon-button"
+                    aria-label={`Remove social link ${index + 1}`}
+                    onClick={() => set({ socials: draft.socials.filter((_, at) => at !== index) })}
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+          {draft.socials.length < LANDING_LIMITS.socials && (
+            <Button onClick={() => set({ socials: [...draft.socials, ''] })}>
+              <Plus size={15} />
+              Add social link
             </Button>
           )}
         </Section>

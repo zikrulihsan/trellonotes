@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { defaultLanding, normalizeLanding, toLinkUrl } from './landing';
+import { defaultLanding, normalizeLanding, socialPlatform, toLinkUrl } from './landing';
 
 describe('landing page links', () => {
   it('turns what a writer types into a safe link', () => {
@@ -50,5 +50,28 @@ describe('normalizeLanding', () => {
 
   it('greets with the first name by default', () => {
     expect(defaultLanding('Zikrul Ihsan').greeting).toBe('Hi, Zikrul Here');
+  });
+});
+
+describe('social links', () => {
+  it('keeps web and mail links, completing what the writer typed', () => {
+    const landing = normalizeLanding({
+      socials: ['github.com/zikrul', 'javascript:alert(1)', 'me@example.com', '/s/cv', ''],
+    })!;
+    expect(landing.socials).toEqual(['https://github.com/zikrul', 'mailto:me@example.com']);
+  });
+
+  it('names the network a link points to', () => {
+    expect(socialPlatform('https://www.linkedin.com/in/zikrul')).toEqual({
+      platform: 'linkedin',
+      label: 'LinkedIn',
+    });
+    expect(socialPlatform('https://twitter.com/zikrul').platform).toBe('x');
+    expect(socialPlatform('https://x.com/zikrul').label).toBe('X');
+    expect(socialPlatform('mailto:me@example.com').platform).toBe('email');
+    expect(socialPlatform('https://www.zikrul.dev')).toEqual({
+      platform: 'website',
+      label: 'zikrul.dev',
+    });
   });
 });
