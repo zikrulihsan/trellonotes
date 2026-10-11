@@ -1,6 +1,6 @@
-// Answers with the preview image a website shares for itself, for projects on a landing
-// page that link to a site instead of a write-up. Results are cached at Netlify's edge.
-import { isPublicWebUrl, previewImage } from '../../src/lib/link-image.ts';
+// Answers with a website's icon, for projects on a landing page that link to a site instead
+// of a write-up. Results are cached at Netlify's edge.
+import { defaultIcon, isPublicWebUrl, siteIcon } from '../../src/lib/link-image.ts';
 
 const reply = (body: { image: string | null }, maxAge: number) =>
   new Response(JSON.stringify(body), {
@@ -11,7 +11,7 @@ const reply = (body: { image: string | null }, maxAge: number) =>
     },
   });
 
-/** Reads the start of the page only; preview tags live in its head. */
+/** Reads the start of the page only; icon links live in its head. */
 async function readHead(response: Response, limit = 300_000) {
   const reader = response.body?.getReader();
   if (!reader) return '';
@@ -47,14 +47,14 @@ export default async function linkImage(request: Request) {
       const next = response.headers.get('location');
       if (response.status < 300 || response.status >= 400 || !next) break;
       const checked = isPublicWebUrl(new URL(next, url).href);
-      if (!checked) return reply({ image: null }, 3600);
+      if (!checked) return reply({ image: defaultIcon(target.href) }, 3600);
       url = checked;
     }
     if (!response?.ok || !response.headers.get('content-type')?.includes('html'))
-      return reply({ image: null }, 3600);
-    return reply({ image: previewImage(await readHead(response), url.href) }, 86400);
+      return reply({ image: defaultIcon(url.href) }, 3600);
+    return reply({ image: siteIcon(await readHead(response), url.href) }, 86400);
   } catch {
-    return reply({ image: null }, 600);
+    return reply({ image: defaultIcon(target.href) }, 600);
   }
 }
 

@@ -262,6 +262,11 @@ describe('public reader', () => {
     const card = await screen.findByRole('link', { name: /flipcard\.id/ });
     expect(card).toHaveAttribute('href', 'https://flipcard.id');
     expect(card).toHaveAttribute('target', '_blank');
+    // The website's icon stands in for a project image.
+    expect(card.querySelector('img.landing-thumb')).toHaveAttribute(
+      'src',
+      'https://flipcard.id/favicon.ico',
+    );
   });
 
   it('shows the last copy of a page at once when coming back', async () => {
