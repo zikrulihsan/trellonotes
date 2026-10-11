@@ -38,8 +38,8 @@ export function WorkspaceSession({ children }: PropsWithChildren) {
         <div className="auth-mark">
           <Feather size={19} />
         </div>
-        <p className="eyebrow">A QUIET PLACE TO WRITE</p>
-        <h1>Welcome to Folio</h1>
+        <p className="eyebrow">FROM NOTES TO GETTING NOTICED</p>
+        <h1>Welcome to Notece</h1>
         <p className="auth-intro">
           Sign in with your Google account to open your boards and sync your writing.
         </p>
@@ -66,7 +66,7 @@ export function WorkspaceSession({ children }: PropsWithChildren) {
           </p>
         )}
         <p className="auth-footnote">
-          Folio only uses your Google or SWE Growth account to sign you in.
+          Notece only uses your Google or SWE Growth account to sign you in.
         </p>
       </section>
     </main>

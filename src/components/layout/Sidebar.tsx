@@ -108,7 +108,7 @@ export function Sidebar({
             <span className="brand-mark">
               <Feather size={22} />
             </span>
-            folio<span className="brand-period">.</span>
+            notece<span className="brand-period">.</span>
           </button>
           <button
             ref={hideRef}
