@@ -20,7 +20,7 @@ Fields:
 - contactEmail: the resume's email, or empty.
 - socials: full profile links found in the resume (LinkedIn, GitHub, personal site...).
 - helps: 3 things they help people do, each with a subtitle starting with "as" or "by" naming the role.
-- projects: up to 6 notable products, systems or side projects, most impressive first. summary is the result or what it does; category is one or two words (AI, Software, Community, Side project...); year is a year or range from the resume, or empty.
+- projects: up to 6 notable products, systems or side projects, most impressive first. summary is the result or what it does; category is one or two words (AI, Software, Community, Side project...); year is a year or range from the resume, or empty; url is the project's link from the resume, or empty.
 - about.role: current title and employer.
 - about.intro: 2 or 3 short paragraphs separated by a blank line.
 - about.stack: up to 15 tools they use most.
@@ -50,7 +50,7 @@ export const RESUME_SCHEMA = {
       type: 'ARRAY',
       items: {
         type: 'OBJECT',
-        properties: { title: text, summary: text, category: text, year: text },
+        properties: { title: text, summary: text, category: text, year: text, url: text },
         required: ['title', 'summary', 'category', 'year'],
       },
     },
