@@ -1,4 +1,11 @@
-import { useEffect, useState, type CSSProperties, type MouseEvent } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type CSSProperties,
+  type MouseEvent,
+} from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -36,11 +43,13 @@ import {
   type Landing,
   type LandingAbout,
   type LandingProject,
+  type LandingTheme,
   type SocialPlatform,
 } from '@/lib/supabase/landing';
 import { getProfile } from '@/lib/supabase/profiles';
 import { readCached, writeCached } from '@/lib/public-cache';
 import { writingExtensions } from '@/features/editor/extensions';
+import { useLandingFont } from './useLandingFont';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const longDate = (iso: string) =>
@@ -130,8 +139,20 @@ async function resolveAuthor(address: Address): Promise<Resolved> {
   return 'handle' in address ? { author } : { author, redirect: writerPath(author, address.slug) };
 }
 
+/** Lets the page that loaded the writer's settings dress the whole reader in their theme. */
+const ThemeContext = createContext<(theme: LandingTheme) => void>(() => {});
+
+/** Applies a theme once it is known; `undefined` while the writer's settings load. */
+function useReaderTheme(theme: LandingTheme | undefined) {
+  const setTheme = useContext(ThemeContext);
+  useEffect(() => {
+    if (theme) setTheme(theme);
+  }, [theme, setTheme]);
+}
+
 /** Public pages anyone can open without signing in. */
 export function PublicReader() {
+  const [theme, setTheme] = useState<LandingTheme>('sketch');
   const { pathname } = useLocation();
   const address = parseAddress(pathname);
   const result = usePublicData(
@@ -155,13 +176,15 @@ export function PublicReader() {
     body = <ArticlePage author={result.data.author} slug={address.slug} />;
   else body = <AuthorPage author={result.data.author} />;
   return (
-    <div className="reader">
-      {body}
-      <footer className="reader-footer">
-        <Feather size={13} />
-        Written with Notis
-      </footer>
-    </div>
+    <ThemeContext.Provider value={setTheme}>
+      <div className="reader" data-landing-theme={theme === 'sketch' ? undefined : theme}>
+        {body}
+        <footer className="reader-footer">
+          <Feather size={13} />
+          Written with Notis
+        </footer>
+      </div>
+    </ThemeContext.Provider>
   );
 }
 
@@ -192,6 +215,7 @@ function AuthorPage({ author }: { author: Author }) {
     document.title = view === 'me' ? who : `${view === 'blog' ? 'Blog' : 'About'} · ${who}`;
   }, [name, author.handle, view]);
   useLandingFont();
+  useReaderTheme(result.status === 'ready' ? (result.data[1]?.theme ?? 'sketch') : undefined);
   if (result.status !== 'ready') return <Status result={result} kind="page" />;
   const [pages, landing] = result.data;
   const about = landing && hasAbout(landing.about) ? landing.about : null;
@@ -207,20 +231,6 @@ function AuthorPage({ author }: { author: Author }) {
       )}
     </>
   );
-}
-
-/** The handwritten face of the landing page, loaded only for public visitors. */
-function useLandingFont() {
-  useEffect(() => {
-    const id = 'landing-font';
-    if (document.getElementById(id)) return;
-    const link = document.createElement('link');
-    link.id = id;
-    link.rel = 'stylesheet';
-    link.href =
-      'https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Patrick+Hand&family=JetBrains+Mono:wght@400&display=swap';
-    document.head.appendChild(link);
-  }, []);
 }
 
 /** Minutes to read at about 200 words a minute. */
@@ -744,6 +754,7 @@ function ArticlePage({ author, slug }: { author: Author; slug: string }) {
   // Unlisted pages are shared by link only, so they don't lead to the public list.
   const listed = Boolean(page && !page.unlisted);
   const site = useAuthorSite(author, listed);
+  useReaderTheme(site ? (site[1]?.theme ?? 'sketch') : undefined);
   useEffect(() => {
     if (page) document.title = page.title;
   }, [page]);

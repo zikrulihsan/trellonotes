@@ -10,6 +10,7 @@ import {
   getLanding,
   ABOUT_INTRO_MAX,
   LANDING_LIMITS,
+  LANDING_THEMES,
   saveLanding,
   socialPlatform,
   toLinkUrl,
@@ -23,6 +24,7 @@ import { visibility } from '@/features/pages/publish-state';
 import { PublicAddress } from '@/features/pages/PublicAddress';
 import { applyResume } from '@/lib/resume-import';
 import { nowTitles } from '@/features/journal/journal';
+import { useLandingFont } from '@/features/reader/useLandingFont';
 import { ResumeImport } from './ResumeImport';
 
 type ListKey = 'links' | 'helps' | 'projects';
@@ -37,6 +39,8 @@ export function LandingSettingsPage() {
   const [saved, setSaved] = useState('');
   const [loadError, setLoadError] = useState('');
   const [status, setStatus] = useState<{ busy?: boolean; error?: string; done?: boolean }>({});
+  // The theme samples show each look in its own faces.
+  useLandingFont();
 
   useEffect(() => {
     if (!supabase || !userId) return;
@@ -164,6 +168,34 @@ export function LandingSettingsPage() {
         />
       </div>
       <form className="landing-form" onSubmit={submit}>
+        <Section title="Theme" hint="How your page looks to visitors. You can switch any time.">
+          <div className="theme-picker" role="radiogroup" aria-label="Theme">
+            {LANDING_THEMES.map((theme) => (
+              <label
+                key={theme.id}
+                className={`theme-option ${draft.theme === theme.id ? 'is-selected' : ''}`}
+              >
+                <input
+                  type="radio"
+                  name="landing-theme"
+                  value={theme.id}
+                  checked={draft.theme === theme.id}
+                  onChange={() => set({ theme: theme.id })}
+                />
+                <span className="theme-preview" data-landing-theme={theme.id} aria-hidden="true">
+                  <span className="theme-preview-title">
+                    Hi, <mark>I'm Ayu</mark>
+                  </span>
+                  <span className="theme-preview-line" />
+                  <span className="theme-preview-card">My first project</span>
+                </span>
+                <strong>{theme.label}</strong>
+                <span>{theme.description}</span>
+              </label>
+            ))}
+          </div>
+        </Section>
+
         <Section title="Hero">
           <Field label="Greeting">
             <input

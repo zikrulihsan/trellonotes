@@ -156,6 +156,7 @@ describe('public reader', () => {
       ],
       notesHeading: 'Want to know what i think of?',
       notesCount: 5,
+      theme: 'editorial',
       working: ['Building Notis', ''],
       workingHeading: "What I'm working on",
     };
@@ -163,6 +164,7 @@ describe('public reader', () => {
     expect(await screen.findByRole('heading', { name: 'Hi, Zikrul Here' })).toBeInTheDocument();
     expect(screen.getByText('Delivering Impact Through Software')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: "What I'm working on" })).toBeInTheDocument();
+    expect(document.querySelector('.reader')).toHaveAttribute('data-landing-theme', 'editorial');
     expect(screen.getByText('Building Notis')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Contact' })).toHaveAttribute(
       'href',

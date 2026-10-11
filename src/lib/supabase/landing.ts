@@ -63,8 +63,20 @@ export interface LandingAbout {
   experiences: LandingExperience[];
 }
 
+/** How the public page looks; the writer picks one, since tastes differ. */
+export const LANDING_THEMES = [
+  { id: 'sketch', label: 'Sketchbook', description: 'Handwriting on dotted paper' },
+  { id: 'clean', label: 'Clean', description: 'Plain white and simple type' },
+  { id: 'editorial', label: 'Editorial', description: 'Warm paper and a serif face' },
+  { id: 'midnight', label: 'Midnight', description: 'Dark, with light text' },
+] as const;
+export type LandingTheme = (typeof LANDING_THEMES)[number]['id'];
+const isTheme = (value: unknown): value is LandingTheme =>
+  LANDING_THEMES.some((theme) => theme.id === value);
+
 /** What the writer's public page (/@handle) shows above and around their notes. */
 export interface Landing {
+  theme: LandingTheme;
   greeting: string;
   tagline: string;
   links: LandingLink[];
@@ -128,6 +140,7 @@ export const defaultAbout = (): LandingAbout => ({
 export function defaultLanding(name: string | null): Landing {
   const first = name?.trim().split(/\s+/)[0];
   return {
+    theme: 'sketch',
     greeting: first ? `Hi, ${first} Here` : 'Hi, welcome',
     tagline: '',
     links: [],
@@ -282,6 +295,7 @@ export function normalizeLanding(value: unknown): Landing | null {
   const fallback = defaultLanding(null);
   const count = Number(raw.notesCount);
   return {
+    theme: isTheme(raw.theme) ? raw.theme : 'sketch',
     greeting: text(raw.greeting, 80),
     tagline: text(raw.tagline, 160),
     links: list(raw.links, LANDING_LIMITS.links, (link) => {

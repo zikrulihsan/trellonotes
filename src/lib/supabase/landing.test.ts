@@ -122,3 +122,11 @@ describe('what the writer is working on', () => {
     expect(normalizeLanding({ workingHeading: '' })!.workingHeading).toBe('');
   });
 });
+
+describe('page themes', () => {
+  it('keeps a known theme and falls back to the sketchbook', () => {
+    expect(normalizeLanding({ theme: 'midnight' })!.theme).toBe('midnight');
+    expect(normalizeLanding({ theme: 'neon' })!.theme).toBe('sketch');
+    expect(normalizeLanding({})!.theme).toBe('sketch');
+  });
+});
