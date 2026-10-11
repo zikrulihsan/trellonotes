@@ -29,6 +29,8 @@ export interface Landing {
   greeting: string;
   tagline: string;
   links: LandingLink[];
+  /** Social profile links shown as icons under the hero buttons. */
+  socials: string[];
   helpsHeading: string;
   helps: LandingHelp[];
   projectsHeading: string;
@@ -37,7 +39,7 @@ export interface Landing {
   notesCount: number;
 }
 
-export const LANDING_LIMITS = { links: 4, helps: 6, projects: 12, notes: 20 } as const;
+export const LANDING_LIMITS = { links: 4, socials: 8, helps: 6, projects: 12, notes: 20 } as const;
 
 export function defaultLanding(name: string | null): Landing {
   const first = name?.trim().split(/\s+/)[0];
@@ -45,6 +47,7 @@ export function defaultLanding(name: string | null): Landing {
     greeting: first ? `Hi, ${first} Here` : 'Hi, welcome',
     tagline: '',
     links: [],
+    socials: [],
     helpsHeading: 'Helps People to:',
     helps: [],
     projectsHeading: 'Curious on what i did?',
@@ -68,6 +71,46 @@ export function toLinkUrl(text: string): string {
   if (/^\+?[\d\s-]{6,}$/.test(value)) return `tel:${value.replace(/[\s-]/g, '')}`;
   if (/^[^\s/:]+\.[a-z]{2,}(\/\S*)?$/i.test(value)) return `https://${value}`;
   return '';
+}
+
+export type SocialPlatform =
+  | 'github'
+  | 'linkedin'
+  | 'instagram'
+  | 'youtube'
+  | 'x'
+  | 'facebook'
+  | 'tiktok'
+  | 'threads'
+  | 'dribbble'
+  | 'email'
+  | 'website';
+
+const PLATFORMS: [SocialPlatform, string, RegExp][] = [
+  ['github', 'GitHub', /(^|\.)github\.com$/],
+  ['linkedin', 'LinkedIn', /(^|\.)linkedin\.com$/],
+  ['instagram', 'Instagram', /(^|\.)instagram\.com$/],
+  ['youtube', 'YouTube', /(^|\.)(youtube\.com|youtu\.be)$/],
+  ['x', 'X', /(^|\.)(x|twitter)\.com$/],
+  ['facebook', 'Facebook', /(^|\.)(facebook\.com|fb\.com)$/],
+  ['tiktok', 'TikTok', /(^|\.)tiktok\.com$/],
+  ['threads', 'Threads', /(^|\.)threads\.(net|com)$/],
+  ['dribbble', 'Dribbble', /(^|\.)dribbble\.com$/],
+];
+
+/** Which network a social link points to, for its icon and label: "github.com/x" → GitHub. */
+export function socialPlatform(url: string): { platform: SocialPlatform; label: string } {
+  if (/^mailto:/i.test(url)) return { platform: 'email', label: 'Email' };
+  let host = '';
+  try {
+    host = new URL(url).hostname.toLowerCase();
+  } catch {
+    /* Not a full address: shown as a website. */
+  }
+  const match = PLATFORMS.find(([, , pattern]) => pattern.test(host));
+  return match
+    ? { platform: match[0], label: match[1] }
+    : { platform: 'website', label: host.replace(/^www\./, '') || 'Website' };
 }
 
 const text = (value: unknown, max: number) =>
@@ -98,6 +141,10 @@ export function normalizeLanding(value: unknown): Landing | null {
         url = toLinkUrl(text(link.url, 500));
       return label && url ? { label, url } : null;
     }),
+    socials: (Array.isArray(raw.socials) ? raw.socials : [])
+      .map((url) => toLinkUrl(text(url, 500)))
+      .filter((url) => /^(https?:\/\/|mailto:)/i.test(url))
+      .slice(0, LANDING_LIMITS.socials),
     helpsHeading: text(raw.helpsHeading, 80),
     helps: list(raw.helps, LANDING_LIMITS.helps, (help) => {
       const title = text(help.title, 80);

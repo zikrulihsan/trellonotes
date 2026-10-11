@@ -1,6 +1,21 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, ArrowUpRight, Feather } from 'lucide-react';
+import {
+  ArrowUpRight,
+  AtSign,
+  Dribbble,
+  Facebook,
+  Feather,
+  Github,
+  Globe,
+  Instagram,
+  Linkedin,
+  Mail,
+  Music2,
+  Twitter,
+  Youtube,
+  type LucideIcon,
+} from 'lucide-react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import { supabase } from '@/lib/supabase/client';
 import { plainText } from '@/lib/text';
@@ -13,7 +28,13 @@ import {
   type PublicAuthor,
   type PublishedPage,
 } from '@/lib/supabase/published-pages';
-import { defaultLanding, getLanding, type Landing } from '@/lib/supabase/landing';
+import {
+  defaultLanding,
+  getLanding,
+  socialPlatform,
+  type Landing,
+  type SocialPlatform,
+} from '@/lib/supabase/landing';
 import { getProfile } from '@/lib/supabase/profiles';
 import { writingExtensions } from '@/features/editor/extensions';
 
@@ -116,7 +137,7 @@ export function PublicReader() {
       {body}
       <footer className="reader-footer">
         <Feather size={13} />
-        Written with folio
+        Written with Notis
       </footer>
     </div>
   );
@@ -124,7 +145,9 @@ export function PublicReader() {
 
 function AuthorPage({ author }: { author: Author }) {
   const { search } = useLocation();
-  const allNotes = new URLSearchParams(search).has('notes');
+  // `?notes` is the older address of the Blog page.
+  const params = new URLSearchParams(search);
+  const blog = params.has('blog') || params.has('notes');
   const result = usePublicData(
     () =>
       supabase
@@ -143,8 +166,16 @@ function AuthorPage({ author }: { author: Author }) {
   useLandingFont();
   if (result.status !== 'ready') return <Status result={result} />;
   const [pages, landing] = result.data;
-  if (allNotes) return <AllNotes author={author} name={name} pages={pages} />;
-  return <LandingView author={author} name={name} pages={pages} landing={landing} />;
+  return (
+    <>
+      <PublicNav author={author} active={blog ? 'blog' : 'me'} />
+      {blog ? (
+        <BlogView author={author} name={name} pages={pages} />
+      ) : (
+        <LandingView author={author} name={name} pages={pages} landing={landing} />
+      )}
+    </>
+  );
 }
 
 /** The handwritten face of the landing page, loaded only for public visitors. */
@@ -160,9 +191,6 @@ function useLandingFont() {
     document.head.appendChild(link);
   }, []);
 }
-
-const monthYear = (iso: string) =>
-  new Date(iso).toLocaleDateString('en', { month: 'short', year: 'numeric' });
 
 /** Minutes to read at about 200 words a minute. */
 const readingMinutes = (html: string) =>
@@ -189,7 +217,12 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
   return (
     <main className="landing">
       <header className="landing-hero">
-        <h1>{content.greeting || name || (author.handle ? `@${author.handle}` : 'Writing')}</h1>
+        <h1>
+          <span className="landing-marker">
+            {content.greeting || name || (author.handle ? `@${author.handle}` : 'Writing')}
+          </span>
+          <Sparkle />
+        </h1>
         {content.tagline && <p className="landing-tagline">{content.tagline}</p>}
         {content.links.length > 0 && (
           <div className="landing-links">
@@ -216,6 +249,26 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
             )}
           </div>
         )}
+        {content.socials.length > 0 && (
+          <ul className="landing-socials" aria-label="Social links">
+            {content.socials.map((url) => {
+              const { platform, label } = socialPlatform(url);
+              return (
+                <li key={url}>
+                  <a
+                    href={url}
+                    target={url.startsWith('http') ? '_blank' : undefined}
+                    rel="noreferrer me"
+                    aria-label={label}
+                    title={label}
+                  >
+                    <SocialIcon platform={platform} />
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </header>
       {content.helps.length > 0 && (
         <section className="landing-helps" aria-labelledby="landing-helps">
@@ -223,6 +276,9 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
           <ul style={{ '--landing-columns': Math.min(content.helps.length, 3) } as CSSProperties}>
             {content.helps.map((help, index) => (
               <li key={index}>
+                <span className="landing-help-number" aria-hidden="true">
+                  {index + 1}
+                </span>
                 <strong>{help.title}</strong>
                 {help.subtitle && <span>{help.subtitle}</span>}
               </li>
@@ -242,7 +298,9 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
                   {project.image ? (
                     <img className="landing-thumb" src={project.image} alt="" />
                   ) : (
-                    <span className="landing-thumb" aria-hidden="true" />
+                    <span className="landing-thumb" aria-hidden="true">
+                      {project.title.replace(/^\W+/, '').charAt(0)}
+                    </span>
                   )}
                   <span className="landing-project-text">
                     <strong>{project.title}</strong>
@@ -269,20 +327,9 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
       {shown.length > 0 ? (
         <section className="landing-section" aria-labelledby="landing-notes">
           {content.notesHeading && <h2 id="landing-notes">{content.notesHeading}</h2>}
-          <ul className="landing-notes">
-            {shown.map((page) => (
-              <li key={page.id}>
-                <Link to={writerPath(author, page.slug)}>
-                  <span>{page.title}</span>
-                  <time dateTime={page.published_at}>
-                    {monthYear(page.published_at)} · {readingMinutes(page.content)} min
-                  </time>
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <Link className="landing-all" to={`${writerPath(author)}?notes`}>
-            All notes <ArrowUpRight size={14} />
+          <PostList author={author} pages={shown} />
+          <Link className="landing-all" to={blogPath(author)}>
+            See all <ArrowUpRight size={15} />
           </Link>
         </section>
       ) : (
@@ -294,31 +341,89 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
   );
 }
 
-function AllNotes({ author, name, pages }: Omit<LandingProps, 'landing'>) {
+const SOCIAL_ICONS: Record<SocialPlatform, LucideIcon> = {
+  github: Github,
+  linkedin: Linkedin,
+  instagram: Instagram,
+  youtube: Youtube,
+  x: Twitter,
+  facebook: Facebook,
+  tiktok: Music2,
+  threads: AtSign,
+  dribbble: Dribbble,
+  email: Mail,
+  website: Globe,
+};
+
+function SocialIcon({ platform }: { platform: SocialPlatform }) {
+  const Icon = SOCIAL_ICONS[platform];
+  return <Icon size={17} strokeWidth={1.75} />;
+}
+
+/** A hand-drawn sparkle beside the greeting. */
+function Sparkle() {
   return (
-    <main className="reader-column">
-      <Link className="reader-back" to={writerPath(author)}>
-        <ArrowLeft size={15} />
-        {name ? `Back to ${name}` : 'Back'}
+    <svg className="landing-sparkle" viewBox="0 0 40 40" aria-hidden="true">
+      <path d="M20 4c1 8 3 12 12 15-9 2-11 6-12 16-1-10-4-14-12-16 8-3 11-7 12-15z" />
+      <path d="M34 2c.4 3 1.2 4.4 4 5-2.8.7-3.6 2-4 5-.4-3-1.3-4.3-4-5 2.7-.6 3.6-2 4-5z" />
+    </svg>
+  );
+}
+
+const blogPath = (author: PublicAuthor) => `${writerPath(author)}?blog`;
+
+/** The two public sections: Me (the landing page with projects) and Blog (every listed page). */
+function PublicNav({ author, active }: { author: PublicAuthor; active?: 'me' | 'blog' }) {
+  useLandingFont();
+  return (
+    <nav className="landing-nav" aria-label="Sections">
+      <Link to={writerPath(author)} aria-current={active === 'me' ? 'page' : undefined}>
+        Me
       </Link>
-      <header className="reader-header">
-        <p className="eyebrow">{author.handle ? `@${author.handle}` : 'WRITING'}</p>
-        <h1>{name ? `Writing by ${name}` : 'Writing'}</h1>
+      <Link to={blogPath(author)} aria-current={active === 'blog' ? 'page' : undefined}>
+        Blog
+      </Link>
+    </nav>
+  );
+}
+
+/** Published pages as cards: date, reading time, title and the opening words. */
+function PostList({ author, pages }: { author: PublicAuthor; pages: PublishedPage[] }) {
+  return (
+    <ul className="landing-posts">
+      {pages.map((page) => {
+        const excerpt = plainText(page.content).slice(0, 180);
+        return (
+          <li key={page.id}>
+            <Link to={writerPath(author, page.slug)}>
+              <time dateTime={page.published_at}>
+                {longDate(page.published_at)} · {readingMinutes(page.content)} min
+              </time>
+              <h3>{page.title}</h3>
+              {excerpt && <p>{excerpt}</p>}
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+function BlogView({ author, name, pages }: Omit<LandingProps, 'landing'>) {
+  return (
+    <main className="landing landing-blog">
+      <header className="landing-blog-header">
+        <h1>
+          <span className="landing-marker">Blog</span>
+        </h1>
+        <p className="landing-tagline">
+          {name ? `Everything ${name} has written.` : 'Everything written here.'}
+        </p>
       </header>
       {pages.length ? (
-        <ul className="reader-list">
-          {pages.map((page) => (
-            <li key={page.id}>
-              <Link to={writerPath(author, page.slug)}>
-                <time dateTime={page.published_at}>{longDate(page.published_at)}</time>
-                <h2>{page.title}</h2>
-                <p>{plainText(page.content).slice(0, 220)}</p>
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <PostList author={author} pages={pages} />
       ) : (
-        <p className="reader-empty">Nothing has been published here yet.</p>
+        <p className="landing-empty">Nothing has been published here yet.</p>
       )}
     </main>
   );
@@ -337,25 +442,22 @@ function ArticlePage({ author, slug }: { author: Author; slug: string }) {
   if (!page) return <NotFound />;
   const name = author.name ?? page.author_name;
   return (
-    <main className="reader-column">
+    <>
       {/* Unlisted pages are shared by link only, so they don't lead to the public list. */}
-      {!page.unlisted && (
-        <Link className="reader-back" to={writerPath(author)}>
-          <ArrowLeft size={15} />
-          {name ? `More from ${name}` : 'More writing'}
-        </Link>
-      )}
-      <article>
-        <header className="reader-header">
-          <h1>{page.title}</h1>
-          <p className="reader-byline">
-            {name && <span>{name} · </span>}
-            <time dateTime={page.published_at}>{longDate(page.published_at)}</time>
-          </p>
-        </header>
-        <ReadOnlyContent html={page.content} />
-      </article>
-    </main>
+      {!page.unlisted && <PublicNav author={author} />}
+      <main className="reader-column">
+        <article>
+          <header className="reader-header">
+            <h1>{page.title}</h1>
+            <p className="reader-byline">
+              {name && <span>{name} · </span>}
+              <time dateTime={page.published_at}>{longDate(page.published_at)}</time>
+            </p>
+          </header>
+          <ReadOnlyContent html={page.content} />
+        </article>
+      </main>
+    </>
   );
 }
 
