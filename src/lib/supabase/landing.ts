@@ -24,6 +24,41 @@ export interface LandingProject {
   pageId: string | null;
 }
 
+export interface LandingExperience {
+  id: string;
+  /** e.g. "Jan 2024 – Present" */
+  period: string;
+  title: string;
+  company: string;
+  companyUrl: string;
+  location: string;
+  description: string;
+  highlights: string[];
+}
+
+/** A published page that tells part of the writer's story, e.g. a yearly retrospective. */
+export interface LandingStory {
+  id: string;
+  label: string;
+  pageId: string | null;
+}
+
+/** The About page (/@handle?about). */
+export interface LandingAbout {
+  subtitle: string;
+  /** An https photo of the writer; empty for none. */
+  photo: string;
+  role: string;
+  /** Paragraphs separated by blank lines. */
+  intro: string;
+  stack: string[];
+  nowHeading: string;
+  now: string[];
+  storiesHeading: string;
+  stories: LandingStory[];
+  experiences: LandingExperience[];
+}
+
 /** What the writer's public page (/@handle) shows above and around their notes. */
 export interface Landing {
   greeting: string;
@@ -37,9 +72,46 @@ export interface Landing {
   projects: LandingProject[];
   notesHeading: string;
   notesCount: number;
+  about: LandingAbout;
 }
 
-export const LANDING_LIMITS = { links: 4, socials: 8, helps: 6, projects: 12, notes: 20 } as const;
+/** True when the About page has something to show, so the menu can leave it out otherwise. */
+export const hasAbout = (about: LandingAbout) =>
+  Boolean(
+    about.intro ||
+    about.photo ||
+    about.role ||
+    about.stack.length ||
+    about.now.length ||
+    about.stories.length ||
+    about.experiences.length,
+  );
+
+export const LANDING_LIMITS = {
+  links: 4,
+  socials: 8,
+  helps: 6,
+  projects: 12,
+  notes: 20,
+  stack: 24,
+  now: 8,
+  stories: 8,
+  experiences: 8,
+  highlights: 5,
+} as const;
+
+export const defaultAbout = (): LandingAbout => ({
+  subtitle: 'A story of growth and discovery',
+  photo: '',
+  role: '',
+  intro: '',
+  stack: [],
+  nowHeading: "What I'm up to now",
+  now: [],
+  storiesHeading: 'Learn about my growth',
+  stories: [],
+  experiences: [],
+});
 
 export function defaultLanding(name: string | null): Landing {
   const first = name?.trim().split(/\s+/)[0];
@@ -54,6 +126,7 @@ export function defaultLanding(name: string | null): Landing {
     projects: [],
     notesHeading: 'Want to know what i think of?',
     notesCount: 5,
+    about: defaultAbout(),
   };
 }
 
@@ -116,6 +189,60 @@ export function socialPlatform(url: string): { platform: SocialPlatform; label: 
 const text = (value: unknown, max: number) =>
   typeof value === 'string' ? value.trim().slice(0, max) : '';
 
+/** Trimmed, non-empty strings from a list, each cut to `max` characters. */
+const strings = (value: unknown, count: number, max: number) =>
+  (Array.isArray(value) ? value : [])
+    .map((item) => text(item, max))
+    .filter(Boolean)
+    .slice(0, count);
+
+const httpsImage = (value: unknown) => {
+  const image = text(value, 500);
+  return /^https:\/\//i.test(image) ? image : '';
+};
+
+function normalizeAbout(value: unknown): LandingAbout {
+  const raw =
+    typeof value === 'object' && value !== null && !Array.isArray(value)
+      ? (value as Record<string, unknown>)
+      : {};
+  const fallback = defaultAbout();
+  const heading = (key: string, fallbackText: string) =>
+    typeof raw[key] === 'string' ? text(raw[key], 80) : fallbackText;
+  return {
+    subtitle: heading('subtitle', fallback.subtitle),
+    photo: httpsImage(raw.photo),
+    role: text(raw.role, 120),
+    intro: typeof raw.intro === 'string' ? raw.intro.trim().slice(0, 2500) : '',
+    stack: strings(raw.stack, LANDING_LIMITS.stack, 30),
+    nowHeading: heading('nowHeading', fallback.nowHeading),
+    now: strings(raw.now, LANDING_LIMITS.now, 160),
+    storiesHeading: heading('storiesHeading', fallback.storiesHeading),
+    stories: list(raw.stories, LANDING_LIMITS.stories, (story) => {
+      const label = text(story.label, 40);
+      const pageId = text(story.pageId, 80);
+      return label || pageId
+        ? { id: text(story.id, 80) || crypto.randomUUID(), label, pageId: pageId || null }
+        : null;
+    }),
+    experiences: list(raw.experiences, LANDING_LIMITS.experiences, (job) => {
+      const title = text(job.title, 100);
+      if (!title) return null;
+      const companyUrl = toLinkUrl(text(job.companyUrl, 500));
+      return {
+        id: text(job.id, 80) || crypto.randomUUID(),
+        period: text(job.period, 40),
+        title,
+        company: text(job.company, 80),
+        companyUrl: /^https?:\/\//i.test(companyUrl) ? companyUrl : '',
+        location: text(job.location, 60),
+        description: text(job.description, 500),
+        highlights: strings(job.highlights, LANDING_LIMITS.highlights, 160),
+      };
+    }),
+  };
+}
+
 const list = <T>(value: unknown, max: number, item: (raw: Record<string, unknown>) => T | null) =>
   (Array.isArray(value) ? value : [])
     .filter((raw): raw is Record<string, unknown> => typeof raw === 'object' && raw !== null)
@@ -154,7 +281,7 @@ export function normalizeLanding(value: unknown): Landing | null {
     projects: list(raw.projects, LANDING_LIMITS.projects, (project) => {
       const title = text(project.title, 100);
       if (!title) return null;
-      const image = text(project.image, 500);
+      const image = httpsImage(project.image);
       const pageId = text(project.pageId, 80);
       return {
         id: text(project.id, 80) || crypto.randomUUID(),
@@ -162,7 +289,7 @@ export function normalizeLanding(value: unknown): Landing | null {
         summary: text(project.summary, 140),
         category: text(project.category, 30),
         year: text(project.year, 12),
-        image: /^https:\/\//i.test(image) ? image : '',
+        image,
         pageId: pageId || null,
       };
     }),
@@ -170,6 +297,7 @@ export function normalizeLanding(value: unknown): Landing | null {
     notesCount: Number.isInteger(count)
       ? Math.min(Math.max(count, 1), LANDING_LIMITS.notes)
       : fallback.notesCount,
+    about: normalizeAbout(raw.about),
   };
 }
 

@@ -31,8 +31,10 @@ import {
 import {
   defaultLanding,
   getLanding,
+  hasAbout,
   socialPlatform,
   type Landing,
+  type LandingAbout,
   type SocialPlatform,
 } from '@/lib/supabase/landing';
 import { getProfile } from '@/lib/supabase/profiles';
@@ -147,7 +149,11 @@ function AuthorPage({ author }: { author: Author }) {
   const { search } = useLocation();
   // `?notes` is the older address of the Blog page.
   const params = new URLSearchParams(search);
-  const blog = params.has('blog') || params.has('notes');
+  const view: Section = params.has('about')
+    ? 'about'
+    : params.has('blog') || params.has('notes')
+      ? 'blog'
+      : 'me';
   const result = usePublicData(
     () =>
       supabase
@@ -166,10 +172,13 @@ function AuthorPage({ author }: { author: Author }) {
   useLandingFont();
   if (result.status !== 'ready') return <Status result={result} />;
   const [pages, landing] = result.data;
+  const about = landing && hasAbout(landing.about) ? landing.about : null;
   return (
     <>
-      <PublicNav author={author} active={blog ? 'blog' : 'me'} />
-      {blog ? (
+      <PublicNav author={author} active={view} showAbout={Boolean(about)} />
+      {view === 'about' && about ? (
+        <AboutView author={author} name={name} pages={pages} about={about} />
+      ) : view === 'blog' ? (
         <BlogView author={author} name={name} pages={pages} />
       ) : (
         <LandingView author={author} name={name} pages={pages} landing={landing} />
@@ -269,6 +278,18 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
             })}
           </ul>
         )}
+        <span className="landing-scroll-cue" aria-hidden="true">
+          <svg viewBox="0 0 24 32" width="22" height="30">
+            <path
+              d="M12 3c-.6 8 .5 16 0 24M5 20c3 3 5 5 7 7 2-2 4-5 7-8"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </span>
       </header>
       {content.helps.length > 0 && (
         <section className="landing-helps" aria-labelledby="landing-helps">
@@ -370,20 +391,158 @@ function Sparkle() {
   );
 }
 
+type Section = 'me' | 'blog' | 'about';
+
 const blogPath = (author: PublicAuthor) => `${writerPath(author)}?blog`;
 
 /** The two public sections: Me (the landing page with projects) and Blog (every listed page). */
-function PublicNav({ author, active }: { author: PublicAuthor; active?: 'me' | 'blog' }) {
+function PublicNav({
+  author,
+  active,
+  showAbout,
+}: {
+  author: PublicAuthor;
+  active?: Section;
+  showAbout: boolean;
+}) {
   useLandingFont();
+  const current = (section: Section) => (active === section ? 'page' : undefined);
   return (
     <nav className="landing-nav" aria-label="Sections">
-      <Link to={writerPath(author)} aria-current={active === 'me' ? 'page' : undefined}>
+      <Link to={writerPath(author)} aria-current={current('me')}>
         Me
       </Link>
-      <Link to={blogPath(author)} aria-current={active === 'blog' ? 'page' : undefined}>
+      <Link to={blogPath(author)} aria-current={current('blog')}>
         Blog
       </Link>
+      {showAbout && (
+        <Link to={`${writerPath(author)}?about`} aria-current={current('about')}>
+          About
+        </Link>
+      )}
     </nav>
+  );
+}
+
+/** The menu on an article page, which shows About only when the writer has filled it in. */
+function ArticleNav({ author }: { author: PublicAuthor }) {
+  const result = usePublicData(
+    () => (supabase ? getLanding(supabase, author.userId) : Promise.resolve(null)),
+    [author.userId],
+  );
+  const landing = result.status === 'ready' ? result.data : null;
+  return <PublicNav author={author} showAbout={Boolean(landing && hasAbout(landing.about))} />;
+}
+
+/** The About page: photo, intro, stack, what's happening now, story pages and experience. */
+function AboutView({
+  author,
+  name,
+  pages,
+  about,
+}: Omit<LandingProps, 'landing'> & { about: LandingAbout }) {
+  // Only listed pages are linked, like projects on Me.
+  const bySlug = new Map(pages.map((page) => [page.id, page]));
+  const paragraphs = about.intro.split(/\n\s*\n/).filter((paragraph) => paragraph.trim());
+  const stories = about.stories
+    .map((story) => ({ ...story, page: story.pageId ? bySlug.get(story.pageId) : undefined }))
+    .filter((story) => story.page);
+  return (
+    <main className="landing landing-about">
+      <header className="landing-blog-header">
+        <h1>
+          <span className="landing-marker">About</span>
+        </h1>
+        {about.subtitle && <p className="landing-tagline">{about.subtitle}</p>}
+      </header>
+      <section className="landing-about-intro">
+        {about.photo && (
+          <figure className="landing-polaroid">
+            <img src={about.photo} alt={name ?? ''} />
+          </figure>
+        )}
+        <div className="landing-about-text">
+          {name && <h2 className="landing-about-name">{name}</h2>}
+          {about.role && <p className="landing-about-role">{about.role}</p>}
+          {paragraphs.map((paragraph, index) => (
+            <p key={index}>{paragraph.trim()}</p>
+          ))}
+        </div>
+      </section>
+      {about.stack.length > 0 && (
+        <section className="landing-section" aria-labelledby="about-stack">
+          <h2 id="about-stack">Tools I love</h2>
+          <ul className="landing-stack">
+            {about.stack.map((tool) => (
+              <li key={tool}>{tool}</li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {about.now.length > 0 && (
+        <section className="landing-section" aria-labelledby="about-now">
+          {about.nowHeading && <h2 id="about-now">{about.nowHeading}</h2>}
+          <ul className="landing-now">
+            {about.now.map((item, index) => (
+              <li key={index}>{item}</li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {stories.length > 0 && (
+        <section className="landing-section" aria-labelledby="about-stories">
+          {about.storiesHeading && <h2 id="about-stories">{about.storiesHeading}</h2>}
+          <ul className="landing-stories">
+            {stories.map(({ id, label, page }) => (
+              <li key={id}>
+                <Link to={writerPath(author, page!.slug)}>
+                  {label && <span className="landing-story-label">{label}</span>}
+                  <strong>{page!.title}</strong>
+                  <span className="landing-story-meta">
+                    {readingMinutes(page!.content)} min read
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {about.experiences.length > 0 && (
+        <section className="landing-section" aria-labelledby="about-experience">
+          <h2 id="about-experience">Experience</h2>
+          <ol className="landing-timeline">
+            {about.experiences.map((job) => (
+              <li key={job.id}>
+                {job.period && <span className="landing-timeline-period">{job.period}</span>}
+                <h3>{job.title}</h3>
+                {(job.company || job.location) && (
+                  <p className="landing-timeline-where">
+                    {job.company &&
+                      (job.companyUrl ? (
+                        <a href={job.companyUrl} target="_blank" rel="noreferrer">
+                          {job.company}
+                        </a>
+                      ) : (
+                        <span>{job.company}</span>
+                      ))}
+                    {job.company && job.location && ' · '}
+                    {job.location}
+                  </p>
+                )}
+                {job.description && <p>{job.description}</p>}
+                {job.highlights.length > 0 && (
+                  <ul>
+                    {job.highlights.map((highlight, index) => (
+                      <li key={index}>{highlight}</li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+    </main>
   );
 }
 
@@ -444,7 +603,7 @@ function ArticlePage({ author, slug }: { author: Author; slug: string }) {
   return (
     <>
       {/* Unlisted pages are shared by link only, so they don't lead to the public list. */}
-      {!page.unlisted && <PublicNav author={author} />}
+      {!page.unlisted && <ArticleNav author={author} />}
       <main className="reader-column">
         <article>
           <header className="reader-header">

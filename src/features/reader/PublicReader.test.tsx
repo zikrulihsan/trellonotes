@@ -29,10 +29,14 @@ const LISTED = [
   page('p-project', 'folio-story', 'How Folio was built', '2026-08-01T00:00:00Z'),
 ];
 let landing: unknown = null;
-vi.mock('@/lib/supabase/landing', async (original) => ({
-  ...(await original<object>()),
-  getLanding: () => Promise.resolve(landing),
-}));
+vi.mock('@/lib/supabase/landing', async (original) => {
+  const actual = await original<typeof import('@/lib/supabase/landing')>();
+  // Normalized, the way getLanding reads it from the database.
+  return {
+    ...actual,
+    getLanding: () => Promise.resolve(landing && actual.normalizeLanding(landing)),
+  };
+});
 vi.mock('@/lib/supabase/published-pages', async (original) => ({
   ...(await original<object>()),
   listPublishedPages: (_client: unknown, userId: string) =>
@@ -175,5 +179,53 @@ describe('public reader', () => {
   it('still opens the Blog page from the older ?notes address', async () => {
     renderAt('/@zikrul?notes');
     expect(await screen.findByRole('heading', { name: 'Blog' })).toBeInTheDocument();
+  });
+
+  it('shows the About page the writer filled in, linking stories to listed pages only', async () => {
+    landing = {
+      about: {
+        role: 'Software Engineer',
+        intro: 'I build things.\n\nI also write.',
+        stack: ['React', 'Supabase'],
+        now: ['Building Notis'],
+        stories: [
+          { id: 's1', label: '2026', pageId: 'p-note' },
+          { id: 's2', label: '2025', pageId: 'p-unlisted' },
+        ],
+        experiences: [
+          {
+            id: 'e1',
+            period: '2024 – Present',
+            title: 'Engineer',
+            company: 'Acme',
+            companyUrl: 'acme.com',
+            location: 'Remote',
+            description: 'Shipped the app.',
+            highlights: ['Led the redesign'],
+          },
+        ],
+      },
+    };
+    renderAt('/@zikrul?about');
+    expect(await screen.findByRole('heading', { name: 'About' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'About' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByText('I also write.')).toBeInTheDocument();
+    expect(screen.getByText('Supabase')).toBeInTheDocument();
+    expect(screen.getByText('Building Notis')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /2026/ })).toHaveAttribute(
+      'href',
+      '/@zikrul/catatan-rilis',
+    );
+    expect(screen.queryByText('2025')).toBeNull();
+    expect(screen.getByRole('heading', { name: 'Engineer' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Acme' })).toHaveAttribute('href', 'https://acme.com');
+    expect(screen.getByText('Led the redesign')).toBeInTheDocument();
+  });
+
+  it('leaves About out of the menu until it has content', async () => {
+    landing = null;
+    renderAt('/@zikrul');
+    expect(await screen.findByRole('link', { name: 'Me' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'About' })).toBeNull();
   });
 });

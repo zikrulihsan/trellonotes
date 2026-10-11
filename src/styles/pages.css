@@ -753,3 +753,32 @@
   font-size: 13px;
   color: #8a8593;
 }
+.landing-form textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 9px 11px;
+  border: 1px solid #ddd9e4;
+  border-radius: 8px;
+  background: #fff;
+  color: #2d2737;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: vertical;
+}
+.landing-form textarea:focus {
+  outline: 2px solid #c9b8f3;
+  border-color: #7954d8;
+}
+.landing-row-full {
+  grid-column: 1 / -1;
+}
+.landing-admin-group {
+  margin: 20px 0 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #2d2737;
+}
+.landing-admin-group-hint {
+  margin-top: -14px;
+}
