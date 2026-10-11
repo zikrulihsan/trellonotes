@@ -3,7 +3,7 @@ import type { PropsWithChildren } from 'react';
 import { UIProvider } from '@/context/UIProvider';
 import { AuthProvider } from '@/context/AuthProvider';
 import { WorkspaceSession } from './WorkspaceSession';
-import { PublicReader } from '@/features/reader/PublicReader';
+import { LandingPreview, PublicReader } from '@/features/reader/PublicReader';
 import { isPublicPath } from '@/lib/app-paths';
 import { FocusProvider } from '@/features/focus/FocusProvider';
 
@@ -11,6 +11,8 @@ import { FocusProvider } from '@/features/focus/FocusProvider';
 function AppOrReader({ children }: PropsWithChildren) {
   const { pathname } = useLocation();
   if (isPublicPath(pathname)) return <PublicReader />;
+  // The frame inside the Public page screen; it shows only what that screen sends it.
+  if (pathname === '/landing-preview') return <LandingPreview />;
   return (
     <UIProvider>
       <FocusProvider>

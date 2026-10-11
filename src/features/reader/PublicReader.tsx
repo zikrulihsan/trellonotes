@@ -2,6 +2,7 @@ import {
   createContext,
   useContext,
   useEffect,
+  useMemo,
   useState,
   type CSSProperties,
   type MouseEvent,
@@ -40,6 +41,7 @@ import {
   defaultLanding,
   getLanding,
   hasAbout,
+  normalizeLanding,
   socialPlatform,
   type Landing,
   type LandingAbout,
@@ -199,17 +201,7 @@ function AuthorPage({ author }: { author: Author }) {
     : params.has('blog') || params.has('notes')
       ? 'blog'
       : 'me';
-  const result = usePublicData(
-    () =>
-      supabase
-        ? Promise.all([
-            listPublishedPages(supabase, author.userId),
-            getLanding(supabase, author.userId),
-          ])
-        : Promise.resolve([[], null] as [PublishedPage[], Landing | null]),
-    [author.userId, true],
-    'site',
-  );
+  const result = useSiteData(author, true);
   const name =
     author.name ?? (result.status === 'ready' ? result.data[0][0]?.author_name : null) ?? null;
   useEffect(() => {
@@ -239,14 +231,14 @@ function AuthorPage({ author }: { author: Author }) {
 const readingMinutes = (html: string) =>
   Math.max(1, Math.round(plainText(html).split(/\s+/).filter(Boolean).length / 200));
 
-interface LandingProps {
+export interface LandingProps {
   author: Author;
   name: string | null;
   pages: PublishedPage[];
   landing: Landing | null;
 }
 
-function LandingView({ author, name, pages, landing }: LandingProps) {
+export function LandingView({ author, name, pages, landing }: LandingProps) {
   const content = landing ?? defaultLanding(name);
   // `pages` holds only listed pages, so an unlisted or unpublished project page never gets a link.
   const bySlug = new Map(pages.map((page) => [page.id, page.slug]));
@@ -558,7 +550,7 @@ type Section = 'me' | 'blog' | 'about';
 const blogPath = (author: PublicAuthor) => `${writerPath(author)}?blog`;
 
 /** The two public sections: Me (the landing page with projects) and Blog (every listed page). */
-function PublicNav({
+export function PublicNav({
   author,
   active,
   showAbout,
@@ -587,7 +579,14 @@ function PublicNav({
 }
 
 /** The writer's listed pages and landing page, for the menu and "Keep reading" on an article. */
-function useAuthorSite(author: PublicAuthor, enabled: boolean) {
+/**
+ * The writer's listed pages and landing page. The landing page is normalized again on the
+ * way out: a copy this browser kept from an older version may lack fields added since.
+ */
+function useSiteData(
+  author: PublicAuthor,
+  enabled: boolean,
+): Load<[PublishedPage[], Landing | null]> {
   const result = usePublicData(
     () =>
       supabase && enabled
@@ -599,6 +598,20 @@ function useAuthorSite(author: PublicAuthor, enabled: boolean) {
     [author.userId, enabled],
     'site',
   );
+  const data = result.status === 'ready' ? result.data : null;
+  const site = useMemo(
+    () =>
+      data &&
+      ([data[0], data[1] && normalizeLanding(data[1])] as [PublishedPage[], Landing | null]),
+    [data],
+  );
+  return site
+    ? { status: 'ready', data: site }
+    : (result as Load<[PublishedPage[], Landing | null]>);
+}
+
+function useAuthorSite(author: PublicAuthor, enabled: boolean) {
+  const result = useSiteData(author, enabled);
   return result.status === 'ready' ? result.data : null;
 }
 
@@ -903,5 +916,55 @@ function NotFound() {
       <h1>Page not found</h1>
       <p>It may have been unpublished, or the link is incomplete.</p>
     </main>
+  );
+}
+
+/** Messages between the Public page screen and its preview frame. */
+const PREVIEW_UPDATE = 'notis:landing-preview';
+const PREVIEW_READY = 'notis:landing-preview-ready';
+
+/**
+ * The live preview shown beside the Public page form (/landing-preview, in a frame). It
+ * draws the Me page from the unsaved draft its parent window sends, so the frame's own
+ * width decides the phone, tablet or desktop layout. Links are inert.
+ */
+export function LandingPreview() {
+  const [draft, setDraft] = useState<{ landing: Landing; author: Author } | null>(null);
+  const [pages, setPages] = useState<PublishedPage[]>([]);
+  useLandingFont();
+  useEffect(() => {
+    const receive = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin || event.source !== window.parent) return;
+      const data = event.data as { type?: string; landing?: unknown; author?: Author };
+      if (data?.type !== PREVIEW_UPDATE || !data.author) return;
+      setDraft({
+        landing: normalizeLanding(data.landing) ?? defaultLanding(data.author.name),
+        author: data.author,
+      });
+    };
+    window.addEventListener('message', receive);
+    window.parent.postMessage({ type: PREVIEW_READY }, window.location.origin);
+    return () => window.removeEventListener('message', receive);
+  }, []);
+  const userId = draft?.author.userId;
+  useEffect(() => {
+    if (!supabase || !userId) return;
+    listPublishedPages(supabase, userId).then(setPages, () => {
+      /* The preview just shows no writing. */
+    });
+  }, [userId]);
+  if (!draft) return null;
+  const { landing, author } = draft;
+  return (
+    <div
+      className="reader landing-preview"
+      data-landing-theme={landing.theme === 'sketch' ? undefined : landing.theme}
+      onClickCapture={(event) => {
+        if ((event.target as Element).closest('a, button')) event.preventDefault();
+      }}
+    >
+      <PublicNav author={author} active="me" showAbout={hasAbout(landing.about)} />
+      <LandingView author={author} name={author.name} pages={pages} landing={landing} />
+    </div>
   );
 }
