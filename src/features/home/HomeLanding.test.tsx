@@ -16,6 +16,10 @@ describe('signed-out home page', () => {
       screen.getByRole('heading', { name: 'Everything starts with a note.' }),
     ).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /deserves to be seen/ })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /See a real one/ })).toHaveAttribute(
+      'href',
+      'https://notis.swegrowth.id/@zikrul-ihsan-md',
+    );
     const google = screen.getAllByRole('button', { name: 'Continue with Google' });
     expect(google).toHaveLength(2);
     fireEvent.click(google[1]);
