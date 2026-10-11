@@ -210,8 +210,8 @@ describe('public reader', () => {
     landing = {
       about: {
         role: 'Software Engineer',
-        intro: 'I build things.\n\nI also write.',
-        stack: ['React', 'Supabase'],
+        intro: 'I build things.\n\n## Going home\n\nI also write.',
+        stack: ['People before code', 'Share what you learn'],
         now: ['Building Notis'],
         stories: [
           { id: 's1', label: '2026', pageId: 'p-note' },
@@ -235,7 +235,9 @@ describe('public reader', () => {
     expect(await screen.findByRole('heading', { name: 'About' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'About' })).toHaveAttribute('aria-current', 'page');
     expect(screen.getByText('I also write.')).toBeInTheDocument();
-    expect(screen.getByText('Supabase')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Going home' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'What I hold onto' })).toBeInTheDocument();
+    expect(screen.getByText('Share what you learn')).toBeInTheDocument();
     expect(screen.getByText('Building Notis')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /2026/ })).toHaveAttribute(
       'href',

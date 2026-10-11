@@ -13,7 +13,6 @@ import {
   Linkedin,
   Mail,
   Music2,
-  Twitter,
   Youtube,
   type LucideIcon,
 } from 'lucide-react';
@@ -458,12 +457,21 @@ function useSiteIcon(url: string) {
   return readCached<string | null>(key)?.data ?? faviconOf(url);
 }
 
-const SOCIAL_ICONS: Record<SocialPlatform, LucideIcon> = {
+/** X's own mark; lucide only has the old Twitter bird. Sized like the lucide icons. */
+function XLogo({ size = 24 }: { size?: number | string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M17.75 3h3.07l-6.71 7.67L22 21h-6.18l-4.84-6.33L5.44 21H2.37l7.18-8.2L2 3h6.34l4.37 5.78L17.75 3Zm-1.08 16.17h1.7L7.4 4.73H5.58l11.09 14.44Z" />
+    </svg>
+  );
+}
+
+const SOCIAL_ICONS: Record<SocialPlatform, LucideIcon | typeof XLogo> = {
   github: Github,
   linkedin: Linkedin,
   instagram: Instagram,
   youtube: Youtube,
-  x: Twitter,
+  x: XLogo,
   facebook: Facebook,
   tiktok: Music2,
   threads: AtSign,
@@ -536,7 +544,10 @@ function useAuthorSite(author: PublicAuthor, enabled: boolean) {
   return result.status === 'ready' ? result.data : null;
 }
 
-/** The About page: photo, intro, stack, what's happening now, story pages and experience. */
+/**
+ * The About page: a short byline, then the writer's story told at reading width, what they
+ * hold onto, what they are up to now, story pages and experience.
+ */
 function AboutView({
   author,
   name,
@@ -545,7 +556,10 @@ function AboutView({
 }: Omit<LandingProps, 'landing'> & { about: LandingAbout }) {
   // Only listed pages are linked, like projects on Me.
   const bySlug = new Map(pages.map((page) => [page.id, page]));
-  const paragraphs = about.intro.split(/\n\s*\n/).filter((paragraph) => paragraph.trim());
+  const blocks = about.intro
+    .split(/\n\s*\n/)
+    .map((block) => block.trim())
+    .filter(Boolean);
   const stories = about.stories
     .map((story) => ({ ...story, page: story.pageId ? bySlug.get(story.pageId) : undefined }))
     .filter((story) => story.page);
@@ -557,28 +571,33 @@ function AboutView({
         </h1>
         {about.subtitle && <p className="landing-tagline">{about.subtitle}</p>}
       </header>
-      <section className="landing-about-intro">
-        {about.photo && (
-          <figure className="landing-polaroid">
-            <img src={about.photo} alt={name ?? ''} />
-          </figure>
+      <article className="landing-story">
+        {(about.photo || name || about.role) && (
+          <div className="landing-byline">
+            {about.photo && <img src={about.photo} alt={name ?? ''} />}
+            <div>
+              {name && <p className="landing-byline-name">{name}</p>}
+              {about.role && <p className="landing-byline-role">{about.role}</p>}
+            </div>
+          </div>
         )}
-        <div className="landing-about-text">
-          {name && <h2 className="landing-about-name">{name}</h2>}
-          {about.role && <p className="landing-about-role">{about.role}</p>}
-          {paragraphs.map((paragraph, index) => (
-            <p key={index}>{paragraph.trim()}</p>
-          ))}
-        </div>
-      </section>
+        {/* A block starting with "## " is a heading that breaks a long story into parts. */}
+        {blocks.map((block, index) =>
+          block.startsWith('## ') ? (
+            <h2 key={index}>{block.slice(3).trim()}</h2>
+          ) : (
+            <p key={index}>{block}</p>
+          ),
+        )}
+      </article>
       {about.stack.length > 0 && (
-        <section className="landing-section" aria-labelledby="about-stack">
-          <h2 id="about-stack">Tools I love</h2>
-          <ul className="landing-stack">
-            {about.stack.map((tool) => (
-              <li key={tool}>{tool}</li>
+        <section className="landing-section" aria-labelledby="about-values">
+          {about.stackHeading && <h2 id="about-values">{about.stackHeading}</h2>}
+          <ol className="landing-values">
+            {about.stack.map((value, index) => (
+              <li key={index}>{value}</li>
             ))}
-          </ul>
+          </ol>
         </section>
       )}
       {about.now.length > 0 && (

@@ -53,7 +53,9 @@ export interface LandingAbout {
   role: string;
   /** Paragraphs separated by blank lines. */
   intro: string;
+  /** What the writer holds onto: principles and values, one sentence each. */
   stack: string[];
+  stackHeading: string;
   nowHeading: string;
   now: string[];
   storiesHeading: string;
@@ -89,13 +91,16 @@ export const hasAbout = (about: LandingAbout) =>
     about.experiences.length,
   );
 
+/** The About story can run long; it is most of the page. */
+export const ABOUT_INTRO_MAX = 8000;
+
 export const LANDING_LIMITS = {
   links: 4,
   socials: 8,
   helps: 6,
   projects: 12,
   notes: 20,
-  stack: 24,
+  stack: 8,
   now: 8,
   stories: 8,
   experiences: 8,
@@ -108,6 +113,7 @@ export const defaultAbout = (): LandingAbout => ({
   role: '',
   intro: '',
   stack: [],
+  stackHeading: 'What I hold onto',
   nowHeading: "What I'm up to now",
   now: [],
   storiesHeading: 'Learn about my growth',
@@ -215,8 +221,9 @@ function normalizeAbout(value: unknown): LandingAbout {
     subtitle: heading('subtitle', fallback.subtitle),
     photo: httpsImage(raw.photo),
     role: text(raw.role, 120),
-    intro: typeof raw.intro === 'string' ? raw.intro.trim().slice(0, 2500) : '',
-    stack: strings(raw.stack, LANDING_LIMITS.stack, 30),
+    intro: typeof raw.intro === 'string' ? raw.intro.trim().slice(0, ABOUT_INTRO_MAX) : '',
+    stack: strings(raw.stack, LANDING_LIMITS.stack, 200),
+    stackHeading: heading('stackHeading', fallback.stackHeading),
     nowHeading: heading('nowHeading', fallback.nowHeading),
     now: strings(raw.now, LANDING_LIMITS.now, 160),
     storiesHeading: heading('storiesHeading', fallback.storiesHeading),

@@ -23,7 +23,7 @@ Fields:
 - projects: up to 6 notable products, systems or side projects, most impressive first. summary is the result or what it does; category is one or two words (AI, Software, Community, Side project...); year is a year or range from the resume, or empty; url is the project's link from the resume, or empty.
 - about.role: current title and employer.
 - about.intro: 2 or 3 short paragraphs separated by a blank line.
-- about.stack: up to 15 tools they use most.
+- about.stack: up to 4 principles or values they hold onto in their work, each one short sentence in their voice, drawn from the resume or cover letter.
 - about.now: up to 3 things they are working on now.
 - about.experiences: jobs, newest first. period like "Oct 2024 – Present"; description is one sentence; highlights are up to 4 results, keeping the resume's numbers.`;
 
