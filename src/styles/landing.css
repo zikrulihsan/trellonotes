@@ -157,7 +157,13 @@ a.landing-project:hover {
   object-fit: cover;
 }
 span.landing-thumb {
-  border: 1px dashed var(--landing-line);
+  display: grid;
+  place-items: center;
+  font-family: var(--landing-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--landing-ink);
+  border: 1.5px dashed var(--landing-muted);
   background: repeating-linear-gradient(135deg, #f3f2f5 0 6px, #e6e4ea 6px 12px);
 }
 .landing-project-text {
@@ -197,10 +203,9 @@ span.landing-thumb {
   color: inherit;
   text-decoration: none;
 }
-.landing-notes a:hover span {
-  text-decoration: underline;
-}
-.landing-notes span {
+.landing-notes a > span:first-child {
+  flex: 1;
+  min-width: 0;
   font-size: 19px;
   line-height: 1.35;
   overflow-wrap: anywhere;
@@ -259,7 +264,7 @@ span.landing-thumb {
     height: 40px;
   }
   .landing-project-text strong,
-  .landing-notes span {
+  .landing-notes a > span:first-child {
     font-size: 17px;
   }
   .landing-project-text span {
@@ -271,5 +276,198 @@ span.landing-thumb {
   }
   .landing-notes time {
     font-size: 12px;
+  }
+}
+
+/* Sketchbook touches: dotted paper, marker highlight, doodles and a little motion. */
+.reader:has(.landing) {
+  background-color: #fffdf8;
+  background-image: radial-gradient(circle, #e4dfd4 1px, transparent 1.2px);
+  background-size: 22px 22px;
+}
+.landing {
+  --landing-marker: #ffe36e;
+  --landing-paper: #fffdf8;
+  --landing-wobble: 16px 12px 18px 10px / 10px 18px 12px 16px;
+}
+.landing-hero h1 {
+  position: relative;
+  display: inline-block;
+}
+.landing-marker {
+  background-image: linear-gradient(
+    100deg,
+    transparent 0.5%,
+    var(--landing-marker) 2%,
+    var(--landing-marker) 97%,
+    transparent 99%
+  );
+  background-repeat: no-repeat;
+  background-position: 0 88%;
+  background-size: 100% 38%;
+  padding: 0 6px;
+  border-radius: 6px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  animation: landing-marker 0.9s 0.25s ease-out both;
+}
+.landing-sparkle {
+  position: absolute;
+  top: -0.35em;
+  right: -0.75em;
+  width: 0.6em;
+  height: 0.6em;
+  fill: var(--landing-marker);
+  stroke: var(--landing-ink);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  animation: landing-twinkle 3.2s ease-in-out infinite;
+}
+.landing-section h2,
+.landing-helps h2 {
+  position: relative;
+  width: fit-content;
+  margin-inline: auto;
+  padding-bottom: 10px;
+}
+.landing-section h2::after,
+.landing-helps h2::after {
+  content: '';
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  bottom: 0;
+  height: 8px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 8' preserveAspectRatio='none'%3E%3Cpath d='M1 5c10-4 20 3 30 0s20-4 30 0 20 3 30 0 19-4 28 0' fill='none' stroke='%231f1d22' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E")
+    center / 100% 100% no-repeat;
+}
+.landing-button {
+  border-radius: var(--landing-wobble);
+  box-shadow: 3px 3px 0 var(--landing-ink);
+  background: var(--landing-paper);
+}
+.landing-button.is-primary {
+  box-shadow: 3px 3px 0 var(--landing-marker);
+}
+.landing-button:hover {
+  transform: translate(-1px, -1px) rotate(-1deg);
+  box-shadow: 4px 4px 0 var(--landing-ink);
+}
+.landing-button.is-primary:hover {
+  box-shadow: 4px 4px 0 var(--landing-marker);
+}
+.landing-button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--landing-ink);
+}
+.landing-help-number {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin: 0 auto 4px;
+  border: 1.5px solid var(--landing-ink);
+  border-radius: 55% 45% 50% 50% / 50% 55% 45% 50%;
+  background: var(--landing-marker);
+  font-family: var(--landing-display);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+  transform: rotate(-6deg);
+}
+.landing-helps li:nth-child(even) .landing-help-number {
+  transform: rotate(5deg);
+}
+.landing-project {
+  border-radius: var(--landing-wobble);
+  background: var(--landing-paper);
+  box-shadow: 4px 4px 0 var(--landing-ink);
+}
+.landing-projects li:nth-child(even) .landing-project {
+  border-radius: 12px 18px 10px 16px / 16px 10px 18px 12px;
+}
+a.landing-project:hover {
+  transform: translate(-2px, -2px) rotate(-0.4deg);
+  box-shadow: 6px 6px 0 var(--landing-ink);
+}
+.landing-projects li:nth-child(even) a.landing-project:hover {
+  transform: translate(-2px, -2px) rotate(0.4deg);
+}
+.landing-tag {
+  background: var(--landing-marker);
+  transform: rotate(-2deg);
+}
+.landing-projects li:nth-child(even) .landing-tag {
+  transform: rotate(2deg);
+}
+.landing-note-arrow {
+  flex-shrink: 0;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+.landing-notes a:hover .landing-note-arrow,
+.landing-notes a:focus-visible .landing-note-arrow {
+  opacity: 1;
+  transform: none;
+}
+.landing-notes a:hover > span:first-child {
+  background: linear-gradient(transparent 60%, var(--landing-marker) 60%);
+}
+.landing-all {
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+.landing-all:hover {
+  text-decoration: none;
+  background: var(--landing-marker);
+}
+.landing > * {
+  animation: landing-rise 0.6s ease-out both;
+}
+.landing > :nth-child(2) {
+  animation-delay: 0.08s;
+}
+.landing > :nth-child(3) {
+  animation-delay: 0.16s;
+}
+.landing > :nth-child(4) {
+  animation-delay: 0.24s;
+}
+@keyframes landing-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+@keyframes landing-marker {
+  from {
+    background-size: 0% 38%;
+  }
+}
+@keyframes landing-twinkle {
+  0%,
+  100% {
+    transform: rotate(0) scale(1);
+  }
+  50% {
+    transform: rotate(14deg) scale(1.12);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing *,
+  .landing > * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+@media (max-width: 560px) {
+  .landing-project {
+    box-shadow: 3px 3px 0 var(--landing-ink);
+  }
+  .landing-note-arrow {
+    display: none;
   }
 }

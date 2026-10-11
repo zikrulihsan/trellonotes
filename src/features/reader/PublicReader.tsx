@@ -189,7 +189,12 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
   return (
     <main className="landing">
       <header className="landing-hero">
-        <h1>{content.greeting || name || (author.handle ? `@${author.handle}` : 'Writing')}</h1>
+        <h1>
+          <span className="landing-marker">
+            {content.greeting || name || (author.handle ? `@${author.handle}` : 'Writing')}
+          </span>
+          <Sparkle />
+        </h1>
         {content.tagline && <p className="landing-tagline">{content.tagline}</p>}
         {content.links.length > 0 && (
           <div className="landing-links">
@@ -223,6 +228,9 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
           <ul style={{ '--landing-columns': Math.min(content.helps.length, 3) } as CSSProperties}>
             {content.helps.map((help, index) => (
               <li key={index}>
+                <span className="landing-help-number" aria-hidden="true">
+                  {index + 1}
+                </span>
                 <strong>{help.title}</strong>
                 {help.subtitle && <span>{help.subtitle}</span>}
               </li>
@@ -242,7 +250,9 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
                   {project.image ? (
                     <img className="landing-thumb" src={project.image} alt="" />
                   ) : (
-                    <span className="landing-thumb" aria-hidden="true" />
+                    <span className="landing-thumb" aria-hidden="true">
+                      {project.title.replace(/^\W+/, '').charAt(0)}
+                    </span>
                   )}
                   <span className="landing-project-text">
                     <strong>{project.title}</strong>
@@ -274,6 +284,9 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
               <li key={page.id}>
                 <Link to={writerPath(author, page.slug)}>
                   <span>{page.title}</span>
+                  <span className="landing-note-arrow" aria-hidden="true">
+                    →
+                  </span>
                   <time dateTime={page.published_at}>
                     {monthYear(page.published_at)} · {readingMinutes(page.content)} min
                   </time>
@@ -291,6 +304,16 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
         )
       )}
     </main>
+  );
+}
+
+/** A hand-drawn sparkle beside the greeting. */
+function Sparkle() {
+  return (
+    <svg className="landing-sparkle" viewBox="0 0 40 40" aria-hidden="true">
+      <path d="M20 4c1 8 3 12 12 15-9 2-11 6-12 16-1-10-4-14-12-16 8-3 11-7 12-15z" />
+      <path d="M34 2c.4 3 1.2 4.4 4 5-2.8.7-3.6 2-4 5-.4-3-1.3-4.3-4-5 2.7-.6 3.6-2 4-5z" />
+    </svg>
   );
 }
 
