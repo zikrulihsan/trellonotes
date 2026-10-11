@@ -782,3 +782,72 @@
 .landing-admin-group-hint {
   margin-top: -14px;
 }
+.landing-form.landing-form-top {
+  padding-bottom: 0;
+}
+.landing-resume {
+  border-color: #d9ccf6;
+  background: linear-gradient(135deg, #faf7ff, #fff 60%);
+}
+.landing-resume h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #2d2737;
+}
+.landing-resume h2 svg {
+  color: #7954d8;
+}
+.landing-resume-pick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.landing-resume-file {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-width: 220px;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border: 1px dashed #c9b8f3;
+  border-radius: 8px;
+  background: #fff;
+  color: #5b5466;
+  font-size: 14px;
+  cursor: pointer;
+}
+.landing-resume-file span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.landing-resume-file input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.landing-resume-file:focus-within {
+  outline: 2px solid #c9b8f3;
+}
+.landing-resume-paste summary {
+  cursor: pointer;
+  color: #6f6b75;
+  font-size: 13px;
+}
+.landing-resume-paste textarea {
+  width: 100%;
+  margin-top: 8px;
+  padding: 9px 11px;
+  border: 1px solid #ddd9e4;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 14px;
+  resize: vertical;
+}

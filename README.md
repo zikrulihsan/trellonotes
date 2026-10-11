@@ -32,6 +32,8 @@ To enable Google sign-in, create a Google OAuth client of type **Web application
 npm run dev
 ```
 
+"Start from your resume" on the Landing page admin reads a resume with Gemini through the `/api/resume-import` Netlify edge function. Set `GEMINI_API_KEY` (a Google AI Studio key) in the Netlify site's environment variables; `GEMINI_MODEL` is optional and defaults to `gemini-2.5-flash`. The key stays on the server, and only signed-in writers can call it. Locally, run `netlify dev` instead of `npm run dev` to try it.
+
 ```sh
 npm run check         # Type checking, lint, tests, and production build
 npm run format:check  # Check formatting
