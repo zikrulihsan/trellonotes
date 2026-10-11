@@ -63,8 +63,98 @@ export interface LandingAbout {
   experiences: LandingExperience[];
 }
 
+/** How the public page looks; the writer picks one, since tastes differ. */
+export const LANDING_THEMES = [
+  { id: 'sketch', label: 'Sketchbook', description: 'Handwriting on dotted paper' },
+  { id: 'clean', label: 'Clean', description: 'Plain white and simple type' },
+  { id: 'editorial', label: 'Editorial', description: 'Warm paper and a serif face' },
+  { id: 'midnight', label: 'Midnight', description: 'Dark, with light text' },
+] as const;
+export type LandingTheme = (typeof LANDING_THEMES)[number]['id'];
+const isTheme = (value: unknown): value is LandingTheme =>
+  LANDING_THEMES.some((theme) => theme.id === value);
+
+/** The Me page's sections below the hero, in the writer's order. */
+export const LANDING_SECTIONS = [
+  { id: 'helps', label: 'Helps people to' },
+  { id: 'working', label: "What you're working on" },
+  { id: 'projects', label: 'Projects' },
+  { id: 'notes', label: 'Writing' },
+] as const;
+export type LandingSectionId = (typeof LANDING_SECTIONS)[number]['id'];
+
+/** The designs each part of the Me page can take; the first is the default. */
+export const SECTION_LAYOUTS = {
+  hero: [
+    { id: 'center', label: 'Centered' },
+    { id: 'left', label: 'Left-aligned' },
+    { id: 'banner', label: 'Banner' },
+  ],
+  helps: [
+    { id: 'columns', label: 'Columns' },
+    { id: 'cards', label: 'Cards' },
+    { id: 'list', label: 'Numbered list' },
+  ],
+  working: [
+    { id: 'list', label: 'List' },
+    { id: 'chips', label: 'Tags' },
+    { id: 'cards', label: 'Cards' },
+  ],
+  projects: [
+    { id: 'list', label: 'Rows' },
+    { id: 'grid', label: 'Grid' },
+    { id: 'compact', label: 'Compact' },
+  ],
+  notes: [
+    { id: 'cards', label: 'Cards' },
+    { id: 'compact', label: 'Titles only' },
+    { id: 'grid', label: 'Grid' },
+  ],
+} as const;
+type LayoutPart = keyof typeof SECTION_LAYOUTS;
+export type LandingLayout = { order: LandingSectionId[] } & {
+  [K in LayoutPart]: (typeof SECTION_LAYOUTS)[K][number]['id'];
+};
+
+export const defaultLayout = (): LandingLayout => ({
+  order: LANDING_SECTIONS.map((section) => section.id),
+  hero: 'center',
+  helps: 'columns',
+  working: 'list',
+  projects: 'list',
+  notes: 'cards',
+});
+
+/** A layout read from storage: every section once, in a known order, with known designs. */
+function normalizeLayout(value: unknown): LandingLayout {
+  const raw = (typeof value === 'object' && value !== null ? value : {}) as Record<string, unknown>;
+  const fallback = defaultLayout();
+  const known = new Set<string>(fallback.order);
+  const order = (Array.isArray(raw.order) ? raw.order : []).filter(
+    (id, index, all): id is LandingSectionId =>
+      typeof id === 'string' && known.has(id) && all.indexOf(id) === index,
+  );
+  for (const id of fallback.order) if (!order.includes(id)) order.push(id);
+  const pick = <K extends LayoutPart>(part: K): LandingLayout[K] => {
+    const options: readonly { id: string }[] = SECTION_LAYOUTS[part];
+    return (
+      options.some((option) => option.id === raw[part]) ? raw[part] : fallback[part]
+    ) as LandingLayout[K];
+  };
+  return {
+    order,
+    hero: pick('hero'),
+    helps: pick('helps'),
+    working: pick('working'),
+    projects: pick('projects'),
+    notes: pick('notes'),
+  };
+}
+
 /** What the writer's public page (/@handle) shows above and around their notes. */
 export interface Landing {
+  theme: LandingTheme;
+  layout: LandingLayout;
   greeting: string;
   tagline: string;
   links: LandingLink[];
@@ -128,6 +218,8 @@ export const defaultAbout = (): LandingAbout => ({
 export function defaultLanding(name: string | null): Landing {
   const first = name?.trim().split(/\s+/)[0];
   return {
+    theme: 'sketch',
+    layout: defaultLayout(),
     greeting: first ? `Hi, ${first} Here` : 'Hi, welcome',
     tagline: '',
     links: [],
@@ -282,6 +374,8 @@ export function normalizeLanding(value: unknown): Landing | null {
   const fallback = defaultLanding(null);
   const count = Number(raw.notesCount);
   return {
+    theme: isTheme(raw.theme) ? raw.theme : 'sketch',
+    layout: normalizeLayout(raw.layout),
     greeting: text(raw.greeting, 80),
     tagline: text(raw.tagline, 160),
     links: list(raw.links, LANDING_LIMITS.links, (link) => {

@@ -1,4 +1,12 @@
-import { useEffect, useState, type CSSProperties, type MouseEvent } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type CSSProperties,
+  type MouseEvent,
+  type ReactNode,
+} from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -36,11 +44,14 @@ import {
   type Landing,
   type LandingAbout,
   type LandingProject,
+  type LandingSectionId,
+  type LandingTheme,
   type SocialPlatform,
 } from '@/lib/supabase/landing';
 import { getProfile } from '@/lib/supabase/profiles';
 import { readCached, writeCached } from '@/lib/public-cache';
 import { writingExtensions } from '@/features/editor/extensions';
+import { useLandingFont } from './useLandingFont';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const longDate = (iso: string) =>
@@ -130,8 +141,20 @@ async function resolveAuthor(address: Address): Promise<Resolved> {
   return 'handle' in address ? { author } : { author, redirect: writerPath(author, address.slug) };
 }
 
+/** Lets the page that loaded the writer's settings dress the whole reader in their theme. */
+const ThemeContext = createContext<(theme: LandingTheme) => void>(() => {});
+
+/** Applies a theme once it is known; `undefined` while the writer's settings load. */
+function useReaderTheme(theme: LandingTheme | undefined) {
+  const setTheme = useContext(ThemeContext);
+  useEffect(() => {
+    if (theme) setTheme(theme);
+  }, [theme, setTheme]);
+}
+
 /** Public pages anyone can open without signing in. */
 export function PublicReader() {
+  const [theme, setTheme] = useState<LandingTheme>('sketch');
   const { pathname } = useLocation();
   const address = parseAddress(pathname);
   const result = usePublicData(
@@ -155,13 +178,15 @@ export function PublicReader() {
     body = <ArticlePage author={result.data.author} slug={address.slug} />;
   else body = <AuthorPage author={result.data.author} />;
   return (
-    <div className="reader">
-      {body}
-      <footer className="reader-footer">
-        <Feather size={13} />
-        Written with Notis
-      </footer>
-    </div>
+    <ThemeContext.Provider value={setTheme}>
+      <div className="reader" data-landing-theme={theme === 'sketch' ? undefined : theme}>
+        {body}
+        <footer className="reader-footer">
+          <Feather size={13} />
+          Written with Notis
+        </footer>
+      </div>
+    </ThemeContext.Provider>
   );
 }
 
@@ -192,6 +217,7 @@ function AuthorPage({ author }: { author: Author }) {
     document.title = view === 'me' ? who : `${view === 'blog' ? 'Blog' : 'About'} · ${who}`;
   }, [name, author.handle, view]);
   useLandingFont();
+  useReaderTheme(result.status === 'ready' ? (result.data[1]?.theme ?? 'sketch') : undefined);
   if (result.status !== 'ready') return <Status result={result} kind="page" />;
   const [pages, landing] = result.data;
   const about = landing && hasAbout(landing.about) ? landing.about : null;
@@ -207,20 +233,6 @@ function AuthorPage({ author }: { author: Author }) {
       )}
     </>
   );
-}
-
-/** The handwritten face of the landing page, loaded only for public visitors. */
-function useLandingFont() {
-  useEffect(() => {
-    const id = 'landing-font';
-    if (document.getElementById(id)) return;
-    const link = document.createElement('link');
-    link.id = id;
-    link.rel = 'stylesheet';
-    link.href =
-      'https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Patrick+Hand&family=JetBrains+Mono:wght@400&display=swap';
-    document.head.appendChild(link);
-  }, []);
 }
 
 /** Minutes to read at about 200 words a minute. */
@@ -245,9 +257,83 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
   const notes = pages.filter((page) => !projectPages.has(page.id));
   const shown = landing ? notes.slice(0, content.notesCount) : notes.slice(0, 10);
   const internal = (url: string) => url.startsWith('/');
+  const layout = content.layout;
+  // Each section below the hero, drawn in the design the writer picked; the order comes
+  // from the layout too.
+  const sections: Record<LandingSectionId, ReactNode> = {
+    helps: content.helps.length > 0 && (
+      <section
+        key="helps"
+        className={`landing-helps is-${layout.helps}`}
+        aria-labelledby="landing-helps"
+      >
+        {content.helpsHeading && <h2 id="landing-helps">{content.helpsHeading}</h2>}
+        <ul style={{ '--landing-columns': Math.min(content.helps.length, 3) } as CSSProperties}>
+          {content.helps.map((help, index) => (
+            <li key={index}>
+              <span className="landing-help-number" aria-hidden="true">
+                {index + 1}
+              </span>
+              <strong>{help.title}</strong>
+              {help.subtitle && <span>{help.subtitle}</span>}
+            </li>
+          ))}
+        </ul>
+        <NextArrow />
+      </section>
+    ),
+    working: content.working.length > 0 && (
+      <section
+        key="working"
+        className={`landing-section landing-working is-${layout.working}`}
+        aria-labelledby="landing-working"
+      >
+        {content.workingHeading && <h2 id="landing-working">{content.workingHeading}</h2>}
+        <ul className="landing-now">
+          {content.working.map((item, index) => (
+            <li key={index}>{item}</li>
+          ))}
+        </ul>
+        <NextArrow />
+      </section>
+    ),
+    projects: content.projects.length > 0 && (
+      <section
+        key="projects"
+        className={`landing-section landing-work is-${layout.projects}`}
+        aria-labelledby="landing-projects"
+      >
+        {content.projectsHeading && <h2 id="landing-projects">{content.projectsHeading}</h2>}
+        <ul className="landing-projects">
+          {content.projects.map((project) => (
+            <ProjectCard
+              key={project.id}
+              project={project}
+              slug={project.pageId ? bySlug.get(project.pageId) : undefined}
+              author={author}
+            />
+          ))}
+        </ul>
+        <NextArrow />
+      </section>
+    ),
+    notes: shown.length > 0 && (
+      <section
+        key="notes"
+        className={`landing-section landing-writing is-${layout.notes}`}
+        aria-labelledby="landing-notes"
+      >
+        {content.notesHeading && <h2 id="landing-notes">{content.notesHeading}</h2>}
+        <PostList author={author} pages={shown} />
+        <Link className="landing-all" to={blogPath(author)}>
+          See all <ArrowUpRight size={15} />
+        </Link>
+      </section>
+    ),
+  };
   return (
     <main className="landing">
-      <header className="landing-hero">
+      <header className={`landing-hero is-${layout.hero}`}>
         <h1>
           <span className="landing-marker">
             {content.greeting || name || (author.handle ? `@${author.handle}` : 'Writing')}
@@ -302,62 +388,9 @@ function LandingView({ author, name, pages, landing }: LandingProps) {
         )}
         <NextArrow className="landing-scroll-cue" />
       </header>
-      {content.helps.length > 0 && (
-        <section className="landing-helps" aria-labelledby="landing-helps">
-          {content.helpsHeading && <h2 id="landing-helps">{content.helpsHeading}</h2>}
-          <ul style={{ '--landing-columns': Math.min(content.helps.length, 3) } as CSSProperties}>
-            {content.helps.map((help, index) => (
-              <li key={index}>
-                <span className="landing-help-number" aria-hidden="true">
-                  {index + 1}
-                </span>
-                <strong>{help.title}</strong>
-                {help.subtitle && <span>{help.subtitle}</span>}
-              </li>
-            ))}
-          </ul>
-          <NextArrow />
-        </section>
-      )}
-      {content.working.length > 0 && (
-        <section className="landing-section" aria-labelledby="landing-working">
-          {content.workingHeading && <h2 id="landing-working">{content.workingHeading}</h2>}
-          <ul className="landing-now">
-            {content.working.map((item, index) => (
-              <li key={index}>{item}</li>
-            ))}
-          </ul>
-          <NextArrow />
-        </section>
-      )}
-      {content.projects.length > 0 && (
-        <section className="landing-section" aria-labelledby="landing-projects">
-          {content.projectsHeading && <h2 id="landing-projects">{content.projectsHeading}</h2>}
-          <ul className="landing-projects">
-            {content.projects.map((project) => (
-              <ProjectCard
-                key={project.id}
-                project={project}
-                slug={project.pageId ? bySlug.get(project.pageId) : undefined}
-                author={author}
-              />
-            ))}
-          </ul>
-          <NextArrow />
-        </section>
-      )}
-      {shown.length > 0 ? (
-        <section className="landing-section" aria-labelledby="landing-notes">
-          {content.notesHeading && <h2 id="landing-notes">{content.notesHeading}</h2>}
-          <PostList author={author} pages={shown} />
-          <Link className="landing-all" to={blogPath(author)}>
-            See all <ArrowUpRight size={15} />
-          </Link>
-        </section>
-      ) : (
-        !content.projects.length && (
-          <p className="landing-empty">Nothing has been published here yet.</p>
-        )
+      {content.layout.order.map((id) => sections[id])}
+      {!shown.length && !content.projects.length && (
+        <p className="landing-empty">Nothing has been published here yet.</p>
       )}
     </main>
   );
@@ -744,6 +777,7 @@ function ArticlePage({ author, slug }: { author: Author; slug: string }) {
   // Unlisted pages are shared by link only, so they don't lead to the public list.
   const listed = Boolean(page && !page.unlisted);
   const site = useAuthorSite(author, listed);
+  useReaderTheme(site ? (site[1]?.theme ?? 'sketch') : undefined);
   useEffect(() => {
     if (page) document.title = page.title;
   }, [page]);

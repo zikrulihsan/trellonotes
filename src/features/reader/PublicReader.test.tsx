@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { clearCached } from '@/lib/public-cache';
@@ -156,6 +156,8 @@ describe('public reader', () => {
       ],
       notesHeading: 'Want to know what i think of?',
       notesCount: 5,
+      theme: 'editorial',
+      layout: { order: ['projects', 'working', 'helps', 'notes'], projects: 'grid' },
       working: ['Building Notis', ''],
       workingHeading: "What I'm working on",
     };
@@ -163,7 +165,18 @@ describe('public reader', () => {
     expect(await screen.findByRole('heading', { name: 'Hi, Zikrul Here' })).toBeInTheDocument();
     expect(screen.getByText('Delivering Impact Through Software')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: "What I'm working on" })).toBeInTheDocument();
+    await waitFor(() =>
+      expect(document.querySelector('.reader')).toHaveAttribute('data-landing-theme', 'editorial'),
+    );
     expect(screen.getByText('Building Notis')).toBeInTheDocument();
+    // Sections follow the writer's order, each in its chosen design.
+    const headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(headings.slice(0, 3)).toEqual([
+      'Curious on what i did?',
+      "What I'm working on",
+      'Helps People to:',
+    ]);
+    expect(document.querySelector('.landing-work')).toHaveClass('is-grid');
     expect(screen.getByRole('link', { name: 'Contact' })).toHaveAttribute(
       'href',
       'mailto:me@example.com',

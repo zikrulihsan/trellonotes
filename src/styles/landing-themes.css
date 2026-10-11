@@ -1,0 +1,214 @@
+/* Themes for the public page (/@handle). Each one only swaps the custom properties
+   landing.css reads; "sketch" (the default) is defined there. */
+
+/* Clean: plain white, a sans face, soft shadows, a lilac highlight. */
+[data-landing-theme='clean'] {
+  --landing-ink: #1d1b22;
+  --landing-text: #3d3a45;
+  --landing-muted: #6f6b78;
+  --landing-line: #e3e0ea;
+  --landing-static: #c5c1cd;
+  --landing-shadow: #e7e4ee;
+  --landing-paper: #ffffff;
+  --landing-dots: transparent;
+  --landing-card: #ffffff;
+  --landing-marker: #e6dcff;
+  --landing-nav-bg: rgb(255 255 255 / 0.9);
+  --landing-hand: 'DM Sans', system-ui, sans-serif;
+  --landing-display: 'DM Sans', system-ui, sans-serif;
+  --landing-wobble: 12px;
+  --landing-wobble-alt: 12px;
+  --landing-blob: 50%;
+}
+
+/* Editorial: warm paper, a serif face, square corners, a peach highlight. */
+[data-landing-theme='editorial'] {
+  --landing-ink: #2a2420;
+  --landing-text: #4a413a;
+  --landing-muted: #7d7067;
+  --landing-line: #d9cdbd;
+  --landing-static: #b3a596;
+  --landing-paper: #f7f1e6;
+  --landing-dots: transparent;
+  --landing-card: #fffaf2;
+  --landing-on-ink: #f7f1e6;
+  --landing-marker: #f4c7a1;
+  --landing-stripe-a: #efe6d8;
+  --landing-stripe-b: #e6dac8;
+  --landing-nav-bg: rgb(247 241 230 / 0.92);
+  --landing-sans: 'Literata', Georgia, serif;
+  --landing-hand: 'Literata', Georgia, serif;
+  --landing-display: 'Literata', Georgia, serif;
+  --landing-wobble: 3px;
+  --landing-wobble-alt: 3px;
+  --landing-blob: 2px;
+}
+
+/* Midnight: dark paper, light ink, a violet highlight. */
+[data-landing-theme='midnight'] {
+  --landing-ink: #f3f1f7;
+  --landing-text: #d9d5e0;
+  --landing-muted: #a7a2b2;
+  --landing-line: #45414f;
+  --landing-static: #6c6778;
+  --landing-shadow: #000000;
+  --landing-paper: #16151b;
+  --landing-dots: #2a2832;
+  --landing-card: #201e27;
+  --landing-on-ink: #16151b;
+  --landing-marker: #6a4fd8;
+  --landing-stripe-a: #26242e;
+  --landing-stripe-b: #2e2c37;
+  --landing-nav-bg: rgb(22 21 27 / 0.9);
+  --landing-hand: 'DM Sans', system-ui, sans-serif;
+  --landing-display: 'DM Sans', system-ui, sans-serif;
+  --landing-wobble: 14px;
+  --landing-wobble-alt: 14px;
+  --landing-blob: 50%;
+  background-color: #16151b;
+}
+[data-landing-theme='midnight'] .reader-footer {
+  color: #6c6778;
+}
+/* Articles: the writing itself switches to light text. */
+[data-landing-theme='midnight'] .reader-column,
+[data-landing-theme='midnight'] .reader-column :is(p, li, h1, h2, h3, h4, blockquote, td, th) {
+  color: var(--landing-text);
+}
+[data-landing-theme='midnight'] .reader-header h1 {
+  color: var(--landing-ink);
+}
+[data-landing-theme='midnight'] .reader-column a {
+  color: #b9a6ff;
+}
+[data-landing-theme='midnight'] .reader-column :is(code, pre) {
+  background: #24222c;
+  color: #e6e3ec;
+}
+[data-landing-theme='midnight'] .reader-column :is(hr, blockquote) {
+  border-color: #45414f;
+}
+
+/* Editorial articles keep the serif and warm paper. */
+[data-landing-theme='editorial'] .reader-back,
+[data-landing-theme='clean'] .reader-back {
+  box-shadow: none;
+}
+
+/* The theme picker on the Public page screen: a small sample of each look. */
+.theme-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+.theme-option {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 8px 12px;
+  border: 1.5px solid #e4e1ea;
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+}
+.theme-option:hover {
+  border-color: #c9bfe4;
+}
+.theme-option.is-selected {
+  border-color: #7954d8;
+  box-shadow: 0 0 0 3px #ede6ff;
+}
+.theme-option:has(input:focus-visible) {
+  outline: 2px solid #7954d8;
+  outline-offset: 2px;
+}
+.theme-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.theme-option strong {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d2737;
+}
+.theme-option > span:last-child {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #8a8593;
+}
+.theme-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 108px;
+  padding: 14px 12px;
+  border-radius: 8px;
+  overflow: hidden;
+  color: var(--landing-ink);
+  background-color: var(--landing-paper);
+  background-image: radial-gradient(circle, var(--landing-dots) 1px, transparent 1.2px);
+  background-size: 12px 12px;
+}
+.theme-preview-title {
+  font-family: var(--landing-display);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.theme-preview-title mark {
+  padding: 0 2px;
+  color: inherit;
+  background: linear-gradient(transparent 55%, var(--landing-marker) 55%);
+}
+.theme-preview-line {
+  width: 70%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--landing-line);
+}
+.theme-preview-card {
+  margin-top: auto;
+  padding: 6px 8px;
+  border: 1.5px solid var(--landing-ink);
+  border-radius: var(--landing-wobble);
+  background: var(--landing-card);
+  box-shadow: 2px 2px 0 var(--landing-shadow);
+  font-family: var(--landing-hand);
+  font-size: 12px;
+}
+
+/* Section order and designs on the Public page screen. */
+.layout-list {
+  display: grid;
+  gap: 6px;
+}
+.layout-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 170px) 76px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px 8px 14px;
+  border-radius: 10px;
+  background: #faf9fc;
+}
+.layout-name {
+  font-size: 14px;
+  font-weight: 550;
+  color: #2d2737;
+}
+.layout-moves {
+  display: flex;
+  justify-content: flex-end;
+  gap: 2px;
+}
+.layout-moves button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.layout-pinned {
+  justify-self: end;
+  font-size: 11px;
+  color: #a39dab;
+}
