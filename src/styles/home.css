@@ -83,6 +83,21 @@
   font-size: clamp(17px, 2vw, 19px);
   line-height: 1.6;
 }
+.home-ai {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 18px auto 0;
+  padding: 6px 14px;
+  border: 1.5px solid var(--home-ink);
+  border-radius: 999px;
+  background: var(--home-marker);
+  font-size: 15px;
+  font-weight: 500;
+}
+.home-ai svg {
+  flex: none;
+}
 .home-signin {
   display: flex;
   flex-wrap: wrap;
