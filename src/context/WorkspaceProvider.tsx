@@ -263,6 +263,12 @@ export function WorkspaceProvider({ children }: PropsWithChildren) {
       deleteList(boardId, listId) {
         dispatch({ type: 'list/delete', boardId, listId });
       },
+      setListDone(boardId, listId, done) {
+        dispatch({ type: 'list/set-done', boardId, listId, done });
+      },
+      updateJournal(weekId, content) {
+        dispatch({ type: 'journal/update', weekId, content, timestamp: Date.now() });
+      },
       createNote(boardId, listId, title) {
         const board = stateRef.current.boards.find((b) => b.id === boardId);
         if (!board?.lists.some((l) => l.id === listId) || !title.trim() || title.length > 150)
@@ -275,7 +281,7 @@ export function WorkspaceProvider({ children }: PropsWithChildren) {
         dispatch({ type: 'note/update', noteId, patch, timestamp: Date.now() });
       },
       moveNote(noteId, listId, beforeId) {
-        dispatch({ type: 'note/move', noteId, listId, beforeId });
+        dispatch({ type: 'note/move', noteId, listId, beforeId, at: Date.now() });
       },
       deleteNote(noteId) {
         dispatch({ type: 'note/delete', noteId });

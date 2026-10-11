@@ -17,6 +17,10 @@ export interface WorkspaceActions {
   createList: (boardId: string, title: string) => void;
   renameList: (boardId: string, listId: string, title: string) => void;
   deleteList: (boardId: string, listId: string) => void;
+  /** Says whether cards in a list count as finished in the work journal. */
+  setListDone: (boardId: string, listId: string, done: boolean) => void;
+  /** Saves the writer's notes on one week of the work journal. */
+  updateJournal: (weekId: string, content: string) => void;
   createNote: (boardId: string, listId: string, title: string) => Note;
   updateNote: (noteId: string, patch: NotePatch) => void;
   moveNote: (noteId: string, listId: string, beforeId?: string) => void;

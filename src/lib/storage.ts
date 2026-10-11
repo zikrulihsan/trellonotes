@@ -1,6 +1,7 @@
 import type {
   Board,
   BoardList,
+  JournalEntry,
   Label,
   Note,
   Page,
@@ -13,7 +14,12 @@ export const STORAGE_KEY = 'folio.workspace.v1';
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
 function isList(value: unknown): value is BoardList {
-  return isRecord(value) && typeof value.id === 'string' && typeof value.title === 'string';
+  return (
+    isRecord(value) &&
+    typeof value.id === 'string' &&
+    typeof value.title === 'string' &&
+    (value.done === undefined || typeof value.done === 'boolean')
+  );
 }
 function isBoard(value: unknown): value is Board {
   return (
@@ -35,7 +41,8 @@ function isNote(value: unknown): value is Note {
     typeof value.updatedAt === 'number' &&
     Number.isFinite(value.updatedAt) &&
     (value.labelColor === undefined || typeof value.labelColor === 'string') &&
-    (value.labelId === undefined || typeof value.labelId === 'string')
+    (value.labelId === undefined || typeof value.labelId === 'string') &&
+    (value.doneAt === undefined || typeof value.doneAt === 'number')
   );
 }
 function isLabel(value: unknown): value is Label {
@@ -78,6 +85,8 @@ function isSheet(value: unknown): value is Sheet {
     Number.isFinite(value.updatedAt)
   );
 }
+const isJournalEntry = (value: unknown): value is JournalEntry =>
+  isSheet(value) && isRecord(value) && typeof value.id === 'string';
 const isOptionalList = <T>(value: unknown, check: (item: unknown) => item is T) =>
   value === undefined || (Array.isArray(value) && value.every(check));
 export function isWorkspace(value: unknown): value is Workspace {
@@ -91,6 +100,7 @@ export function isWorkspace(value: unknown): value is Workspace {
     !isOptionalList(value.labels, isLabel) ||
     !isOptionalList(value.pages, isPage) ||
     !isOptionalList(value.todos, isTodoList) ||
+    !isOptionalList(value.journal, isJournalEntry) ||
     (value.scratch !== undefined && !isSheet(value.scratch)) ||
     (value.todo !== undefined && !isSheet(value.todo))
   )

@@ -15,6 +15,7 @@ describe('signed-out home page', () => {
     expect(
       screen.getByRole('heading', { name: 'Everything starts with a note.' }),
     ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /deserves to be seen/ })).toBeInTheDocument();
     const google = screen.getAllByRole('button', { name: 'Continue with Google' });
     expect(google).toHaveLength(2);
     fireEvent.click(google[1]);

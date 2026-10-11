@@ -12,10 +12,14 @@ export interface Note {
   labelColor?: string;
   /** Retained for compatibility with previously saved workspaces. */
   cover?: string;
+  /** When the note last arrived in a list that counts as done; cleared when it leaves. */
+  doneAt?: number;
 }
 export interface BoardList {
   id: string;
   title: string;
+  /** Whether cards here count as finished; unset means guessed from the title. */
+  done?: boolean;
 }
 export interface Board {
   id: string;
@@ -51,6 +55,13 @@ export interface TodoList {
   content: string;
   updatedAt: number;
 }
+/** The writer's own notes on one week of the work journal. */
+export interface JournalEntry {
+  /** The week's Monday, as YYYY-MM-DD. */
+  id: string;
+  content: string;
+  updatedAt: number;
+}
 /** A standing sheet that is always there, not listed anywhere: free writing. */
 export interface Sheet {
   content: string;
@@ -65,6 +76,8 @@ export interface Workspace {
   /** Free writing: no title, kept until cleared. */
   scratch?: Sheet;
   todos?: TodoList[];
+  /** Work journal notes, one per week that has any. */
+  journal?: JournalEntry[];
   /** A single standing to-do list used briefly before To-do lists; moved into `todos` on load. */
   todo?: Sheet;
 }

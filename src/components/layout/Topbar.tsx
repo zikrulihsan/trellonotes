@@ -5,6 +5,7 @@ import {
   Globe,
   LayoutGrid,
   ListChecks,
+  NotebookPen,
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
@@ -19,7 +20,7 @@ export function Topbar({
   section,
 }: {
   board: Board;
-  section: 'boards' | 'pages' | 'todos' | 'landing';
+  section: 'boards' | 'pages' | 'todos' | 'landing' | 'journal';
 }) {
   const { sidebarVisible, narrowScreen, toggleSidebar, showSidebar } = useUI();
   // One toggle for every screen size: it docks or hides the sidebar on wide
@@ -63,6 +64,11 @@ export function Topbar({
           <>
             <FileText size={16} />
             <span>Pages</span>
+          </>
+        ) : section === 'journal' ? (
+          <>
+            <NotebookPen size={16} />
+            <span>Work journal</span>
           </>
         ) : section === 'landing' ? (
           <>

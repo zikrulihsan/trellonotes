@@ -1,6 +1,8 @@
-import { MoreHorizontal, Pencil, Plus, Trash2 } from 'lucide-react';
+import { CircleCheck, MoreHorizontal, Pencil, Plus, Trash2 } from 'lucide-react';
 import type { Board, BoardList, Note } from '@/features/workspace/types';
 import { useUI } from '@/hooks/useUI';
+import { useWorkspaceActions } from '@/hooks/useWorkspace';
+import { isDoneList } from '@/features/journal/journal';
 import { useDropdown } from '@/hooks/useDropdown';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { useBoardDrag } from '../useBoardDrag';
@@ -16,7 +18,9 @@ export function BoardColumn({
 }) {
   const { openDialog } = useUI(),
     menu = useDropdown(),
-    drag = useBoardDrag();
+    drag = useBoardDrag(),
+    { setListDone } = useWorkspaceActions();
+  const done = isDoneList(list);
   return (
     <section
       className={`column ${drag.dropListId === list.id ? 'drop-active' : ''}`}
@@ -47,6 +51,11 @@ export function BoardColumn({
       <header className="column-header">
         <div>
           <h2>{list.title}</h2>
+          {done && (
+            <span className="column-done" title="Cards here count as finished in your work journal">
+              <CircleCheck size={14} aria-label="Counts as done" />
+            </span>
+          )}
           <span className="count">{notes.length}</span>
         </div>
         <div className="menu-anchor" data-menu-id={menu.id}>
@@ -72,6 +81,16 @@ export function BoardColumn({
             >
               <Pencil size={15} />
               Rename list
+            </button>
+            <button
+              aria-pressed={done}
+              onClick={() => {
+                setListDone(board.id, list.id, !done);
+                menu.close();
+              }}
+            >
+              <CircleCheck size={15} />
+              {done ? 'Stop counting as done' : 'Counts as done'}
             </button>
             <button
               className="danger"

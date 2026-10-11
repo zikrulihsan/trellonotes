@@ -14,6 +14,7 @@ describe('writing workspace invariants', () => {
       noteId: 'small',
       listId: 'drafting',
       beforeId: 'attention',
+      at: 1,
     });
     expect(moved.cards.find((note) => note.id === 'small')).toMatchObject({
       listId: 'drafting',
@@ -28,7 +29,7 @@ describe('writing workspace invariants', () => {
   it('rejects unknown lists and cross-board moves', () => {
     const initial = fixture();
     expect(
-      workspaceReducer(initial, { type: 'note/move', noteId: 'small', listId: 'missing' }),
+      workspaceReducer(initial, { type: 'note/move', noteId: 'small', listId: 'missing', at: 1 }),
     ).toBe(initial);
     const other = {
       id: 'other',
@@ -39,7 +40,12 @@ describe('writing workspace invariants', () => {
     };
     initial.boards.push(other);
     expect(
-      workspaceReducer(initial, { type: 'note/move', noteId: 'small', listId: 'other-list' }),
+      workspaceReducer(initial, {
+        type: 'note/move',
+        noteId: 'small',
+        listId: 'other-list',
+        at: 1,
+      }),
     ).toBe(initial);
   });
   it('updates the writing timestamp only for changed writing', () => {
@@ -117,5 +123,55 @@ describe('writing workspace invariants', () => {
     });
     expect(unpinned.pages?.[0]).toEqual(page);
     expect('pinnedAt' in (unpinned.pages?.[0] ?? {})).toBe(false);
+  });
+  it('stamps when a card reaches a done list and forgets it when it leaves', () => {
+    const done = workspaceReducer(fixture(), {
+      type: 'note/move',
+      noteId: 'small',
+      listId: 'published',
+      at: 7,
+    });
+    expect(done.cards.find((note) => note.id === 'small')?.doneAt).toBe(7);
+    const back = workspaceReducer(done, {
+      type: 'note/move',
+      noteId: 'small',
+      listId: 'ideas',
+      at: 9,
+    });
+    expect('doneAt' in (back.cards.find((note) => note.id === 'small') ?? {})).toBe(false);
+  });
+  it('lets the writer say which lists count as done', () => {
+    const flagged = workspaceReducer(fixture(), {
+      type: 'list/set-done',
+      boardId: 'writing-room',
+      listId: 'review',
+      done: true,
+    });
+    expect(flagged.boards[0].lists.find((list) => list.id === 'review')?.done).toBe(true);
+  });
+  it('keeps one journal entry per week', () => {
+    const first = workspaceReducer(fixture(), {
+      type: 'journal/update',
+      weekId: '2026-10-05',
+      content: 'Shipped it.',
+      timestamp: 3,
+    });
+    const second = workspaceReducer(first, {
+      type: 'journal/update',
+      weekId: '2026-10-05',
+      content: 'Shipped it, finally.',
+      timestamp: 4,
+    });
+    expect(second.journal).toEqual([
+      { id: '2026-10-05', content: 'Shipped it, finally.', updatedAt: 4 },
+    ]);
+    expect(
+      workspaceReducer(second, {
+        type: 'journal/update',
+        weekId: '2026-10-05',
+        content: 'Shipped it, finally.',
+        timestamp: 5,
+      }),
+    ).toBe(second);
   });
 });

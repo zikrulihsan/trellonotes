@@ -1,5 +1,15 @@
 import { isWorkspace } from '@/lib/storage';
-import type { Board, Label, Note, Page, Sheet, SheetName, TodoList, Workspace } from './types';
+import type {
+  Board,
+  JournalEntry,
+  Label,
+  Note,
+  Page,
+  Sheet,
+  SheetName,
+  TodoList,
+  Workspace,
+} from './types';
 
 type Entity = { id: string };
 
@@ -142,6 +152,16 @@ export function mergeWorkspaces(
       base?.todos,
       local.todos ?? [],
       remote.todos ?? [],
+      (b, l, r) =>
+        mergeFields(b, l, r, l.updatedAt >= r.updatedAt, {
+          updatedAt: (_b, lu, ru) => Math.max(lu as number, ru as number),
+        }),
+    );
+  if (local.journal || remote.journal)
+    merged.journal = mergeById<JournalEntry>(
+      base?.journal,
+      local.journal ?? [],
+      remote.journal ?? [],
       (b, l, r) =>
         mergeFields(b, l, r, l.updatedAt >= r.updatedAt, {
           updatedAt: (_b, lu, ru) => Math.max(lu as number, ru as number),

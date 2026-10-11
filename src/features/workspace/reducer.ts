@@ -12,6 +12,7 @@ import type {
   TodoPatch,
   Workspace,
 } from './types';
+import { isDoneList } from '@/features/journal/journal';
 export type WorkspaceAction =
   | { type: 'workspace/replace'; workspace: Workspace }
   | { type: 'board/create'; board: Board }
@@ -20,9 +21,10 @@ export type WorkspaceAction =
   | { type: 'list/create'; boardId: string; list: BoardList }
   | { type: 'list/rename'; boardId: string; listId: string; title: string }
   | { type: 'list/delete'; boardId: string; listId: string }
+  | { type: 'list/set-done'; boardId: string; listId: string; done: boolean }
   | { type: 'note/create'; note: Note }
   | { type: 'note/update'; noteId: string; patch: NotePatch; timestamp: number }
-  | { type: 'note/move'; noteId: string; listId: string; beforeId?: string }
+  | { type: 'note/move'; noteId: string; listId: string; beforeId?: string; at: number }
   | { type: 'note/delete'; noteId: string }
   | { type: 'label/create'; label: Label }
   | { type: 'label/update'; labelId: string; patch: LabelPatch }
@@ -35,7 +37,8 @@ export type WorkspaceAction =
   | { type: 'todo/create'; todo: TodoList }
   | { type: 'todo/update'; todoId: string; patch: TodoPatch; timestamp: number }
   | { type: 'todo/delete'; todoId: string }
-  | { type: 'sheet/update'; sheet: SheetName; content: string; timestamp: number };
+  | { type: 'sheet/update'; sheet: SheetName; content: string; timestamp: number }
+  | { type: 'journal/update'; weekId: string; content: string; timestamp: number };
 
 export function workspaceReducer(state: Workspace, action: WorkspaceAction): Workspace {
   switch (action.type) {
@@ -106,7 +109,16 @@ export function workspaceReducer(state: Workspace, action: WorkspaceAction): Wor
       return b?.lists.some((l) => l.id === action.note.listId) &&
         action.note.title.trim() &&
         !state.cards.some((c) => c.id === action.note.id)
-        ? { ...state, cards: [...state.cards, action.note] }
+        ? {
+            ...state,
+            cards: [
+              ...state.cards,
+              // A card started in a done list is finished from the start.
+              isDoneList(b.lists.find((l) => l.id === action.note.listId)!)
+                ? { ...action.note, doneAt: action.note.updatedAt }
+                : action.note,
+            ],
+          }
         : state;
     }
     case 'note/update':
@@ -133,7 +145,18 @@ export function workspaceReducer(state: Workspace, action: WorkspaceAction): Wor
       const before = cards.findIndex(
         (c) => c.id === action.beforeId && c.boardId === note.boardId && c.listId === action.listId,
       );
-      cards.splice(before < 0 ? cards.length : before, 0, { ...note, listId: action.listId });
+      // Arriving in a done list marks the card finished; leaving one clears it.
+      const target = board.lists.find((l) => l.id === action.listId)!;
+      const source = board.lists.find((l) => l.id === note.listId);
+      const { doneAt, ...rest } = note;
+      const moved: Note = isDoneList(target)
+        ? {
+            ...rest,
+            listId: action.listId,
+            doneAt: source && isDoneList(source) && doneAt ? doneAt : action.at,
+          }
+        : { ...rest, listId: action.listId };
+      cards.splice(before < 0 ? cards.length : before, 0, moved);
       return { ...state, cards };
     }
     case 'note/delete':
@@ -211,6 +234,32 @@ export function workspaceReducer(state: Workspace, action: WorkspaceAction): Wor
       };
     case 'todo/delete':
       return { ...state, todos: state.todos?.filter((t) => t.id !== action.todoId) };
+    case 'list/set-done':
+      return {
+        ...state,
+        boards: state.boards.map((b) =>
+          b.id === action.boardId
+            ? {
+                ...b,
+                lists: b.lists.map((l) =>
+                  l.id === action.listId ? { ...l, done: action.done } : l,
+                ),
+              }
+            : b,
+        ),
+      };
+    case 'journal/update': {
+      const entries = state.journal ?? [];
+      const current = entries.find((entry) => entry.id === action.weekId);
+      if ((current?.content ?? '') === action.content) return state;
+      const entry = { id: action.weekId, content: action.content, updatedAt: action.timestamp };
+      return {
+        ...state,
+        journal: current
+          ? entries.map((item) => (item.id === action.weekId ? entry : item))
+          : [...entries, entry],
+      };
+    }
     case 'sheet/update':
       return action.content === (state[action.sheet]?.content ?? '')
         ? state

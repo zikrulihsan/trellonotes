@@ -1,14 +1,15 @@
 import type { ReactNode } from 'react';
 import {
   ArrowRight,
+  CircleCheck,
   Feather,
   FileText,
   Globe,
   KanbanSquare,
-  Link2,
   ListChecks,
   LoaderCircle,
   Lock,
+  NotebookPen,
   PenLine,
   Sparkles,
 } from 'lucide-react';
@@ -34,6 +35,11 @@ const PILLARS: { icon: ReactNode; title: string; text: string }[] = [
     text: 'Plans on boards, steps on to-do lists, thoughts on a free writing sheet. All of it private, for you.',
   },
   {
+    icon: <NotebookPen size={20} />,
+    title: 'Look back',
+    text: 'Your work journal gathers what you finished each week, so you never start from a blank page.',
+  },
+  {
     icon: <PenLine size={20} />,
     title: 'Write',
     text: 'Turn what you noted into a page in a calm, focused editor, when it is worth telling.',
@@ -45,11 +51,32 @@ const PILLARS: { icon: ReactNode; title: string; text: string }[] = [
   },
 ];
 
+const COMPARE: { kind: string; text: string; ours?: boolean }[] = [
+  {
+    kind: 'Task apps',
+    text: 'Finished work disappears into a Done column. A month later, nobody remembers it, not even you.',
+  },
+  {
+    kind: 'Blogs and notes apps',
+    text: 'You have to stop, remember and write it all from scratch. So it never gets written.',
+  },
+  {
+    kind: 'Notis',
+    text: 'Work, document and publish in one flow. Every week of your work becomes professional history you can share.',
+    ours: true,
+  },
+];
+
 const FEATURES: { icon: ReactNode; title: string; text: string }[] = [
   {
     icon: <KanbanSquare size={18} />,
     title: 'Boards',
     text: 'Lists and cards for any kind of work.',
+  },
+  {
+    icon: <NotebookPen size={18} />,
+    title: 'Work journal',
+    text: 'Every week of finished work, kept for you.',
   },
   {
     icon: <ListChecks size={18} />,
@@ -70,11 +97,6 @@ const FEATURES: { icon: ReactNode; title: string; text: string }[] = [
     icon: <Sparkles size={18} />,
     title: 'Start from your resume',
     text: 'Fill your page from your CV in one step.',
-  },
-  {
-    icon: <Link2 size={18} />,
-    title: 'Short links',
-    text: 'Share any page with a link that fits anywhere.',
   },
 ];
 
@@ -117,8 +139,8 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             From notes to <mark>getting noticed</mark>.
           </h1>
           <p className="home-lead">
-            Notis is where you note your plans, progress and wins, then turn them into writing and a
-            page of your own that gets you noticed.
+            Note your plans and progress. Notis keeps a journal of what you finish each week, and
+            turns it into writing and a page of your own that gets you noticed.
           </p>
           {signIn}
           {error && (
@@ -130,6 +152,29 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             <Lock size={13} /> Private until you choose to publish.
           </p>
           <HeroSketch />
+        </section>
+
+        <section className="home-different" aria-labelledby="home-different">
+          <p className="eyebrow">WHAT MAKES NOTIS DIFFERENT</p>
+          <h2 id="home-different">
+            Your work deserves to be <mark>seen</mark>.
+          </h2>
+          <p className="home-different-lead">
+            Don't wait until you find time to write about it. As you work, Notis keeps a journal of
+            what you finish, and turns each week into a page for your public profile. A brag
+            document that writes itself.
+          </p>
+          <div className="home-different-grid">
+            <ul className="home-compare">
+              {COMPARE.map((item) => (
+                <li key={item.kind} className={item.ours ? 'is-ours' : undefined}>
+                  <strong>{item.kind}</strong>
+                  <span>{item.text}</span>
+                </li>
+              ))}
+            </ul>
+            <JournalSketch />
+          </div>
         </section>
 
         <section className="home-flow" aria-labelledby="home-flow">
@@ -191,6 +236,40 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
         <span>Notis</span>
         <span>From notes to getting noticed.</span>
       </footer>
+    </div>
+  );
+}
+
+/** A week in the work journal, the thing no task app or notes app keeps for you. */
+function JournalSketch() {
+  return (
+    <div className="home-journal" aria-hidden="true">
+      <span className="home-sketch-label">Work journal · This week</span>
+      <div className="home-journal-stats">
+        <span>
+          <b>5</b> finished
+        </span>
+        <span>
+          <b>3</b> in progress
+        </span>
+        <span>
+          <b>1</b> written
+        </span>
+      </div>
+      <span className="home-journal-board">Clients</span>
+      <span className="home-journal-item">
+        <CircleCheck size={15} /> Sent the redesign to Studio Rana
+      </span>
+      <span className="home-journal-item">
+        <CircleCheck size={15} /> Invoiced October
+      </span>
+      <span className="home-journal-board">Side project</span>
+      <span className="home-journal-item">
+        <CircleCheck size={15} /> Launched the waitlist
+      </span>
+      <span className="home-journal-draft">
+        <PenLine size={14} /> Draft a page from this week
+      </span>
     </div>
   );
 }

@@ -16,13 +16,22 @@ export function AppLayout() {
     pagesRoute = useMatch('/pages'),
     todosRoute = useMatch('/todos'),
     landingRoute = useMatch('/landing'),
+    journalRoute = useMatch('/journal'),
     boardRoute = useMatch('/board/:ref');
   const note = findByRef(workspace.cards, noteRoute?.params.ref);
   const board =
     (note
       ? workspace.boards.find((board) => board.id === note.boardId)
       : findByRef(workspace.boards, boardRoute?.params.ref)) ?? workspace.boards[0];
-  const section = pagesRoute ? 'pages' : todosRoute ? 'todos' : landingRoute ? 'landing' : 'boards';
+  const section = pagesRoute
+    ? 'pages'
+    : todosRoute
+      ? 'todos'
+      : landingRoute
+        ? 'landing'
+        : journalRoute
+          ? 'journal'
+          : 'boards';
   const writing = Boolean(noteRoute || pageRoute || freeWriteRoute || todoRoute);
   return (
     <div
