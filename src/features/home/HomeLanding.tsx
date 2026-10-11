@@ -155,7 +155,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
         <section className="home-hero">
           <p className="eyebrow">YOUR NOTES, YOUR PUBLIC PRESENCE</p>
           <h1>
-            <mark>Getting noticed</mark>, from daily notes.
+            Write notes, <mark>get noticed</mark>.
           </h1>
           <p className="home-lead">
             A notes and writing app for professionals that turns everyday notes into a public
@@ -297,7 +297,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
 
       <footer className="home-footer">
         <span>Notis</span>
-        <span>Getting noticed, from daily notes.</span>
+        <span>Write notes, get noticed.</span>
       </footer>
     </div>
   );
