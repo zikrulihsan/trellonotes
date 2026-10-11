@@ -13,6 +13,8 @@ import {
   socialPlatform,
   toLinkUrl,
   type Landing,
+  type LandingAbout,
+  type LandingExperience,
   type LandingProject,
 } from '@/lib/supabase/landing';
 import { useProfile } from '@/features/pages/useProfile';
@@ -100,6 +102,7 @@ export function LandingSettingsPage() {
     items.splice(index + by, 0, item);
     set({ [key]: items });
   }
+  const setAbout = (patch: Partial<LandingAbout>) => set({ about: { ...draft.about, ...patch } });
   const dirty = JSON.stringify(draft) !== saved;
 
   async function submit(event: FormEvent) {
@@ -414,6 +417,244 @@ export function LandingSettingsPage() {
           </Field>
         </Section>
 
+        <h2 className="landing-admin-group">About page</h2>
+        <p className="landing-admin-hint landing-admin-group-hint">
+          Shown as About in the menu of your public page once you fill something in.
+        </p>
+        <Section title="Intro">
+          <Field label="Subtitle">
+            <input
+              value={draft.about.subtitle}
+              maxLength={80}
+              onChange={(event) => setAbout({ subtitle: event.target.value })}
+            />
+          </Field>
+          <Field label="Photo link (https://…)">
+            <input
+              value={draft.about.photo}
+              maxLength={500}
+              placeholder="https://…/me.jpg"
+              onChange={(event) => setAbout({ photo: event.target.value })}
+            />
+          </Field>
+          <Field label="Role">
+            <input
+              value={draft.about.role}
+              maxLength={120}
+              placeholder="Software Engineer at [Company]"
+              onChange={(event) => setAbout({ role: event.target.value })}
+            />
+          </Field>
+          <Field label="About you (leave a blank line between paragraphs)">
+            <textarea
+              rows={7}
+              value={draft.about.intro}
+              maxLength={2500}
+              onChange={(event) => setAbout({ intro: event.target.value })}
+            />
+          </Field>
+          <Field label="Tools you love (separate with commas)">
+            <input
+              value={draft.about.stack.join(', ')}
+              placeholder="React, TypeScript, Supabase"
+              onChange={(event) => setAbout({ stack: event.target.value.split(/,\s*/) })}
+            />
+          </Field>
+        </Section>
+
+        <Section title="What you're up to now" hint="One item per line.">
+          <Field label="Heading">
+            <input
+              value={draft.about.nowHeading}
+              maxLength={80}
+              onChange={(event) => setAbout({ nowHeading: event.target.value })}
+            />
+          </Field>
+          <textarea
+            aria-label="What you're up to now"
+            rows={4}
+            value={draft.about.now.join('\n')}
+            placeholder={'Building Notis\nMentoring at SWE Growth'}
+            onChange={(event) => setAbout({ now: event.target.value.split('\n') })}
+          />
+        </Section>
+
+        <Section
+          title="Your story in writing"
+          hint="Pick published pages that tell your story, like yearly retrospectives. Unlisted pages can't be picked."
+        >
+          <Field label="Heading">
+            <input
+              value={draft.about.storiesHeading}
+              maxLength={80}
+              onChange={(event) => setAbout({ storiesHeading: event.target.value })}
+            />
+          </Field>
+          {draft.about.stories.map((story, index) => {
+            const hidden = story.pageId && !listedIds.has(story.pageId);
+            return (
+              <Row
+                key={story.id}
+                label={`story ${index + 1}`}
+                onRemove={() =>
+                  setAbout({ stories: draft.about.stories.filter((_, at) => at !== index) })
+                }
+                onMove={(by) => setAbout({ stories: moved(draft.about.stories, index, by) })}
+                first={index === 0}
+                last={index === draft.about.stories.length - 1}
+              >
+                <input
+                  aria-label="Label"
+                  value={story.label}
+                  maxLength={40}
+                  placeholder="2025"
+                  onChange={(event) =>
+                    setAbout({
+                      stories: replaced(draft.about.stories, index, { label: event.target.value }),
+                    })
+                  }
+                />
+                <select
+                  aria-label="Page"
+                  value={story.pageId ?? ''}
+                  onChange={(event) =>
+                    setAbout({
+                      stories: replaced(draft.about.stories, index, {
+                        pageId: event.target.value || null,
+                      }),
+                    })
+                  }
+                >
+                  <option value="">Choose a page</option>
+                  {hidden && <option value={story.pageId!}>Not on your public list</option>}
+                  {listedPages.map((page) => (
+                    <option key={page.id} value={page.id}>
+                      {page.title || 'Untitled'}
+                    </option>
+                  ))}
+                </select>
+              </Row>
+            );
+          })}
+          {draft.about.stories.length < LANDING_LIMITS.stories && (
+            <Button
+              onClick={() =>
+                setAbout({
+                  stories: [
+                    ...draft.about.stories,
+                    { id: crypto.randomUUID(), label: '', pageId: null },
+                  ],
+                })
+              }
+            >
+              <Plus size={15} />
+              Add story
+            </Button>
+          )}
+        </Section>
+
+        <Section title="Experience" hint="Newest first. Highlights: one per line.">
+          {draft.about.experiences.map((job, index) => {
+            const update = (patch: Partial<LandingExperience>) =>
+              setAbout({ experiences: replaced(draft.about.experiences, index, patch) });
+            return (
+              <Row
+                key={job.id}
+                label={`experience ${index + 1}`}
+                onRemove={() =>
+                  setAbout({
+                    experiences: draft.about.experiences.filter((_, at) => at !== index),
+                  })
+                }
+                onMove={(by) =>
+                  setAbout({ experiences: moved(draft.about.experiences, index, by) })
+                }
+                first={index === 0}
+                last={index === draft.about.experiences.length - 1}
+                wide
+              >
+                <input
+                  aria-label="Job title"
+                  value={job.title}
+                  maxLength={100}
+                  placeholder="Software Engineer"
+                  onChange={(event) => update({ title: event.target.value })}
+                />
+                <input
+                  aria-label="Period"
+                  value={job.period}
+                  maxLength={40}
+                  placeholder="Jan 2024 – Present"
+                  onChange={(event) => update({ period: event.target.value })}
+                />
+                <input
+                  aria-label="Company"
+                  value={job.company}
+                  maxLength={80}
+                  placeholder="Company"
+                  onChange={(event) => update({ company: event.target.value })}
+                />
+                <input
+                  aria-label="Company link"
+                  value={job.companyUrl}
+                  maxLength={500}
+                  placeholder="company.com (optional)"
+                  onChange={(event) => update({ companyUrl: event.target.value })}
+                />
+                <input
+                  aria-label="Location"
+                  value={job.location}
+                  maxLength={60}
+                  placeholder="Remote · Jakarta"
+                  onChange={(event) => update({ location: event.target.value })}
+                />
+                <span />
+                <textarea
+                  className="landing-row-full"
+                  aria-label="Description"
+                  rows={2}
+                  value={job.description}
+                  maxLength={500}
+                  placeholder="What you did there, in a sentence or two"
+                  onChange={(event) => update({ description: event.target.value })}
+                />
+                <textarea
+                  className="landing-row-full"
+                  aria-label="Highlights"
+                  rows={3}
+                  value={job.highlights.join('\n')}
+                  placeholder={'Led the design system\nCut page load time in half'}
+                  onChange={(event) => update({ highlights: event.target.value.split('\n') })}
+                />
+              </Row>
+            );
+          })}
+          {draft.about.experiences.length < LANDING_LIMITS.experiences && (
+            <Button
+              onClick={() =>
+                setAbout({
+                  experiences: [
+                    ...draft.about.experiences,
+                    {
+                      id: crypto.randomUUID(),
+                      period: '',
+                      title: '',
+                      company: '',
+                      companyUrl: '',
+                      location: '',
+                      description: '',
+                      highlights: [],
+                    },
+                  ],
+                })
+              }
+            >
+              <Plus size={15} />
+              Add experience
+            </Button>
+          )}
+        </Section>
+
         <div className="landing-form-actions">
           {status.error && (
             <p className="publish-error" role="alert">
@@ -428,6 +669,19 @@ export function LandingSettingsPage() {
       </form>
     </div>
   );
+}
+
+/** A copy of `items` with the one at `index` changed. */
+function replaced<T>(items: T[], index: number, patch: Partial<T>): T[] {
+  return items.map((item, at) => (at === index ? { ...item, ...patch } : item));
+}
+
+/** A copy of `items` with the one at `index` moved `by` places. */
+function moved<T>(items: T[], index: number, by: number): T[] {
+  const next = [...items];
+  const [item] = next.splice(index, 1);
+  next.splice(index + by, 0, item);
+  return next;
 }
 
 function Header({ children }: { children?: ReactNode }) {

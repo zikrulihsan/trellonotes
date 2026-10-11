@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { defaultLanding, normalizeLanding, socialPlatform, toLinkUrl } from './landing';
+import { defaultLanding, hasAbout, normalizeLanding, socialPlatform, toLinkUrl } from './landing';
 
 describe('landing page links', () => {
   it('turns what a writer types into a safe link', () => {
@@ -73,5 +73,42 @@ describe('social links', () => {
       platform: 'website',
       label: 'zikrul.dev',
     });
+  });
+});
+
+describe('about page', () => {
+  it('is empty by default, so the menu leaves it out', () => {
+    expect(hasAbout(defaultLanding('Zikrul').about)).toBe(false);
+    expect(hasAbout(normalizeLanding({ about: 'nope' })!.about)).toBe(false);
+  });
+
+  it('trims lists, drops unsafe links and empty entries', () => {
+    const { about } = normalizeLanding({
+      about: {
+        photo: 'http://insecure.example/me.jpg',
+        stack: [' React ', '', 'Supabase'],
+        now: ['Building Notis', '  '],
+        stories: [
+          { label: '2025', pageId: 'p1' },
+          { label: '', pageId: null },
+        ],
+        experiences: [
+          {
+            title: 'Engineer',
+            companyUrl: 'javascript:alert(1)',
+            highlights: ['Shipped', ''],
+          },
+          { title: '' },
+        ],
+      },
+    })!;
+    expect(about.photo).toBe('');
+    expect(about.stack).toEqual(['React', 'Supabase']);
+    expect(about.now).toEqual(['Building Notis']);
+    expect(about.stories).toHaveLength(1);
+    expect(about.experiences).toHaveLength(1);
+    expect(about.experiences[0].companyUrl).toBe('');
+    expect(about.experiences[0].highlights).toEqual(['Shipped']);
+    expect(hasAbout(about)).toBe(true);
   });
 });
