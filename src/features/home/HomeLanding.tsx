@@ -52,7 +52,8 @@ const EXAMPLE_SITE = 'https://notis.swegrowth.id/@zikrul-ihsan-md';
 export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeLandingProps) {
   // The sign-in choices open only once the visitor asks to start; a failed sign-in reopens them.
   const [asked, setAsked] = useState(false),
-    [dismissedError, setDismissedError] = useState('');
+    [dismissedError, setDismissedError] = useState(''),
+    [agreed, setAgreed] = useState(false);
   const signingIn = asked || Boolean(error && error !== dismissedError);
   const setSigningIn = (open: boolean) => {
     setAsked(open);
@@ -225,12 +226,30 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           onClose={() => !redirecting && setSigningIn(false)}
         >
           <p>Sign in and your first board is ready. Nothing is public until you publish it.</p>
+          <label className="home-consent">
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(event) => setAgreed(event.target.checked)}
+            />
+            <span>
+              I have read the{' '}
+              <a href="/terms" target="_blank" rel="noreferrer">
+                Terms
+              </a>{' '}
+              and agree to the{' '}
+              <a href="/privacy" target="_blank" rel="noreferrer">
+                Privacy Policy
+              </a>
+              .
+            </span>
+          </label>
           <div className="home-signin-options">
             <button
               className="home-button is-primary"
               type="button"
               onClick={onGoogle}
-              disabled={redirecting}
+              disabled={redirecting || !agreed}
             >
               {redirecting ? <LoaderCircle size={18} className="auth-spinner" /> : <GoogleMark />}
               {redirecting ? 'Opening Google…' : 'Continue with Google'}
@@ -239,7 +258,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               className="home-button"
               type="button"
               onClick={onSwegrowth}
-              disabled={redirecting}
+              disabled={redirecting || !agreed}
             >
               Continue with SWE Growth
             </button>
