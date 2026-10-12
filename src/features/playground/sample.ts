@@ -1,6 +1,6 @@
 import type { Note, Page, Workspace } from '@/features/workspace/types';
 import { formatDate } from '@/features/editor/slash-commands';
-import { weekId } from '@/features/journal/journal';
+import { nowTitles, weekId } from '@/features/journal/journal';
 import { defaultAbout, defaultLanding, type Landing } from '@/lib/supabase/landing';
 import { writerPath, type PublicAuthor, type PublishedPage } from '@/lib/supabase/published-pages';
 
@@ -23,9 +23,6 @@ export const PLAYGROUND_IDS = {
 
 const HOUR = 3_600_000,
   DAY = 24 * HOUR;
-
-const escape = (text: string) =>
-  text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 /** An initiative's updates, newest last, each under its date as `/date` writes it. */
 const updates = (now: number, entries: [daysAgo: number, html: string][]) =>
@@ -101,20 +98,24 @@ export function playgroundWorkspace(now = Date.now()): Workspace {
         '<ul><li><p>Where did he get stuck in the first week?</p></li><li><p>What did he wish someone told him?</p></li></ul>',
         2 * DAY,
       ),
-      card(
-        PLAYGROUND_IDS.initiative,
-        'doing',
-        'Checkout redesign',
-        `<p>Goal: get more carts through checkout without adding steps.</p>${updates(now, [
-          [3, '<p>Carts are dropping at the address step. No idea why yet.</p>'],
-          [
-            2,
-            '<p>Found it: the promo field resets the address form. Fixed it with Rana, shipped after lunch.</p>',
-          ],
-          [0, '<p>Checkouts back up 12%. Lesson: test the boring paths too.</p>'],
-        ])}`,
-        HOUR,
-      ),
+      // On the landing page's "What I'm working on", as picked from the board.
+      {
+        ...card(
+          PLAYGROUND_IDS.initiative,
+          'doing',
+          'Checkout redesign',
+          `<p>Goal: get more carts through checkout without adding steps.</p>${updates(now, [
+            [3, '<p>Carts are dropping at the address step. No idea why yet.</p>'],
+            [
+              2,
+              '<p>Found it: the promo field resets the address form. Fixed it with Rana, shipped after lunch.</p>',
+            ],
+            [0, '<p>Checkouts back up 12%. Lesson: test the boring paths too.</p>'],
+          ])}`,
+          HOUR,
+        ),
+        nowAt: now - DAY,
+      },
       card(
         'waitlist-launch',
         'done',
@@ -161,21 +162,6 @@ export function playgroundWorkspace(now = Date.now()): Workspace {
   };
 }
 
-/**
- * Stands in for "Write it up" in the playground, where nothing goes to the AI: the checkout
- * initiative gets the story the sample was written for, any other card a page made from
- * its own notes.
- */
-export function playgroundDraft(note: Note): { title: string; content: string } {
-  if (note.id === PLAYGROUND_IDS.initiative)
-    return { title: 'The boring bug that cost us sales', content: STORY };
-  const title = note.title.trim() || 'Untitled';
-  return {
-    title,
-    content: `<p>What I worked on in ${escape(title)}, and what I learned.</p>${note.content}`,
-  };
-}
-
 /** The workspace's listed, published pages as the website shows them, newest first. */
 export function playgroundPosts(workspace: Workspace): PublishedPage[] {
   return (workspace.pages ?? [])
@@ -192,11 +178,9 @@ export function playgroundPosts(workspace: Workspace): PublishedPage[] {
     }));
 }
 
-/** Alya's website, with "What I'm working on" following the board as the real app does. */
+/** Alya's landing page, with "What I'm working on" taken from the cards picked on the board. */
 export function playgroundLanding(workspace: Workspace): Landing {
-  const doing = workspace.cards.filter(
-    (card) => card.boardId === PLAYGROUND_IDS.board && card.listId === 'doing',
-  );
+  const working = nowTitles(workspace);
   return {
     ...defaultLanding(PLAYGROUND_AUTHOR.name),
     tagline: 'Product engineer who fixes the boring parts that cost money.',
@@ -206,7 +190,7 @@ export function playgroundLanding(workspace: Workspace): Landing {
       { title: 'Turn messy bugs into clear fixes', subtitle: 'by writing down what I find' },
       { title: 'Grow as engineers', subtitle: 'by sharing what each project taught me' },
     ],
-    working: doing.map((card) => card.title),
+    working,
     projects: [
       {
         id: 'playground-project-waitlist',
@@ -236,7 +220,7 @@ export function playgroundLanding(workspace: Workspace): Landing {
       intro:
         'I build the parts of an online store people only notice when they break: checkout, payments and the alerts that wake us up.\n\nI keep a short note on every initiative as I work. Most of what is on this site started as one of those notes.',
       stack: ['Fix the cause, not the symptom.', 'Write it down while it is fresh.'],
-      now: doing.map((card) => card.title),
+      now: working,
       experiences: [
         {
           id: 'playground-exp-store',

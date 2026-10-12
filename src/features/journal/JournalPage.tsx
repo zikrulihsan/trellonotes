@@ -19,6 +19,7 @@ import type { Board, Note } from '@/features/workspace/types';
 import { journalWeek, shiftWeek, weekDraft, weekId } from './journal';
 import { WeekWriteup } from './WeekWriteup';
 import { usePlayground } from '@/features/playground/playground-context';
+import { SignInPrompt } from '@/features/playground/SignInPrompt';
 
 const day = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
 
@@ -44,7 +45,8 @@ export function JournalPage() {
     [writing, setWriting] = useState(false),
     // Writing up with Gemini needs an account; the playground keeps the template draft.
     playground = usePlayground(),
-    canWriteUp = Boolean(supabase) && !playground;
+    // The playground shows the button; writing up needs an account.
+    [askSignIn, setAskSignIn] = useState(false);
   const week = journalWeek(workspace, shiftWeek(now, offset));
   const thisWeek = week.id === weekId(now);
   const range = weekRange(week.start, week.end);
@@ -72,9 +74,9 @@ export function JournalPage() {
           </p>
         </div>
         <div className="board-actions">
-          {canWriteUp && (
+          {(supabase || playground) && (
             <Button
-              onClick={() => setWriting(!writing)}
+              onClick={() => (playground ? setAskSignIn(true) : setWriting(!writing))}
               disabled={empty && !week.todos.length && !week.notes.trim()}
               aria-expanded={writing}
             >
@@ -89,6 +91,7 @@ export function JournalPage() {
         </div>
       </section>
 
+      {askSignIn && <SignInPrompt feature="Write it up" onClose={() => setAskSignIn(false)} />}
       <div className="journal-body">
         {writing && (
           <WeekWriteup key={week.id} week={week} title={title} onClose={() => setWriting(false)} />
