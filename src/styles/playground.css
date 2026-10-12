@@ -1,0 +1,71 @@
+/* The playground: the app on sample data, with the way to the example or an account in reach. */
+.playground-side-cta a {
+  display: block;
+  margin-top: 6px;
+  color: #c4b5fd;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+}
+/* Floats over the app and the website, so it never moves their layout. */
+.playground-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 14px;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  padding: 6px 6px 6px 14px;
+  border: 1px solid #27282e;
+  border-radius: 999px;
+  color: #27282e;
+  background: #fffdf3;
+  box-shadow: 3px 3px 0 #27282e;
+  font-size: 13px;
+  transform: translateX(-50%);
+}
+.playground-bar-text {
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+}
+.playground-bar-text span {
+  overflow: hidden;
+  color: #5d5c66;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.playground-bar-link {
+  flex: none;
+  padding: 6px 12px;
+  border-radius: 999px;
+  color: inherit;
+  font-weight: 600;
+  text-decoration: none;
+}
+.playground-bar-link:hover {
+  background: rgba(39, 40, 46, 0.07);
+}
+.playground-bar-link.is-primary {
+  color: #fff;
+  background: #27282e;
+}
+.playground-site .reader {
+  padding-bottom: 72px;
+}
+@media (max-width: 640px) {
+  .playground-bar {
+    bottom: 10px;
+    padding-left: 12px;
+    font-size: 12px;
+  }
+  .playground-bar-text span {
+    display: none;
+  }
+  .playground-bar-link {
+    padding: 6px 10px;
+  }
+}

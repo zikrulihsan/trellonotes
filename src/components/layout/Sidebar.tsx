@@ -25,6 +25,8 @@ import { useFocus } from '@/features/focus/focus-context';
 import { formatClock } from '@/features/focus/focus-timer';
 import { useProfile } from '@/features/pages/useProfile';
 import { writerPath } from '@/lib/supabase/published-pages';
+import { usePlayground } from '@/features/playground/playground-context';
+import { PLAYGROUND_AUTHOR } from '@/features/playground/sample';
 export function Sidebar({
   board,
   section,
@@ -37,6 +39,7 @@ export function Sidebar({
     focus = useFocus(),
     { user, signOut } = useAuth(),
     { author } = useProfile(),
+    playground = usePlayground(),
     [signingOut, setSigningOut] = useState(false),
     { sidebarVisible, narrowScreen, hideSidebar, closeSidebarDrawer, openDialog } = useUI(),
     navigate = useNavigate(),
@@ -134,165 +137,208 @@ export function Sidebar({
             {narrowScreen ? <X size={18} /> : <PanelLeftClose size={18} />}
           </button>
         </div>
-        <div className="sidebar-body">
-          <div className="workspace-label">
-            <span className="workspace-avatar">S</span>
-            <div className="sidebar-text">
-              Personal workspace<small>Note it, write it, show it</small>
+        {playground ? (
+          <div className="sidebar-body">
+            <nav className="side-links" aria-label="Sections">
+              <button
+                className={`side-link ${section === 'boards' ? 'active' : ''}`}
+                aria-current={section === 'boards' ? 'page' : undefined}
+                onClick={() => go(board)}
+              >
+                <LayoutGrid size={18} />
+                <span className="side-label">Board</span>
+              </button>
+              <button
+                className={`side-link ${section === 'pages' ? 'active' : ''}`}
+                aria-current={section === 'pages' ? 'page' : undefined}
+                onClick={goPages}
+              >
+                <FileText size={18} />
+                <span className="side-label">Pages</span>
+                <span className="side-count">{workspace.pages?.length ?? 0}</span>
+              </button>
+              <button
+                className="side-link"
+                onClick={() => {
+                  navigate(writerPath(PLAYGROUND_AUTHOR));
+                  closeSidebarDrawer();
+                }}
+              >
+                <Globe size={18} />
+                <span className="side-label">Landing page</span>
+              </button>
+            </nav>
+            <div className="sidebar-note playground-side-cta">
+              <BookOpen size={20} />
+              <p>
+                This is a sample workspace. Nothing here is saved.
+                <a href="/?start">Make your own</a>
+              </p>
             </div>
           </div>
-          {/* The main flow: note it, look back, write it, show it. */}
-          <nav className="side-links" aria-label="Sections">
-            <div className="side-section">
-              <span>NOTE</span>
+        ) : (
+          <div className="sidebar-body">
+            <div className="workspace-label">
+              <span className="workspace-avatar">S</span>
+              <div className="sidebar-text">
+                Personal workspace<small>Note it, write it, show it</small>
+              </div>
             </div>
-            <button
-              className={`side-link ${section === 'boards' ? 'active' : ''}`}
-              aria-current={section === 'boards' ? 'page' : undefined}
-              onClick={() => go(board)}
-            >
-              <LayoutGrid size={18} />
-              <span className="side-label">My boards</span>
-              <span className="side-count">{workspace.boards.length}</span>
-            </button>
-            <button
-              className={`side-link ${section === 'todos' ? 'active' : ''}`}
-              aria-current={section === 'todos' ? 'page' : undefined}
-              onClick={goTodos}
-            >
-              <ListChecks size={18} />
-              <span className="side-label">To-do lists</span>
-              <span className="side-count">{workspace.todos?.length ?? 0}</span>
-            </button>
-            <button className="side-link" onClick={freeWrite}>
-              <PenLine size={18} />
-              <span className="side-label">Free write</span>
-            </button>
-            <div className="side-section">
-              <span>LOOK BACK</span>
-            </div>
-            <button
-              className={`side-link ${section === 'journal' ? 'active' : ''}`}
-              aria-current={section === 'journal' ? 'page' : undefined}
-              onClick={goJournal}
-            >
-              <NotebookPen size={18} />
-              <span className="side-label">Work journal</span>
-            </button>
-            <div className="side-section">
-              <span>WRITE</span>
-            </div>
-            <button
-              className={`side-link ${section === 'pages' ? 'active' : ''}`}
-              aria-current={section === 'pages' ? 'page' : undefined}
-              onClick={goPages}
-            >
-              <FileText size={18} />
-              <span className="side-label">Pages</span>
-              <span className="side-count">{workspace.pages?.length ?? 0}</span>
-            </button>
-            {cloudEnabled && (
-              <>
-                <div className="side-section">
-                  <span>SHOW</span>
-                </div>
-                <button
-                  className={`side-link ${section === 'landing' ? 'active' : ''}`}
-                  aria-current={section === 'landing' ? 'page' : undefined}
-                  onClick={goLanding}
-                >
-                  <Globe size={18} />
-                  <span className="side-label">Public page</span>
-                </button>
-                {author?.handle && (
-                  <a
-                    className="side-link"
-                    href={writerPath(author)}
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={closeSidebarDrawer}
+            {/* The main flow: note it, look back, write it, show it. */}
+            <nav className="side-links" aria-label="Sections">
+              <div className="side-section">
+                <span>NOTE</span>
+              </div>
+              <button
+                className={`side-link ${section === 'boards' ? 'active' : ''}`}
+                aria-current={section === 'boards' ? 'page' : undefined}
+                onClick={() => go(board)}
+              >
+                <LayoutGrid size={18} />
+                <span className="side-label">My boards</span>
+                <span className="side-count">{workspace.boards.length}</span>
+              </button>
+              <button
+                className={`side-link ${section === 'todos' ? 'active' : ''}`}
+                aria-current={section === 'todos' ? 'page' : undefined}
+                onClick={goTodos}
+              >
+                <ListChecks size={18} />
+                <span className="side-label">To-do lists</span>
+                <span className="side-count">{workspace.todos?.length ?? 0}</span>
+              </button>
+              <button className="side-link" onClick={freeWrite}>
+                <PenLine size={18} />
+                <span className="side-label">Free write</span>
+              </button>
+              <div className="side-section">
+                <span>LOOK BACK</span>
+              </div>
+              <button
+                className={`side-link ${section === 'journal' ? 'active' : ''}`}
+                aria-current={section === 'journal' ? 'page' : undefined}
+                onClick={goJournal}
+              >
+                <NotebookPen size={18} />
+                <span className="side-label">Work journal</span>
+              </button>
+              <div className="side-section">
+                <span>WRITE</span>
+              </div>
+              <button
+                className={`side-link ${section === 'pages' ? 'active' : ''}`}
+                aria-current={section === 'pages' ? 'page' : undefined}
+                onClick={goPages}
+              >
+                <FileText size={18} />
+                <span className="side-label">Pages</span>
+                <span className="side-count">{workspace.pages?.length ?? 0}</span>
+              </button>
+              {cloudEnabled && (
+                <>
+                  <div className="side-section">
+                    <span>SHOW</span>
+                  </div>
+                  <button
+                    className={`side-link ${section === 'landing' ? 'active' : ''}`}
+                    aria-current={section === 'landing' ? 'page' : undefined}
+                    onClick={goLanding}
                   >
-                    <ExternalLink size={18} />
-                    <span className="side-label">View my page</span>
-                  </a>
-                )}
-              </>
-            )}
-          </nav>
-          <div className="side-section">
-            <span>TOOLS</span>
-          </div>
-          <button
-            className="side-link side-quick"
-            onClick={() => openDialog({ kind: 'manage-labels' })}
-          >
-            <Tags size={18} />
-            <span className="side-label">Labels</span>
-            <span className="side-count">{workspace.labels?.length ?? 0}</span>
-          </button>
-          <button
-            className="side-link side-quick"
-            onClick={openFocus}
-            aria-expanded={focus.panelOpen}
-          >
-            <Timer size={18} />
-            <span className="side-label">Focus timer</span>
-            {focus.active && (
-              <span className={`side-count side-timer ${focus.running ? '' : 'is-paused'}`}>
-                {formatClock(focus.left)}
-              </span>
-            )}
-          </button>
-          <div className="side-section">
-            <span>YOUR BOARDS</span>
+                    <Globe size={18} />
+                    <span className="side-label">Public page</span>
+                  </button>
+                  {author?.handle && (
+                    <a
+                      className="side-link"
+                      href={writerPath(author)}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={closeSidebarDrawer}
+                    >
+                      <ExternalLink size={18} />
+                      <span className="side-label">View my page</span>
+                    </a>
+                  )}
+                </>
+              )}
+            </nav>
+            <div className="side-section">
+              <span>TOOLS</span>
+            </div>
             <button
-              aria-label="Create board"
-              title="Create board"
-              onClick={() => openDialog({ kind: 'create-board' })}
+              className="side-link side-quick"
+              onClick={() => openDialog({ kind: 'manage-labels' })}
             >
-              <Plus size={16} />
+              <Tags size={18} />
+              <span className="side-label">Labels</span>
+              <span className="side-count">{workspace.labels?.length ?? 0}</span>
             </button>
+            <button
+              className="side-link side-quick"
+              onClick={openFocus}
+              aria-expanded={focus.panelOpen}
+            >
+              <Timer size={18} />
+              <span className="side-label">Focus timer</span>
+              {focus.active && (
+                <span className={`side-count side-timer ${focus.running ? '' : 'is-paused'}`}>
+                  {formatClock(focus.left)}
+                </span>
+              )}
+            </button>
+            <div className="side-section">
+              <span>YOUR BOARDS</span>
+              <button
+                aria-label="Create board"
+                title="Create board"
+                onClick={() => openDialog({ kind: 'create-board' })}
+              >
+                <Plus size={16} />
+              </button>
+            </div>
+            <nav aria-label="Boards">
+              {workspace.boards.map((b) => {
+                const selected = section === 'boards' && b.id === board.id;
+                return (
+                  <button
+                    className={`board-nav ${selected ? 'selected' : ''}`}
+                    aria-current={selected ? 'page' : undefined}
+                    key={b.id}
+                    title={b.title}
+                    onClick={() => go(b)}
+                  >
+                    <span className="board-dot" style={{ background: b.color }} />
+                    <span className="board-nav-label">{b.title}</span>
+                  </button>
+                );
+              })}
+            </nav>
+            <button className="new-board" onClick={() => openDialog({ kind: 'create-board' })}>
+              <Plus size={16} />
+              Create a board
+            </button>
+            <div className="sidebar-note">
+              <BookOpen size={20} />
+              <p>
+                Everything starts
+                <br />
+                with a note.
+              </p>
+            </div>
           </div>
-          <nav aria-label="Boards">
-            {workspace.boards.map((b) => {
-              const selected = section === 'boards' && b.id === board.id;
-              return (
-                <button
-                  className={`board-nav ${selected ? 'selected' : ''}`}
-                  aria-current={selected ? 'page' : undefined}
-                  key={b.id}
-                  title={b.title}
-                  onClick={() => go(b)}
-                >
-                  <span className="board-dot" style={{ background: b.color }} />
-                  <span className="board-nav-label">{b.title}</span>
-                </button>
-              );
-            })}
-          </nav>
-          <button className="new-board" onClick={() => openDialog({ kind: 'create-board' })}>
-            <Plus size={16} />
-            Create a board
-          </button>
-          <div className="sidebar-note">
-            <BookOpen size={20} />
-            <p>
-              Everything starts
-              <br />
-              with a note.
-            </p>
-          </div>
-        </div>
+        )}
         <div className="sidebar-footer">
           <span className="profile-avatar">S</span>
           <div className="sidebar-text" title={user?.email ?? undefined}>
-            {user?.email ?? 'My workspace'}
+            {user?.email ?? (playground ? 'Playground' : 'My workspace')}
             <small>
-              {cloudEnabled
-                ? syncStatus === 'error'
-                  ? 'Sync paused'
-                  : 'SweGrowth sync'
-                : 'Saved on this device'}
+              {playground
+                ? 'Sample data, not saved'
+                : cloudEnabled
+                  ? syncStatus === 'error'
+                    ? 'Sync paused'
+                    : 'SweGrowth sync'
+                  : 'Saved on this device'}
             </small>
           </div>
           {cloudEnabled ? (
@@ -304,6 +350,10 @@ export function Sidebar({
             >
               {signingOut ? 'Saving…' : 'Sign out'}
             </button>
+          ) : playground ? (
+            <a className="local-pill signout-pill" href="/" title="Back to the Notis home page">
+              Exit
+            </a>
           ) : (
             <span className="local-pill">Local</span>
           )}

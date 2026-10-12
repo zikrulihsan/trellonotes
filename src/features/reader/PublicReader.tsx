@@ -885,11 +885,25 @@ function ArticlePage({ author, slug }: { author: Author; slug: string }) {
   const listed = Boolean(page && !page.unlisted);
   const site = useAuthorSite(author, listed);
   useReaderTheme(site ? (site[1]?.theme ?? 'sketch') : undefined);
-  useEffect(() => {
-    if (page) document.title = page.title;
-  }, [page]);
   if (result.status !== 'ready') return <Status result={result} kind="article" />;
   if (!page) return <NotFound />;
+  return <ArticleView author={author} page={page} site={listed ? site : null} />;
+}
+
+/** One article; `site` (the listed pages and landing page) adds the menu and "Keep reading". */
+function ArticleView({
+  author,
+  page,
+  site,
+}: {
+  author: Author;
+  page: PublishedPage;
+  site: [PublishedPage[], Landing | null] | null;
+}) {
+  useEffect(() => {
+    document.title = page.title;
+  }, [page.title]);
+  const listed = !page.unlisted;
   const name = author.name ?? page.author_name;
   return (
     <>
@@ -922,6 +936,66 @@ function ArticlePage({ author, slug }: { author: Author; slug: string }) {
         )}
       </main>
     </>
+  );
+}
+
+/**
+ * A whole website drawn from data in hand instead of the database, at the same addresses
+ * (/@handle, ?blog, ?about, /@handle/slug) relative to the router: the playground's sample.
+ */
+export function SampleSite({
+  author,
+  pages,
+  landing,
+}: {
+  author: Author;
+  pages: PublishedPage[];
+  landing: Landing;
+}) {
+  const { pathname, search } = useLocation();
+  const params = new URLSearchParams(search);
+  const address = parseAddress(pathname);
+  const slug = address && 'slug' in address ? address.slug : undefined;
+  const page = slug ? pages.find((listed) => listed.slug === slug) : undefined;
+  const view: Section = params.has('about') ? 'about' : params.has('blog') ? 'blog' : 'me';
+  useLandingFont();
+  useEffect(() => {
+    const who = author.name ?? 'Writing';
+    if (!slug)
+      document.title = view === 'me' ? who : `${view === 'blog' ? 'Blog' : 'About'} · ${who}`;
+  }, [slug, view, author.name]);
+  useEffect(() => window.scrollTo(0, 0), [pathname, search]);
+  let body;
+  if (slug)
+    body = page ? (
+      <ArticleView author={author} page={page} site={[pages, landing]} />
+    ) : (
+      <NotFound />
+    );
+  else
+    body = (
+      <>
+        <PublicNav author={author} active={view} showAbout={hasAbout(landing.about)} />
+        {view === 'about' ? (
+          <AboutView author={author} name={author.name} pages={pages} about={landing.about} />
+        ) : view === 'blog' ? (
+          <BlogView author={author} name={author.name} pages={pages} blog={landing.blog} />
+        ) : (
+          <LandingView author={author} name={author.name} pages={pages} landing={landing} />
+        )}
+      </>
+    );
+  return (
+    <div
+      className="reader"
+      data-landing-theme={landing.theme === 'sketch' ? undefined : landing.theme}
+    >
+      {body}
+      <footer className="reader-footer">
+        <Feather size={13} />
+        Written with Notis
+      </footer>
+    </div>
   );
 }
 
