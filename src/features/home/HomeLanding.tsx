@@ -13,9 +13,7 @@ import {
   Lock,
   NotebookPen,
   PenLine,
-  Send,
   Sparkles,
-  Sprout,
 } from 'lucide-react';
 
 interface HomeLandingProps {
@@ -24,28 +22,6 @@ interface HomeLandingProps {
   onGoogle: () => void;
   onSwegrowth: () => void;
 }
-
-/** Notis in three steps: the notes and posts add up to a portfolio, not just a published page. */
-const LOOP: { icon: ReactNode; title: string; text: string }[] = [
-  {
-    icon: <NotebookPen size={20} />,
-    title: 'Note it',
-    text: 'Plans, progress and results, as you work. Private until you say so.',
-  },
-  {
-    icon: <Send size={20} />,
-    title: 'Publish it',
-    text: 'When something is worth telling, turn your notes into a post and put it live.',
-  },
-  {
-    icon: <Sprout size={20} />,
-    title: 'Grow your portfolio',
-    text: 'Every post adds to your page at /@you. It keeps growing with your work, week after week.',
-  },
-];
-
-/** What the portfolio is made of, shown on the third step. */
-const PORTFOLIO_PARTS = ['Me', 'Blog', 'About', "What I'm up to now"];
 
 /** The everyday loop: each moment of work, and what you do with it in Notis. */
 const STEPS = [
@@ -194,34 +170,6 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             <Lock size={13} /> Private until you choose to publish.
           </p>
           <HeroSketch />
-        </section>
-
-        <section className="home-loop" aria-labelledby="home-loop">
-          <p className="eyebrow">MORE THAN NOTE AND PUBLISH</p>
-          <h2 id="home-loop">
-            Note it. Publish it. <mark>Grow your portfolio.</mark>
-          </h2>
-          <p className="home-section-lead">
-            Publishing is not the finish line. Everything you publish builds a professional
-            portfolio that keeps growing as long as you work.
-          </p>
-          <ol className="home-loop-steps">
-            {LOOP.map((step, index) => (
-              <li key={step.title}>
-                <span className="home-pillar-icon">{step.icon}</span>
-                <span className="home-pillar-step">0{index + 1}</span>
-                <h3>{step.title}</h3>
-                <p>{step.text}</p>
-                {index === LOOP.length - 1 && (
-                  <ul className="home-loop-parts" aria-label="Your portfolio">
-                    {PORTFOLIO_PARTS.map((part) => (
-                      <li key={part}>{part}</li>
-                    ))}
-                  </ul>
-                )}
-              </li>
-            ))}
-          </ol>
         </section>
 
         <section className="home-different" aria-labelledby="home-different">
@@ -460,25 +408,49 @@ function SiteSketch() {
   );
 }
 
-/** A small picture of the idea: a card on a board becomes a page people can read. */
+/** The idea in one picture: your notes plus your resume make a portfolio site. */
 function HeroSketch() {
   return (
-    <div className="home-sketch" aria-hidden="true">
-      <div className="home-sketch-board">
-        <span className="home-sketch-label">Board · In progress</span>
-        <span className="home-sketch-card">Launch the landing page</span>
-        <span className="home-sketch-card is-dim">Write about the launch</span>
-        <span className="home-sketch-card is-dim">Ask for feedback</span>
+    <div className="home-sketch" aria-label="Your notes plus your resume make your portfolio site">
+      <div className="home-sketch-inputs">
+        <div className="home-sketch-board">
+          <span className="home-sketch-label">Your notes</span>
+          <span className="home-sketch-card">Shipped the pricing page</span>
+          <span className="home-sketch-card">What I learned from 40 sign-ups</span>
+        </div>
+        <span className="home-sketch-op" aria-hidden="true">
+          +
+        </span>
+        <div className="home-sketch-resume">
+          <span className="home-sketch-label">
+            <FileText size={13} /> Your resume
+          </span>
+          <strong>Senior Engineer · Payments</strong>
+          <span className="home-sketch-line" />
+          <span className="home-sketch-line is-short" />
+        </div>
       </div>
-      <ArrowRight className="home-sketch-arrow" size={22} />
+      <span className="home-sketch-op is-equals" aria-hidden="true">
+        =
+      </span>
       <div className="home-sketch-page">
         <span className="home-sketch-url">notis.swegrowth.id/@you</span>
+        <span className="home-sketch-tabs" aria-hidden="true">
+          <b>Me</b>
+          <span>Blog</span>
+          <span>About</span>
+        </span>
         <strong>
           Hi, <mark>I'm Ayu</mark>
         </strong>
-        <span className="home-sketch-line" />
-        <span className="home-sketch-line is-short" />
-        <span className="home-sketch-post">How I launched in a week</span>
+        <span className="home-sketch-sub">I build payment systems.</span>
+        <span className="home-sketch-label">Projects</span>
+        <span className="home-sketch-chips">
+          <span>Checkout v2</span>
+          <span>Fraud alerts</span>
+        </span>
+        <span className="home-sketch-post">What I learned from 40 sign-ups</span>
+        <span className="home-sketch-caption">Your portfolio site, ready in minutes</span>
       </div>
     </div>
   );

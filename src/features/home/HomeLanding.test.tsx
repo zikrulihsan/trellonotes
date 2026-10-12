@@ -16,11 +16,8 @@ describe('signed-out home page', () => {
       screen.getByRole('heading', { name: 'Everything starts with a note.' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: 'Note it. Publish it. Grow your portfolio.' }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('list', { name: 'Your portfolio' })).toHaveTextContent(
-      "What I'm up to now",
-    );
+      screen.getByLabelText('Your notes plus your resume make your portfolio site'),
+    ).toHaveTextContent('Your resume');
     expect(screen.getByRole('heading', { name: /deserves to be seen/ })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /See a real one/ })).toHaveAttribute(
       'href',
