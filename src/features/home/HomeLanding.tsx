@@ -92,18 +92,18 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             </a>
           </div>
           <Equation
-            label="Write notes, publish, get noticed"
+            label="Write notes, turn them into stories, show your work"
             parts={[
-              { title: 'Write notes', caption: 'while you work', art: <NotesArt /> },
+              { title: 'Write notes', caption: 'everyday, as you work', art: <NotesArt /> },
               {
                 op: <ArrowRight size={30} />,
-                title: 'Publish',
-                caption: 'when it is worth telling',
+                title: 'Turn into stories',
+                caption: 'journal, insights, lessons',
                 art: <PostArt />,
               },
               {
                 op: <ArrowRight size={30} />,
-                title: 'Get noticed',
+                title: 'Show your work',
                 caption: 'on your own website',
                 art: <SiteArt />,
                 result: true,
@@ -115,10 +115,10 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
         <section className="home-beat" aria-labelledby="home-beat-notes">
           <div className="home-beat-text">
             <p className="eyebrow">1 · WRITE NOTES</p>
-            <h2 id="home-beat-notes">Note your work while it is fresh.</h2>
+            <h2 id="home-beat-notes">Just write it down.</h2>
             <p>
-              A line is enough: what you planned, what moved, what shipped. Notis gathers it into a
-              weekly work journal, so you never have to remember what you did.
+              Plans, progress, wins, lessons. Short everyday notes are enough, and Notis keeps them
+              as a weekly work journal.
             </p>
           </div>
           <JournalSketch />
@@ -126,11 +126,11 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
 
         <section className="home-beat is-flipped" aria-labelledby="home-beat-publish">
           <div className="home-beat-text">
-            <p className="eyebrow">2 · PUBLISH</p>
-            <h2 id="home-beat-publish">Your notes are already the first draft.</h2>
+            <p className="eyebrow">2 · TURN INTO STORIES</p>
+            <h2 id="home-beat-publish">Your notes grow into stories.</h2>
             <p>
-              When something is worth sharing, turn a week or a project into a post, starting from
-              what you already wrote. No blank page.
+              Turn a week, a project or a lesson into a post full of insight, starting from what you
+              already noted. No blank page.
             </p>
           </div>
           <PostSketch />
@@ -138,17 +138,17 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
 
         <section className="home-beat is-wide" aria-labelledby="home-beat-noticed">
           <div className="home-beat-text">
-            <p className="eyebrow">3 · GET NOTICED</p>
-            <h2 id="home-beat-noticed">Every post lands on your own website.</h2>
+            <p className="eyebrow">3 · SHOW YOUR WORK</p>
+            <h2 id="home-beat-noticed">Show your work on your own website.</h2>
             <p>
-              Upload your resume once and your website is ready in minutes. Each note you publish
-              keeps it growing.
+              Your stories and projects live at /@yourname. Upload your resume once and it is ready
+              in minutes, then every story keeps it growing.
             </p>
           </div>
           <Equation
-            label="Notes plus resume equals your own website"
+            label="Stories plus resume equals your own website"
             parts={[
-              { title: 'Notes', caption: 'you published', art: <NotesArt /> },
+              { title: 'Stories', caption: 'from your notes', art: <PostArt /> },
               { op: '+', title: 'Resume', caption: 'uploaded once', art: <ResumeArt /> },
               {
                 op: '=',
@@ -261,12 +261,12 @@ function JournalSketch() {
   );
 }
 
-/** A post drafted from the week's notes, one click from going live. */
+/** A story drafted from the week's notes, one click from going live. */
 function PostSketch() {
   return (
     <div className="home-journal home-post" aria-hidden="true">
-      <span className="home-sketch-label">New page · from this week</span>
-      <strong className="home-post-title">What I shipped this week</strong>
+      <span className="home-sketch-label">Story · from your notes</span>
+      <strong className="home-post-title">What I learned shipping the waitlist</strong>
       <span className="home-journal-item">
         <CircleCheck size={15} /> Sent the redesign to Studio Rana
       </span>

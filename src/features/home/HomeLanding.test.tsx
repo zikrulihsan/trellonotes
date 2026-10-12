@@ -13,13 +13,13 @@ describe('signed-out home page', () => {
       'Write notes, get noticed.',
     );
     expect(
-      screen.getByRole('img', { name: 'Write notes, publish, get noticed' }),
+      screen.getByRole('img', { name: 'Write notes, turn them into stories, show your work' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('img', { name: 'Notes plus resume equals your own website' }),
+      screen.getByRole('img', { name: 'Stories plus resume equals your own website' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: 'Every post lands on your own website.' }),
+      screen.getByRole('heading', { name: 'Show your work on your own website.' }),
     ).toBeInTheDocument();
     expect(screen.getByText('Is everything I write public?')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'See a real one' })).toHaveAttribute(
