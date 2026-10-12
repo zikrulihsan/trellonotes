@@ -455,6 +455,17 @@
   font-size: 15px;
   line-height: 1.65;
 }
+.home-note-entry {
+  display: grid;
+  gap: 2px;
+  padding-left: 12px;
+  border-left: 2px solid #e3dcf7;
+}
+.home-note-entry time {
+  color: var(--purple);
+  font-size: 12px;
+  font-weight: 600;
+}
 .home-story-points {
   display: grid;
   gap: 6px;

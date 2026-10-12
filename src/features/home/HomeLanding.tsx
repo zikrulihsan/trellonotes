@@ -119,8 +119,8 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             <p className="eyebrow">1 · WRITE NOTES</p>
             <h2 id="home-beat-notes">Just write it down.</h2>
             <p>
-              What you worked on, what went wrong, what you figured out. Write it the way you would
-              tell a friend, a few lines at a time. Every note keeps its date.
+              Start an initiative and keep adding to it: what you tried, what went wrong, what you
+              figured out. A few lines at a time, each update with its date.
             </p>
           </div>
           <NoteSketch />
@@ -191,8 +191,9 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             <p className="eyebrow">AND EVERY DAY</p>
             <h2 id="home-beat-boards">Track your work on boards built for writing.</h2>
             <p>
-              Plan and move work across lists to stay productive. Every card opens into a note, so
-              the progress you track is already written down when it is time to tell the story.
+              Plan and move work across lists to stay productive. Every card is an initiative you
+              write in, so the progress you track is already written down when it is time to tell
+              the story.
             </p>
           </div>
           <BoardSketch />
@@ -256,17 +257,32 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
   );
 }
 
-/** One dated note, written the way people actually write. */
+/** One initiative, updated over several days: each entry keeps its date. */
 function NoteSketch() {
+  const entries = [
+    {
+      date: 'Mon, 13 Oct',
+      text: 'Carts are dropping at the address step. No idea why yet.',
+    },
+    {
+      date: 'Tue, 14 Oct',
+      text: 'Found it: the promo field resets the address form. Fixed it with Rana, shipped after lunch.',
+    },
+    {
+      date: 'Thu, 16 Oct',
+      text: 'Checkouts back up 12%. Lesson: test the boring paths too.',
+    },
+  ];
   return (
     <div className="home-paper home-note" aria-hidden="true">
-      <span className="home-sketch-label">Tue, 14 Oct · Checkout</span>
+      <span className="home-sketch-label">Initiative · Checkout</span>
       <strong className="home-paper-title">Why carts were dropping</strong>
-      <p>
-        Finally found it: the promo field reset the address form, so people gave up. Fixed it with
-        Rana and shipped after lunch.
-      </p>
-      <p>Next: watch conversion for a week. Lesson: test the boring paths too.</p>
+      {entries.map((entry) => (
+        <div key={entry.date} className="home-note-entry">
+          <time>{entry.date}</time>
+          <p>{entry.text}</p>
+        </div>
+      ))}
     </div>
   );
 }
@@ -299,7 +315,7 @@ function StorySketch() {
   );
 }
 
-/** A board whose cards are notes: one is open, already written in. */
+/** A board whose cards are initiatives: one is open, already written in. */
 function BoardSketch() {
   const lists = [
     { title: 'To do', cards: ['Pricing page copy', 'Interview Dimas'] },
@@ -319,7 +335,7 @@ function BoardSketch() {
                   <span className="home-post-line" />
                   <span className="home-post-line is-short" />
                   <span className="home-board-meta">
-                    <NotebookPen size={12} /> 3 notes
+                    <NotebookPen size={12} /> Initiative · 3 updates
                   </span>
                 </>
               )}
