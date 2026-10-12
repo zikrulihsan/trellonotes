@@ -192,8 +192,8 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             <h2 id="home-beat-boards">Track your work on boards built for writing.</h2>
             <p>
               Plan and move work across lists to stay productive. Every card is an initiative you
-              write in, so the progress you track is already written down when it is time to tell
-              the story.
+              update by writing, like a journal, so your progress is already written down when it is
+              time to tell the story.
             </p>
           </div>
           <BoardSketch />
@@ -315,7 +315,7 @@ function StorySketch() {
   );
 }
 
-/** A board whose cards are initiatives: one is open, already written in. */
+/** A board whose cards are initiatives: the open one is updated like a journal. */
 function BoardSketch() {
   const lists = [
     { title: 'To do', cards: ['Pricing page copy', 'Interview Dimas'] },
@@ -332,10 +332,14 @@ function BoardSketch() {
               {card}
               {list.open && (
                 <>
-                  <span className="home-post-line" />
-                  <span className="home-post-line is-short" />
+                  <span className="home-board-entry">
+                    <time>Tue</time> Found the promo field bug, fixed it.
+                  </span>
+                  <span className="home-board-entry">
+                    <time>Thu</time> Checkouts back up 12%.
+                  </span>
                   <span className="home-board-meta">
-                    <NotebookPen size={12} /> Initiative · 3 updates
+                    <NotebookPen size={12} /> Journal · 3 updates
                   </span>
                 </>
               )}

@@ -530,6 +530,18 @@
   height: 6px;
   margin-top: 0;
 }
+.home-board-entry {
+  padding-left: 7px;
+  border-left: 2px solid #e3dcf7;
+  color: #4a4953;
+  font-size: 11px;
+  font-weight: 450;
+  line-height: 1.4;
+}
+.home-board-entry time {
+  color: var(--purple);
+  font-weight: 600;
+}
 .home-board-meta {
   display: inline-flex;
   align-items: center;
