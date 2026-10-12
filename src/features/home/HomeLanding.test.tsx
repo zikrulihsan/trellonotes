@@ -27,6 +27,7 @@ describe('signed-out home page', () => {
       'href',
       'https://notis.swegrowth.id/@zikrul-ihsan-md',
     );
+    expect(screen.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy');
     expect(screen.queryByRole('button', { name: 'Continue with Google' })).toBeNull();
     const starts = screen.getAllByRole('button', { name: /Start writing/ });
     expect(starts).toHaveLength(2);

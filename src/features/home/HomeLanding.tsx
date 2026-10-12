@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { Modal } from '@/components/ui/Modal';
+import { LegalFooter } from '@/features/legal/LegalPage';
 import {
   ArrowRight,
   CircleCheck,
@@ -325,10 +326,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
         </Modal>
       )}
 
-      <footer className="home-footer">
-        <span>Notis</span>
-        <span>Write notes, get noticed.</span>
-      </footer>
+      <LegalFooter />
     </div>
   );
 }
