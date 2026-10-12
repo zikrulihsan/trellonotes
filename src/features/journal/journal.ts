@@ -1,4 +1,4 @@
-import type { BoardList, Note, Page, Workspace } from '@/features/workspace/types';
+import type { BoardList, Note, Page, TodoList, Workspace } from '@/features/workspace/types';
 
 /** List names that mean "finished" when the writer hasn't said otherwise. */
 const DONE_TITLES =
@@ -40,6 +40,8 @@ export interface JournalWeek {
   progress: Note[];
   /** Pages written this week. */
   pages: Page[];
+  /** To-do lists changed this week. */
+  todos: TodoList[];
   notes: string;
 }
 
@@ -67,6 +69,7 @@ export function journalWeek(workspace: Workspace, time: number): JournalWeek {
       .filter((note) => !isFinished(note) && within(note.updatedAt))
       .sort(newest),
     pages: (workspace.pages ?? []).filter((page) => within(page.updatedAt)).sort(newest),
+    todos: (workspace.todos ?? []).filter((todo) => within(todo.updatedAt)).sort(newest),
     notes: workspace.journal?.find((entry) => entry.id === id)?.content ?? '',
   };
 }

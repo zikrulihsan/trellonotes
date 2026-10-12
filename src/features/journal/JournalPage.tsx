@@ -8,13 +8,16 @@ import {
   Lock,
   NotebookPen,
   PenLine,
+  Sparkles,
   TrendingUp,
 } from 'lucide-react';
 import { useWorkspace, useWorkspaceActions } from '@/hooks/useWorkspace';
 import { Button } from '@/components/ui/Button';
 import { initiativePath, pagePath } from '@/lib/app-paths';
+import { supabase } from '@/lib/supabase/client';
 import type { Board, Note } from '@/features/workspace/types';
 import { journalWeek, shiftWeek, weekDraft, weekId } from './journal';
+import { WeekWriteup } from './WeekWriteup';
 
 const day = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
 
@@ -36,7 +39,8 @@ export function JournalPage() {
     { createPage, updateJournal } = useWorkspaceActions(),
     navigate = useNavigate(),
     [offset, setOffset] = useState(0),
-    [now] = useState(() => Date.now());
+    [now] = useState(() => Date.now()),
+    [writing, setWriting] = useState(false);
   const week = journalWeek(workspace, shiftWeek(now, offset));
   const thisWeek = week.id === weekId(now);
   const range = weekRange(week.start, week.end);
@@ -48,8 +52,8 @@ export function JournalPage() {
     .filter((group) => group.notes.length);
   const boardOf = (note: Note) => workspace.boards.find((board) => board.id === note.boardId);
   const empty = !week.finished.length && !week.progress.length && !week.pages.length;
+  const title = `${thisWeek ? 'This week' : `Week of ${day.format(week.start)}`}: what I worked on`;
   const draft = () => {
-    const title = `${thisWeek ? 'This week' : `Week of ${day.format(week.start)}`}: what I worked on`;
     navigate(pagePath({ id: createPage(weekDraft(workspace, week, title)), title }));
   };
   return (
@@ -64,6 +68,16 @@ export function JournalPage() {
           </p>
         </div>
         <div className="board-actions">
+          {supabase && (
+            <Button
+              onClick={() => setWriting(!writing)}
+              disabled={empty && !week.todos.length && !week.notes.trim()}
+              aria-expanded={writing}
+            >
+              <Sparkles size={17} />
+              Write it up
+            </Button>
+          )}
           <Button variant="primary" onClick={draft} disabled={empty && !week.notes.trim()}>
             <PenLine size={17} />
             Draft a page from this week
@@ -72,6 +86,9 @@ export function JournalPage() {
       </section>
 
       <div className="journal-body">
+        {writing && (
+          <WeekWriteup key={week.id} week={week} title={title} onClose={() => setWriting(false)} />
+        )}
         <nav className="journal-weeks" aria-label="Weeks">
           <button
             className="icon-button"
