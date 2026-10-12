@@ -39,3 +39,8 @@ export const todoPath = (todo: Linkable) => `/todo/${linkRef(todo)}`;
 export function isPublicPath(pathname: string): boolean {
   return pathname.startsWith('/@') || pathname.startsWith('/read/') || pathname.startsWith('/s/');
 }
+
+/** The terms of service and privacy policy, readable without signing in. */
+export function isLegalPath(pathname: string): boolean {
+  return ['/terms', '/privacy'].includes(pathname.replace(/\/$/, ''));
+}
