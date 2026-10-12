@@ -100,7 +100,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               {
                 op: <ArrowRight size={30} />,
                 title: 'Turn into stories',
-                caption: 'journal, insights, lessons',
+                caption: 'with AI',
                 art: <PostArt />,
               },
               {
@@ -130,13 +130,16 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           <div className="home-beat-text">
             <p className="eyebrow">2 · TURN INTO STORIES</p>
             <h2 id="home-beat-stories">
-              Turn your notes into <mark>stories worth sharing</mark>.
+              From notes to <mark>stories worth sharing</mark>, using AI.
             </h2>
             <p>
-              The points you noted over a week or a project are already the bones of a story. Notis
-              drafts a post from them, and you shape it into a lesson, an insight or a project
+              The points you noted over a week or a project are already the bones of a story. AI
+              turns them into a draft, and you shape it into a lesson, an insight or a project
               recap.
             </p>
+            <span className="home-ai">
+              <Sparkles size={15} /> Powered by AI: write it up from your notes in one click.
+            </span>
           </div>
           <StorySketch />
         </section>
@@ -303,7 +306,9 @@ function StorySketch() {
           <mark>Test the boring paths too</mark>
         </li>
       </ul>
-      <ArrowDown className="home-story-arrow" size={18} />
+      <span className="home-story-ai">
+        <ArrowDown size={16} /> <Sparkles size={14} /> AI writes it up
+      </span>
       <span className="home-sketch-label">Story</span>
       <strong className="home-paper-title">The boring bug that cost us sales</strong>
       <span className="home-post-line" />
