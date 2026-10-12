@@ -24,10 +24,9 @@ describe('signed-out home page', () => {
       'href',
       'https://notis.swegrowth.id/@zikrul-ihsan-md',
     );
-    expect(screen.getByRole('link', { name: 'See an example page' })).toHaveAttribute(
-      'href',
-      'https://notis.swegrowth.id/@zikrul-ihsan-md',
-    );
+    const explore = screen.getAllByRole('link', { name: 'Explore it first' });
+    expect(explore).toHaveLength(2);
+    explore.forEach((link) => expect(link).toHaveAttribute('href', '/playground'));
     expect(screen.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy');
     expect(screen.queryByRole('button', { name: 'Continue with Google' })).toBeNull();
     const starts = screen.getAllByRole('button', { name: /Start writing/ });

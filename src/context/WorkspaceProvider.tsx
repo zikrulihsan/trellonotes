@@ -38,20 +38,30 @@ import {
   WorkspaceStateContext,
   type WorkspaceActions,
 } from './workspace-context';
-type SyncStatus = 'local' | 'loading' | 'syncing' | 'synced' | 'error';
-export function WorkspaceProvider({ children }: PropsWithChildren) {
+type SyncStatus = 'local' | 'loading' | 'syncing' | 'synced' | 'error' | 'memory';
+/**
+ * The workspace, saved on this device and synced to the cloud when signed in. With
+ * `initial`, it starts from that workspace and lives only in memory, as in the playground.
+ */
+export function WorkspaceProvider({
+  children,
+  initial,
+}: PropsWithChildren<{ initial?: () => Workspace }>) {
   const { user } = useAuth();
-  const userId = user?.id;
+  const memory = Boolean(initial);
+  const userId = memory ? undefined : user?.id;
   const client = userId ? supabase : null;
   const cloudEnabled = Boolean(client);
   const storageKey = workspaceStorageKey(userId);
   const [workspace, dispatch] = useReducer(workspaceReducer, storageKey, (key) =>
-    normalizeWorkspace(loadWorkspace(localStorage, key)),
+    normalizeWorkspace(initial ? initial() : loadWorkspace(localStorage, key)),
   );
   const [saveError, setSaveError] = useState(false);
   const [firstLoadDone, setFirstLoadDone] = useState(!cloudEnabled);
   const [cloudLoaded, setCloudLoaded] = useState(false);
-  const [syncStatus, setSyncStatus] = useState<SyncStatus>(cloudEnabled ? 'loading' : 'local');
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>(
+    memory ? 'memory' : cloudEnabled ? 'loading' : 'local',
+  );
   const stateRef = useRef(workspace);
   // The workspace the cloud is known to hold; anything else on screen still needs saving.
   // The local copy only counts as synced when no earlier session left changes behind.
@@ -214,6 +224,7 @@ export function WorkspaceProvider({ children }: PropsWithChildren) {
   }, [client, userId, cloudLoaded, storageKey]);
 
   useEffect(() => {
+    if (memory) return;
     let active = true;
     let failed = false;
     try {
@@ -234,7 +245,7 @@ export function WorkspaceProvider({ children }: PropsWithChildren) {
     return () => {
       active = false;
     };
-  }, [workspace, cloudLoaded, cloudEnabled, storageKey]);
+  }, [workspace, cloudLoaded, cloudEnabled, storageKey, memory]);
   const actions = useMemo<WorkspaceActions>(
     () => ({
       createBoard(title, templateId) {

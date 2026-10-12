@@ -14,7 +14,7 @@ export function WritingBar({
   onBack: () => void;
   saving: boolean;
   saveError: boolean;
-  syncStatus: 'local' | 'loading' | 'syncing' | 'synced' | 'error';
+  syncStatus: 'local' | 'loading' | 'syncing' | 'synced' | 'error' | 'memory';
   toolbar: ReactNode;
 }>) {
   const status = saveError
@@ -23,7 +23,9 @@ export function WritingBar({
       : 'Not saved'
     : saving || syncStatus === 'loading' || syncStatus === 'syncing'
       ? 'Saving…'
-      : 'Saved';
+      : syncStatus === 'memory'
+        ? 'Not saved · playground'
+        : 'Saved';
   return (
     <header className="writing-bar">
       <button className="back-board" onClick={onBack} title={`Back to ${backLabel}`}>

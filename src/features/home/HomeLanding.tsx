@@ -50,10 +50,16 @@ const FAQ: { q: string; a: string }[] = [
 /** A real Notis website to point visitors at. */
 const EXAMPLE_SITE = 'https://notis.swegrowth.id/@zikrul-ihsan-md';
 
+/** The app on sample data, to explore without an account. */
+const PLAYGROUND = '/playground';
+
 /** What signed-out visitors see: what Notis is, and the way in. */
 export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeLandingProps) {
-  // The sign-in choices open only once the visitor asks to start; a failed sign-in reopens them.
-  const [asked, setAsked] = useState(false),
+  // The sign-in choices open only once the visitor asks to start (here, or from the
+  // playground with ?start); a failed sign-in reopens them.
+  const [asked, setAsked] = useState(() =>
+      new URLSearchParams(window.location.search).has('start'),
+    ),
     [dismissedError, setDismissedError] = useState(''),
     [agreed, setAgreed] = useState(false);
   const signingIn = asked || Boolean(error && error !== dismissedError);
@@ -93,8 +99,8 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           </p>
           <div className="home-signin">
             {start}
-            <a className="home-button" href={EXAMPLE_SITE} target="_blank" rel="noreferrer">
-              See an example page
+            <a className="home-button" href={PLAYGROUND}>
+              Explore it first
             </a>
           </div>
           <Equation
@@ -217,7 +223,12 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
         <section className="home-start" id="start" aria-labelledby="home-start">
           <h2 id="home-start">Start with one note.</h2>
           <p>Sign in and your first board is ready.</p>
-          <div className="home-signin">{start}</div>
+          <div className="home-signin">
+            {start}
+            <a className="home-button" href={PLAYGROUND}>
+              Explore it first
+            </a>
+          </div>
         </section>
       </main>
 

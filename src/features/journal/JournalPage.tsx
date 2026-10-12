@@ -18,6 +18,7 @@ import { supabase } from '@/lib/supabase/client';
 import type { Board, Note } from '@/features/workspace/types';
 import { journalWeek, shiftWeek, weekDraft, weekId } from './journal';
 import { WeekWriteup } from './WeekWriteup';
+import { usePlayground } from '@/features/playground/playground-context';
 
 const day = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
 
@@ -40,7 +41,10 @@ export function JournalPage() {
     navigate = useNavigate(),
     [offset, setOffset] = useState(0),
     [now] = useState(() => Date.now()),
-    [writing, setWriting] = useState(false);
+    [writing, setWriting] = useState(false),
+    // Writing up with Gemini needs an account; the playground keeps the template draft.
+    playground = usePlayground(),
+    canWriteUp = Boolean(supabase) && !playground;
   const week = journalWeek(workspace, shiftWeek(now, offset));
   const thisWeek = week.id === weekId(now);
   const range = weekRange(week.start, week.end);
@@ -68,7 +72,7 @@ export function JournalPage() {
           </p>
         </div>
         <div className="board-actions">
-          {supabase && (
+          {canWriteUp && (
             <Button
               onClick={() => setWriting(!writing)}
               disabled={empty && !week.todos.length && !week.notes.trim()}
