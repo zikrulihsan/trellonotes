@@ -4,14 +4,20 @@ import { Button } from '@/components/ui/Button';
 import { supabase } from '@/lib/supabase/client';
 import { readResume, RESUME_ACCEPT } from '@/lib/resume-import';
 import { RESUME_MAX_CHARS } from '@/lib/resume-prompt';
+import { usePlayground } from '@/features/playground/playground-context';
+import { SignInPrompt } from '@/features/playground/SignInPrompt';
 
 /** Reads a resume with Gemini and hands the result to the editor below for review. */
 export function ResumeImport({ onRead }: { onRead: (resume: unknown) => void }) {
   const [file, setFile] = useState<File | null>(null);
   const [text, setText] = useState('');
   const [state, setState] = useState<{ busy?: boolean; error?: string; done?: boolean }>({});
+  const playground = usePlayground();
+  const [askSignIn, setAskSignIn] = useState(false);
 
   async function run() {
+    // The playground shows the resume import; reading one needs an account.
+    if (playground) return setAskSignIn(true);
     if (!supabase) return;
     setState({ busy: true });
     try {
@@ -44,7 +50,7 @@ export function ResumeImport({ onRead }: { onRead: (resume: unknown) => void }) 
             }}
           />
         </label>
-        <Button onClick={run} disabled={state.busy || (!file && !text.trim())}>
+        <Button onClick={run} disabled={state.busy || (!playground && !file && !text.trim())}>
           {state.busy ? 'Reading…' : 'Fill with Gemini'}
         </Button>
       </div>
@@ -62,6 +68,12 @@ export function ResumeImport({ onRead }: { onRead: (resume: unknown) => void }) 
             }}
           />
         </details>
+      )}
+      {askSignIn && (
+        <SignInPrompt
+          feature="Filling your page from a resume"
+          onClose={() => setAskSignIn(false)}
+        />
       )}
       {state.error && (
         <p className="publish-error" role="alert">

@@ -26,7 +26,6 @@ import { formatClock } from '@/features/focus/focus-timer';
 import { useProfile } from '@/features/pages/useProfile';
 import { writerPath } from '@/lib/supabase/published-pages';
 import { usePlayground } from '@/features/playground/playground-context';
-import { PLAYGROUND_AUTHOR } from '@/features/playground/sample';
 export function Sidebar({
   board,
   section,
@@ -149,6 +148,14 @@ export function Sidebar({
                 <span className="side-label">Board</span>
               </button>
               <button
+                className={`side-link ${section === 'journal' ? 'active' : ''}`}
+                aria-current={section === 'journal' ? 'page' : undefined}
+                onClick={goJournal}
+              >
+                <NotebookPen size={18} />
+                <span className="side-label">Look back</span>
+              </button>
+              <button
                 className={`side-link ${section === 'pages' ? 'active' : ''}`}
                 aria-current={section === 'pages' ? 'page' : undefined}
                 onClick={goPages}
@@ -158,11 +165,9 @@ export function Sidebar({
                 <span className="side-count">{workspace.pages?.length ?? 0}</span>
               </button>
               <button
-                className="side-link"
-                onClick={() => {
-                  navigate(writerPath(PLAYGROUND_AUTHOR));
-                  closeSidebarDrawer();
-                }}
+                className={`side-link ${section === 'landing' ? 'active' : ''}`}
+                aria-current={section === 'landing' ? 'page' : undefined}
+                onClick={goLanding}
               >
                 <Globe size={18} />
                 <span className="side-label">Landing page</span>

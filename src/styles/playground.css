@@ -69,3 +69,6 @@
     padding: 6px 10px;
   }
 }
+.modal-actions a.button {
+  text-decoration: none;
+}

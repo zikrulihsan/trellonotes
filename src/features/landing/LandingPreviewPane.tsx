@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Monitor, Smartphone, Tablet, X } from 'lucide-react';
 import type { Landing } from '@/lib/supabase/landing';
-import type { PublicAuthor } from '@/lib/supabase/published-pages';
+import type { PublicAuthor, PublishedPage } from '@/lib/supabase/published-pages';
 import type { Section } from '@/features/reader/PublicReader';
 
 const DEVICES = [
@@ -20,6 +20,7 @@ type Device = (typeof DEVICES)[number]['id'];
 export function LandingPreviewPane({
   landing,
   author,
+  pages,
   view,
   focus,
   focusKey,
@@ -27,6 +28,8 @@ export function LandingPreviewPane({
 }: {
   landing: Landing;
   author: PublicAuthor & { name: string | null };
+  /** The posts to show, when they aren't the writer's published pages (the playground). */
+  pages?: PublishedPage[];
   view: Section;
   focus?: string;
   focusKey?: number;
@@ -62,10 +65,10 @@ export function LandingPreviewPane({
   useEffect(() => {
     if (!ready) return;
     frame.current?.contentWindow?.postMessage(
-      { type: 'notis:landing-preview', landing, author, view, focus, focusKey },
+      { type: 'notis:landing-preview', landing, author, pages, view, focus, focusKey },
       window.location.origin,
     );
-  }, [ready, landing, author, view, focus, focusKey]);
+  }, [ready, landing, author, pages, view, focus, focusKey]);
 
   const scale = box.width ? Math.min(1, box.width / width) : 1;
   return (

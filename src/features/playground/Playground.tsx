@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react';
 import { BrowserRouter, Link, Navigate, useLocation } from 'react-router-dom';
 import { App } from '@/app/App';
 import { AuthContext, type AuthContextValue } from '@/context/auth-context';
@@ -8,7 +9,9 @@ import { SampleSite } from '@/features/reader/PublicReader';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { boardPath } from '@/lib/app-paths';
 import { writerPath } from '@/lib/supabase/published-pages';
-import { PlaygroundContext } from './playground-context';
+import { nowTitles } from '@/features/journal/journal';
+import type { Landing } from '@/lib/supabase/landing';
+import { PlaygroundContext, usePlayground } from './playground-context';
 import {
   PLAYGROUND_AUTHOR,
   playgroundLanding,
@@ -41,10 +44,12 @@ const GUEST: AuthContextValue = {
  * is saved and nothing is published; closing or reloading the tab starts over.
  */
 export function Playground() {
+  const [landing, saveLanding] = useState<Landing>(() => playgroundLanding(playgroundWorkspace()));
+  const playground = useMemo(() => ({ landing, saveLanding }), [landing]);
   return (
     <BrowserRouter basename="/playground">
       <AuthContext.Provider value={GUEST}>
-        <PlaygroundContext.Provider value>
+        <PlaygroundContext.Provider value={playground}>
           <UIProvider>
             <FocusProvider>
               <WorkspaceProvider initial={playgroundWorkspace}>
@@ -84,16 +89,20 @@ function PlaygroundRoutes() {
   );
 }
 
+/** The landing page as last saved in the form, with the cards picked on the board. */
 function PlaygroundSite() {
   const { workspace } = useWorkspace();
+  const { landing } = usePlaygroundValue();
   return (
     <SampleSite
       author={PLAYGROUND_AUTHOR}
       pages={playgroundPosts(workspace)}
-      landing={playgroundLanding(workspace)}
+      landing={{ ...landing, working: nowTitles(workspace) }}
     />
   );
 }
+
+const usePlaygroundValue = () => usePlayground()!;
 
 /** A hint for the next step of the flow, from the screen the visitor is on. */
 function tipFor(pathname: string) {
@@ -101,6 +110,8 @@ function tipFor(pathname: string) {
   if (pathname.startsWith('/initiative/') || pathname.startsWith('/card/'))
     return 'Add an update, then try ··· › Write it up.';
   if (pathname.startsWith('/page/')) return 'Publish it to see it on your website.';
+  if (pathname === '/journal') return 'Your week, gathered from the board, ready to write up.';
+  if (pathname === '/landing') return 'Edit the form, save, then see the live page.';
   if (pathname === '/pages') return 'Published pages make up the blog on your landing page.';
   return 'Sample data. Nothing you change is saved.';
 }

@@ -12,7 +12,7 @@ import { pagePath } from '@/lib/app-paths';
 import { wordCount } from '@/lib/text';
 import { cardNotes, writeUp } from '@/lib/writeup';
 import { usePlayground } from '@/features/playground/playground-context';
-import { playgroundDraft } from '@/features/playground/sample';
+import { SignInPrompt } from '@/features/playground/SignInPrompt';
 export function NoteOptions({ note, board }: { note: Note; board: Board }) {
   const { updateNote, moveNote, createPage } = useWorkspaceActions(),
     { workspace } = useWorkspace(),
@@ -21,19 +21,19 @@ export function NoteOptions({ note, board }: { note: Note; board: Board }) {
     menu = useDropdown(),
     navigate = useNavigate(),
     playground = usePlayground(),
-    [writing, setWriting] = useState<{ busy?: boolean; error?: string }>({});
+    [writing, setWriting] = useState<{ busy?: boolean; error?: string }>({}),
+    [askSignIn, setAskSignIn] = useState(false);
   /** Drafts a private page about this card with Gemini, from its notes. */
   async function writeItUp() {
-    if (!supabase && !playground) return;
+    // The playground shows where writing up lives; running it needs an account.
+    if (playground) {
+      menu.close();
+      return setAskSignIn(true);
+    }
+    if (!supabase) return;
     setWriting({ busy: true });
     try {
-      // The playground never sends notes anywhere; it shows the draft a sample would get.
-      const page =
-        playground || !supabase
-          ? await new Promise<ReturnType<typeof playgroundDraft>>((done) =>
-              setTimeout(() => done(playgroundDraft(note)), 900),
-            )
-          : await writeUp(supabase, 'card', cardNotes(workspace, note), note.title);
+      const page = await writeUp(supabase, 'card', cardNotes(workspace, note), note.title);
       menu.close();
       navigate(pagePath({ id: createPage(page), title: page.title }));
     } catch (reason) {
@@ -95,7 +95,7 @@ export function NoteOptions({ note, board }: { note: Note; board: Board }) {
                 !wordCount(note.content)
                   ? 'Write some notes on this card first'
                   : playground
-                    ? 'Shows a sample draft. Signed in, Gemini drafts it from the card’s notes'
+                    ? 'Sign in and Gemini drafts a page about this work from the card’s notes'
                     : 'Gemini drafts a private page about this work from the card’s notes'
               }
             >
@@ -129,6 +129,7 @@ export function NoteOptions({ note, board }: { note: Note; board: Board }) {
           </button>
         </div>
       </Dropdown>
+      {askSignIn && <SignInPrompt feature="Write it up" onClose={() => setAskSignIn(false)} />}
       {writing.error && (
         <p className="publish-error" role="alert">
           {writing.error}
