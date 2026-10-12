@@ -48,7 +48,7 @@ const FAQ: { q: string; a: string }[] = [
 /** A real Notis website to point visitors at. */
 const EXAMPLE_SITE = 'https://notis.swegrowth.id/@zikrul-ihsan-md';
 
-/** Sample boards, writing and a website to try without an account. */
+/** The app on sample data, to explore without an account. */
 const PLAYGROUND = '/playground';
 
 /** What signed-out visitors see: what Notis is, and the way in. */
@@ -97,7 +97,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           <div className="home-signin">
             {start}
             <a className="home-button" href={PLAYGROUND}>
-              Try it first, no sign-up
+              Explore it first
             </a>
           </div>
           <Equation
@@ -223,7 +223,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           <div className="home-signin">
             {start}
             <a className="home-button" href={PLAYGROUND}>
-              Try the playground
+              Explore it first
             </a>
           </div>
         </section>

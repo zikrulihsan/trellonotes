@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { workspaceStorageKey } from '@/lib/storage';
 import { Playground } from './Playground';
@@ -13,31 +13,40 @@ afterEach(() => {
 });
 
 describe('playground', () => {
-  it('lets visitors pick what to try, and keeps the sample out of storage', async () => {
+  it('opens on the sample board with only Board, Pages and Landing page', () => {
     window.history.replaceState(null, '', '/playground');
     render(<Playground />);
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/Try Notis, no sign.up\./);
-    expect(
-      screen.getByRole('link', { name: /Build your website from your resume/ }),
-    ).toHaveAttribute('href', '/?start');
-    fireEvent.click(screen.getByRole('link', { name: /Updates on an initiative/ }));
-    await waitFor(() =>
-      expect(screen.getByRole('textbox', { name: 'Title' })).toHaveValue('Checkout redesign'),
+    expect(window.location.pathname).toMatch(/^\/playground\/board\//);
+    expect(screen.getByRole('heading', { level: 1, name: 'My work' })).toBeInTheDocument();
+    const sections = within(screen.getByRole('navigation', { name: 'Sections' }));
+    expect(sections.getAllByRole('button').map((item) => item.textContent)).toEqual([
+      'Board',
+      'Pages3',
+      'Landing page',
+    ]);
+    expect(screen.getByRole('link', { name: 'See the live page' })).toHaveAttribute(
+      'href',
+      '/playground/@alya',
     );
-    expect(window.location.pathname).toMatch(/^\/playground\/initiative\/checkout-redesign/);
+    for (const link of screen.getAllByRole('link', { name: 'Make your own' }))
+      expect(link).toHaveAttribute('href', '/?start');
+  });
+
+  it('edits the sample without saving it', async () => {
+    window.history.replaceState(null, '', '/playground/initiative/checkout-redesign');
+    render(<Playground />);
+    expect(await screen.findByRole('textbox', { name: 'Title' })).toHaveValue('Checkout redesign');
     expect(screen.getByText('Not saved · playground')).toBeInTheDocument();
-    fireEvent.change(screen.getByRole('textbox', { name: 'Title' }), {
-      target: { value: 'Checkout redesign, round two' },
-    });
     expect(localStorage.getItem(workspaceStorageKey())).toBeNull();
   });
 
-  it('shows the sample website with the posts already published', () => {
+  it('shows the sample landing page with the posts already published', () => {
     window.history.replaceState(null, '', '/playground/@alya?blog');
     render(<Playground />);
     expect(screen.getByRole('link', { name: 'Blog' })).toHaveAttribute('aria-current', 'page');
     expect(screen.getByText('Shipping a waitlist in a week')).toBeInTheDocument();
     // The story is still a draft until the visitor publishes it.
     expect(screen.queryByText('The boring bug that cost us sales')).toBeNull();
+    expect(screen.getByRole('link', { name: 'Back to the app' })).toBeInTheDocument();
   });
 });
