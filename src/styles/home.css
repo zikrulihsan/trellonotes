@@ -530,25 +530,9 @@
   font-size: 13px;
   font-weight: 550;
 }
-.home-board-card.is-open {
+.home-board-card.is-target {
   border-color: var(--home-ink);
   box-shadow: 2px 2px 0 var(--home-ink);
-}
-.home-board-card .home-post-line {
-  height: 6px;
-  margin-top: 0;
-}
-.home-board-entry {
-  padding-left: 7px;
-  border-left: 2px solid #e3dcf7;
-  color: #4a4953;
-  font-size: 11px;
-  font-weight: 450;
-  line-height: 1.4;
-}
-.home-board-entry time {
-  color: var(--purple);
-  font-weight: 600;
 }
 .home-board-meta {
   display: inline-flex;
@@ -746,4 +730,118 @@ a.home-logo {
 }
 .home-sketch.is-animated .home-sketch-note:nth-child(5) .home-sketch-bar {
   transition-delay: 0.4s;
+}
+
+/* The other pictures play too: updates appear, points get highlighted, a card opens. */
+.is-animated .home-note-entry {
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s ease;
+}
+.is-animated .home-note-entry.is-shown {
+  opacity: 1;
+  transform: none;
+}
+.home-story.is-animated .home-story-points mark {
+  background-repeat: no-repeat;
+  background-size: 0% 100%;
+  transition: background-size 0.6s ease;
+}
+.home-story.is-animated .home-story-points .is-shown mark {
+  background-size: 100% 100%;
+}
+.home-story.is-animated .home-story-ai,
+.home-story.is-animated .home-story-result {
+  opacity: 0.15;
+  transition: opacity 0.45s ease;
+}
+.home-story.is-animated .is-shown {
+  opacity: 1;
+}
+.home-story-result {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.home-story.is-animated .home-story-result :is(.home-post-line, .home-post-publish) {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s ease 0.2s;
+}
+.home-story.is-animated .home-story-result.is-shown :is(.home-post-line, .home-post-publish) {
+  transform: none;
+}
+.home-board {
+  position: relative;
+  align-content: start;
+  min-height: 300px;
+  overflow: hidden;
+}
+.home-board-card {
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+.home-board-card.is-pressed {
+  background: #f0eaff;
+  transform: scale(0.95);
+}
+.home-board-pointer {
+  position: absolute;
+  top: 82%;
+  left: 86%;
+  color: var(--home-ink);
+  fill: #fff;
+  transition:
+    top 0.8s ease,
+    left 0.8s ease;
+}
+.home-board-pointer.is-on-card {
+  top: 22%;
+  left: 54%;
+}
+.home-board.is-open .home-board-pointer {
+  opacity: 0;
+}
+.home-board-panel {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(78%, 340px);
+  padding: 16px;
+  border: 1px solid var(--home-ink);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 3px 3px 0 var(--home-ink);
+  opacity: 0;
+  transform: translateX(30px);
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease;
+}
+.home-board.is-open .home-board-panel {
+  opacity: 1;
+  transform: none;
+}
+.home-board-panel .home-paper-title {
+  font-size: 18px;
+}
+.home-board-panel p {
+  margin: 0;
+  color: #4a4953;
+  font-size: 13px;
+  line-height: 1.5;
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-board *,
+  .home-story *,
+  .home-note * {
+    transition: none;
+  }
 }

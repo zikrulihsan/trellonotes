@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Modal } from '@/components/ui/Modal';
 import { LegalFooter } from '@/features/legal/LegalPage';
 import {
@@ -7,6 +7,7 @@ import {
   ExternalLink,
   Feather,
   LoaderCircle,
+  MousePointer2,
   NotebookPen,
   Sparkles,
   ArrowDown,
@@ -157,6 +158,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             </span>
           </div>
           <Equation
+            animate
             label="Stories plus resume equals your personal website"
             parts={[
               { title: 'Stories', caption: 'from your notes', art: <PostArt /> },
@@ -255,28 +257,63 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
   );
 }
 
-/** One initiative, updated over several days: each entry keeps its date. */
+/** How long each step of an animated picture stays before the next one. */
+const STEP_MS = 1100;
+
+/**
+ * Steps through `length` frames while the picture is on screen, then starts over; a picture
+ * starts from its first frame each time it scrolls into view. Without motion (or without
+ * IntersectionObserver), it rests on the last frame, where everything is shown.
+ */
+function useLoop(length: number) {
+  const ref = useRef<HTMLDivElement>(null);
+  const still =
+    typeof IntersectionObserver === 'undefined' ||
+    Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
+  const [visible, setVisible] = useState(false);
+  const [step, setStep] = useState(0);
+  useEffect(() => {
+    const node = ref.current;
+    if (still || !node) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      setVisible(entry.isIntersecting);
+      if (entry.isIntersecting) setStep(0);
+    });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [still]);
+  useEffect(() => {
+    if (still || !visible) return;
+    const timer = window.setInterval(() => setStep((current) => (current + 1) % length), STEP_MS);
+    return () => window.clearInterval(timer);
+  }, [length, still, visible]);
+  return { ref, step: still ? length - 1 : step, animated: !still };
+}
+
+const shownFrom = (from: number, step: number) => (step >= from ? ' is-shown' : '');
+
+const INITIATIVE = [
+  { date: 'Mon, 13 Oct', text: 'Carts are dropping at the address step. No idea why yet.' },
+  {
+    date: 'Tue, 14 Oct',
+    text: 'Found it: the promo field resets the address form. Fixed it with Rana, shipped after lunch.',
+  },
+  { date: 'Thu, 16 Oct', text: 'Checkouts back up 12%. Lesson: test the boring paths too.' },
+];
+
+/** One initiative, updated over several days: each dated update appears in turn. */
 function NoteSketch() {
-  const entries = [
-    {
-      date: 'Mon, 13 Oct',
-      text: 'Carts are dropping at the address step. No idea why yet.',
-    },
-    {
-      date: 'Tue, 14 Oct',
-      text: 'Found it: the promo field resets the address form. Fixed it with Rana, shipped after lunch.',
-    },
-    {
-      date: 'Thu, 16 Oct',
-      text: 'Checkouts back up 12%. Lesson: test the boring paths too.',
-    },
-  ];
+  const { ref, step, animated } = useLoop(INITIATIVE.length + 3);
   return (
-    <div className="home-paper home-note" aria-hidden="true">
+    <div
+      ref={ref}
+      className={`home-paper home-note${animated ? ' is-animated' : ''}`}
+      aria-hidden="true"
+    >
       <span className="home-sketch-label">Initiative · Checkout</span>
       <strong className="home-paper-title">Why carts were dropping</strong>
-      {entries.map((entry) => (
-        <div key={entry.date} className="home-note-entry">
+      {INITIATIVE.map((entry, index) => (
+        <div key={entry.date} className={`home-note-entry${shownFrom(index, step)}`}>
           <time>{entry.date}</time>
           <p>{entry.text}</p>
         </div>
@@ -285,68 +322,103 @@ function NoteSketch() {
   );
 }
 
-/** Points picked from the notes, and the story drafted from them. */
+const STORY_POINTS = [
+  'Promo field reset the address form',
+  'Fixed and shipped the same day',
+  'Test the boring paths too',
+];
+
+/** Points get picked from the notes one by one, then AI writes the story from them. */
 function StorySketch() {
+  const points = STORY_POINTS.length;
+  const { ref, step, animated } = useLoop(points + 5);
   return (
-    <div className="home-paper home-story" aria-hidden="true">
+    <div
+      ref={ref}
+      className={`home-paper home-story${animated ? ' is-animated' : ''}`}
+      aria-hidden="true"
+    >
       <span className="home-sketch-label">From your notes</span>
       <ul className="home-story-points">
-        <li>
-          <mark>Promo field reset the address form</mark>
-        </li>
-        <li>
-          <mark>Fixed and shipped the same day</mark>
-        </li>
-        <li>
-          <mark>Test the boring paths too</mark>
-        </li>
+        {STORY_POINTS.map((point, index) => (
+          <li key={point} className={shownFrom(index, step).trim()}>
+            <mark>{point}</mark>
+          </li>
+        ))}
       </ul>
-      <span className="home-story-ai">
+      <span className={`home-story-ai${shownFrom(points, step)}`}>
         <ArrowDown size={16} /> <Sparkles size={14} /> AI writes it up
       </span>
-      <span className="home-sketch-label">Story</span>
-      <strong className="home-paper-title">The boring bug that cost us sales</strong>
-      <span className="home-post-line" />
-      <span className="home-post-line is-short" />
-      <span className="home-post-publish">
-        <Send size={14} /> Publish
-      </span>
+      <div className={`home-story-result${shownFrom(points + 1, step)}`}>
+        <span className="home-sketch-label">Story</span>
+        <strong className="home-paper-title">The boring bug that cost us sales</strong>
+        <span className="home-post-line" />
+        <span className="home-post-line is-short" />
+        <span className="home-post-publish">
+          <Send size={14} /> Publish
+        </span>
+      </div>
     </div>
   );
 }
 
-/** A board whose cards are initiatives: the open one is updated like a journal. */
+/**
+ * A board whose cards are initiatives. The pointer clicks one, its journal opens, and the
+ * updates appear one by one; then it closes and starts again.
+ */
 function BoardSketch() {
   const lists = [
     { title: 'To do', cards: ['Pricing page copy', 'Interview Dimas'] },
     { title: 'Doing', cards: ['Checkout redesign'], open: true },
     { title: 'Done', cards: ['Fix cart drop', 'Launch waitlist'] },
   ];
+  // Frames: 0 board, 1 pointer on the card, 2 journal open, 3-5 updates, 6-7 hold.
+  const { ref, step, animated } = useLoop(8);
+  const open = step >= 2;
   return (
-    <div className="home-board" aria-hidden="true">
+    <div
+      ref={ref}
+      className={`home-board${animated ? ' is-animated' : ''}${open ? ' is-open' : ''}`}
+      aria-hidden="true"
+    >
       {lists.map((list) => (
         <div key={list.title} className="home-board-list">
           <span className="home-sketch-label">{list.title}</span>
           {list.cards.map((card) => (
-            <span key={card} className={list.open ? 'home-board-card is-open' : 'home-board-card'}>
+            <span
+              key={card}
+              className={
+                list.open
+                  ? `home-board-card is-target${step === 1 ? ' is-pressed' : ''}`
+                  : 'home-board-card'
+              }
+            >
               {card}
               {list.open && (
-                <>
-                  <span className="home-board-entry">
-                    <time>Tue</time> Found the promo field bug, fixed it.
-                  </span>
-                  <span className="home-board-entry">
-                    <time>Thu</time> Checkouts back up 12%.
-                  </span>
-                  <span className="home-board-meta">
-                    <NotebookPen size={12} /> Journal · 3 updates
-                  </span>
-                </>
+                <span className="home-board-meta">
+                  <NotebookPen size={12} /> Journal · 3 updates
+                </span>
               )}
             </span>
           ))}
         </div>
       ))}
+      {animated && (
+        <MousePointer2
+          className={`home-board-pointer${step >= 1 && step < 2 ? ' is-on-card' : ''}`}
+          size={20}
+        />
+      )}
+      <div className="home-board-panel">
+        <span className="home-sketch-label">Initiative · Doing</span>
+        <strong className="home-paper-title">Checkout redesign</strong>
+        {INITIATIVE.map((entry, index) => (
+          <div key={entry.date} className={`home-note-entry${shownFrom(index + 3, step)}`}>
+            <time>{entry.date}</time>
+            <p>{entry.text}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -359,29 +431,7 @@ interface EquationPart {
   result?: boolean;
 }
 
-/** A picture read left to right: labelled drawings joined by +, = or arrows. */
-/** How long each step of an animated equation stays before the next one appears. */
-const STEP_MS = 1100;
-
-/**
- * Plays an equation left to right, one step at a time, then starts over. Steps are the
- * parts and the operators between them, plus a pause at the end. Without motion, all show.
- */
-function useSteps(count: number, animate: boolean) {
-  const still =
-    !animate || Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
-  const [step, setStep] = useState(0);
-  useEffect(() => {
-    if (still) return;
-    const timer = window.setInterval(
-      () => setStep((current) => (current + 1) % (count + 3)),
-      STEP_MS,
-    );
-    return () => window.clearInterval(timer);
-  }, [count, still]);
-  return still ? count : step;
-}
-
+/** A picture read left to right: labelled drawings joined by +, = or arrows, played in turn. */
 function Equation({
   label,
   parts,
@@ -391,11 +441,13 @@ function Equation({
   parts: EquationPart[];
   animate?: boolean;
 }) {
-  const step = useSteps(parts.length * 2 - 1, animate);
+  const { ref, step: frame, animated } = useLoop(parts.length * 2 + 2);
+  const step = animate ? frame : Infinity;
   const shown = (index: number) => (index <= step ? ' is-shown' : '');
   return (
     <div
-      className={animate ? 'home-sketch is-animated' : 'home-sketch'}
+      ref={ref}
+      className={animate && animated ? 'home-sketch is-animated' : 'home-sketch'}
       role="img"
       aria-label={label}
     >
