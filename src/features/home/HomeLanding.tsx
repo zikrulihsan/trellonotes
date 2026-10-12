@@ -408,50 +408,73 @@ function SiteSketch() {
   );
 }
 
-/** The idea in one picture: your notes plus your resume make a portfolio site. */
+/** The idea in one picture: notes plus a resume make a portfolio website. */
 function HeroSketch() {
   return (
-    <div className="home-sketch" aria-label="Your notes plus your resume make your portfolio site">
-      <div className="home-sketch-inputs">
-        <div className="home-sketch-board">
-          <span className="home-sketch-label">Your notes</span>
-          <span className="home-sketch-card">Shipped the pricing page</span>
-          <span className="home-sketch-card">What I learned from 40 sign-ups</span>
+    <div className="home-sketch" role="img" aria-label="Notes plus resume equals portfolio website">
+      <figure>
+        <div className="home-sketch-art" aria-hidden="true">
+          {[0, 1, 2, 3, 4].map((line) => (
+            <span key={line} className="home-sketch-note">
+              <CircleCheck size={14} />
+              <span className={line % 2 ? 'home-sketch-bar is-short' : 'home-sketch-bar'} />
+            </span>
+          ))}
         </div>
-        <span className="home-sketch-op" aria-hidden="true">
-          +
-        </span>
-        <div className="home-sketch-resume">
-          <span className="home-sketch-label">
-            <FileText size={13} /> Your resume
-          </span>
-          <strong>Senior Engineer · Payments</strong>
-          <span className="home-sketch-line" />
-          <span className="home-sketch-line is-short" />
+        <figcaption>
+          <strong>Notes</strong>
+          <span>on your work</span>
+        </figcaption>
+      </figure>
+      <span className="home-sketch-op" aria-hidden="true">
+        +
+      </span>
+      <figure>
+        <div className="home-sketch-art" aria-hidden="true">
+          <span className="home-sketch-tag">CV</span>
+          <span className="home-sketch-face" />
+          <span className="home-sketch-bar is-dark is-short" />
+          <span className="home-sketch-bar" />
+          <span className="home-sketch-bar" />
+          <span className="home-sketch-bar is-short" />
         </div>
-      </div>
-      <span className="home-sketch-op is-equals" aria-hidden="true">
+        <figcaption>
+          <strong>Resume</strong>
+          <span>upload once</span>
+        </figcaption>
+      </figure>
+      <span className="home-sketch-op" aria-hidden="true">
         =
       </span>
-      <div className="home-sketch-page">
-        <span className="home-sketch-url">notis.swegrowth.id/@you</span>
-        <span className="home-sketch-tabs" aria-hidden="true">
-          <b>Me</b>
-          <span>Blog</span>
-          <span>About</span>
-        </span>
-        <strong>
-          Hi, <mark>I'm Ayu</mark>
-        </strong>
-        <span className="home-sketch-sub">I build payment systems.</span>
-        <span className="home-sketch-label">Projects</span>
-        <span className="home-sketch-chips">
-          <span>Checkout v2</span>
-          <span>Fraud alerts</span>
-        </span>
-        <span className="home-sketch-post">What I learned from 40 sign-ups</span>
-        <span className="home-sketch-caption">Your portfolio site, ready in minutes</span>
-      </div>
+      <figure className="is-result">
+        <div className="home-sketch-art" aria-hidden="true">
+          <span className="home-sketch-browser">
+            <i />
+            <i />
+            <i />
+          </span>
+          <span className="home-sketch-site">
+            <span className="home-sketch-tabs">
+              <i />
+              <i />
+              <i />
+            </span>
+            <span className="home-sketch-face" />
+            <span className="home-sketch-bar is-dark" />
+            <span className="home-sketch-bar is-short" />
+            <span className="home-sketch-posts">
+              <i />
+              <i />
+            </span>
+          </span>
+        </div>
+        <figcaption>
+          <strong>
+            <mark>Portfolio website</mark>
+          </strong>
+          <span>ready instantly</span>
+        </figcaption>
+      </figure>
     </div>
   );
 }

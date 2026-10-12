@@ -16,8 +16,8 @@ describe('signed-out home page', () => {
       screen.getByRole('heading', { name: 'Everything starts with a note.' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByLabelText('Your notes plus your resume make your portfolio site'),
-    ).toHaveTextContent('Your resume');
+      screen.getByRole('img', { name: 'Notes plus resume equals portfolio website' }),
+    ).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /deserves to be seen/ })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /See a real one/ })).toHaveAttribute(
       'href',

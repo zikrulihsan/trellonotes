@@ -153,143 +153,171 @@
   font-size: 13px;
 }
 
-/* Notes plus a resume making a portfolio site. */
+/* Notes plus a resume making a portfolio website, drawn as an equation. */
 .home-sketch {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  gap: clamp(12px, 3vw, 28px);
-  margin-top: clamp(40px, 6vw, 64px);
-  text-align: left;
+  gap: clamp(6px, 2.5vw, 24px);
+  margin: clamp(40px, 6vw, 64px) 0 0;
+  padding: 0;
+  list-style: none;
 }
-.home-sketch-board,
-.home-sketch-resume,
-.home-sketch-page {
+.home-sketch figure {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  width: min(44%, 300px);
-  padding: 16px;
-  border: 1px solid #e3e1ea;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 18px 50px rgba(42, 33, 59, 0.08);
+  align-items: center;
+  gap: 10px;
+  width: clamp(92px, 24vw, 220px);
+  margin: 0;
 }
-.home-sketch-board {
-  background: #f1eef8;
-  transform: rotate(-2deg);
+.home-sketch figure.is-result {
+  width: clamp(120px, 32vw, 300px);
 }
-.home-sketch-page {
-  transform: rotate(1.5deg);
+.home-sketch figcaption {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
-.home-sketch-label,
-.home-sketch-url {
+.home-sketch figcaption strong {
+  font-family: 'Literata', Georgia, serif;
+  font-size: clamp(16px, 2.4vw, 22px);
+  font-weight: 500;
+  line-height: 1.2;
+}
+.home-sketch figcaption span {
+  color: var(--home-muted);
+  font-size: clamp(12px, 1.6vw, 14px);
+}
+.home-sketch-label {
   color: #92919c;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.4px;
 }
-.home-sketch-card {
-  padding: 10px 12px;
-  border: 1px solid #e3e1ea;
-  border-left: 3px solid var(--purple);
-  border-radius: 8px;
-  background: #fff;
-  font-size: 13px;
-  font-weight: 550;
-}
-.home-sketch-card.is-dim {
-  border-left-color: #d7cff0;
-  color: #85858f;
-  font-weight: 450;
-}
-.home-sketch-inputs {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  width: min(44%, 300px);
-}
-.home-sketch-inputs > div {
-  width: 100%;
-}
-.home-sketch-resume {
-  transform: rotate(1deg);
-}
-.home-sketch-resume .home-sketch-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-.home-sketch-resume strong {
-  font-size: 14px;
-  font-weight: 600;
-}
 .home-sketch-op {
-  flex-shrink: 0;
+  align-self: flex-start;
+  margin-top: clamp(30px, 7vw, 70px);
   color: var(--purple);
   font-family: 'Literata', Georgia, serif;
-  font-size: 32px;
+  font-size: clamp(28px, 5vw, 44px);
   line-height: 1;
 }
-.home-sketch-op.is-equals {
-  font-size: 40px;
-}
-.home-sketch-tabs {
+.home-sketch-art {
+  position: relative;
   display: flex;
-  gap: 12px;
-  color: #92919c;
-  font-size: 12px;
+  flex-direction: column;
+  gap: clamp(5px, 1vw, 8px);
+  justify-content: center;
+  width: 100%;
+  height: clamp(116px, 24vw, 220px);
+  padding: clamp(10px, 2vw, 18px);
+  border: 1px solid #e3e1ea;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 18px 50px rgba(42, 33, 59, 0.08);
+  text-align: left;
 }
-.home-sketch-tabs b {
-  color: var(--home-ink);
-  border-bottom: 2px solid var(--purple);
+.is-result .home-sketch-art {
+  justify-content: flex-start;
+  padding: 0;
+  overflow: hidden;
+  border-color: var(--home-ink);
+  box-shadow: 4px 4px 0 var(--home-ink);
 }
-.home-sketch-sub {
-  color: var(--home-muted);
-  font-size: 13px;
-}
-.home-sketch-chips {
+.home-sketch-note {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   gap: 6px;
-}
-.home-sketch-chips span {
-  padding: 3px 9px;
-  border-radius: 999px;
-  background: #f0eaff;
   color: var(--purple);
-  font-size: 12px;
-  font-weight: 600;
 }
-.home-sketch-caption {
-  margin-top: 4px;
-  color: var(--purple);
-  font-size: 12px;
-  font-weight: 600;
+.home-sketch-note svg {
+  flex-shrink: 0;
 }
-.home-sketch-page strong {
-  margin: 6px 0 2px;
-  font-family: 'Literata', Georgia, serif;
-  font-size: 22px;
-  font-weight: 500;
-}
-.home-sketch-line {
-  height: 8px;
+.home-sketch-bar {
+  display: block;
+  flex: 1;
+  height: clamp(5px, 1vw, 8px);
   border-radius: 4px;
   background: #ecebf0;
 }
-.home-sketch-line.is-short {
-  width: 62%;
+.home-sketch-bar.is-short {
+  flex: 0 0 55%;
 }
-.home-sketch-post {
-  margin-top: 6px;
-  padding: 10px 12px;
-  border: 1px solid var(--home-ink);
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 550;
-  box-shadow: 2px 2px 0 var(--home-ink);
+.home-sketch-bar.is-dark {
+  background: #c9c6d3;
+}
+.home-sketch-art > .home-sketch-bar,
+.home-sketch-site .home-sketch-bar {
+  flex: none;
+  width: 100%;
+}
+.home-sketch-art > .home-sketch-bar.is-short,
+.home-sketch-site .home-sketch-bar.is-short {
+  width: 60%;
+}
+.home-sketch-face {
+  width: clamp(22px, 5vw, 40px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #d9cff5;
+}
+.home-sketch-tag {
+  position: absolute;
+  top: clamp(8px, 1.5vw, 14px);
+  right: clamp(8px, 1.5vw, 14px);
+  padding: 2px 6px;
+  border-radius: 5px;
+  color: #fff;
+  background: #e5533d;
+  font-size: clamp(9px, 1.3vw, 11px);
+  font-weight: 700;
+}
+.home-sketch-browser {
+  display: flex;
+  gap: 4px;
+  padding: clamp(6px, 1.2vw, 10px);
+  border-bottom: 1px solid #ecebf0;
+  background: #f6f5f9;
+}
+.home-sketch-browser i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #d5d3dc;
+}
+.home-sketch-site {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(5px, 1vw, 8px);
+  padding: clamp(10px, 2vw, 18px);
+}
+.home-sketch-tabs {
+  display: flex;
+  gap: 4px;
+}
+.home-sketch-tabs i {
+  width: clamp(16px, 3.4vw, 30px);
+  height: clamp(5px, 1vw, 8px);
+  border-radius: 4px;
+  background: #ecebf0;
+}
+.home-sketch-tabs i:first-child {
+  background: var(--purple);
+}
+.home-sketch-posts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  width: 100%;
+  margin-top: 2px;
+}
+.home-sketch-posts i {
+  height: clamp(18px, 4vw, 36px);
+  border: 1px solid #e3e1ea;
+  border-radius: 6px;
+  background: #fffbe6;
 }
 
 .home section + section {
@@ -515,13 +543,6 @@
   .home-signin {
     flex-direction: column;
     align-items: stretch;
-  }
-  .home-sketch {
-    flex-direction: column;
-  }
-  .home-sketch-inputs,
-  .home-sketch-page {
-    width: min(100%, 300px);
   }
   .home-flow li {
     padding: 16px;
