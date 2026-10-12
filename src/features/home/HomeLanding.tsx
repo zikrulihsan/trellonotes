@@ -258,7 +258,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
 }
 
 /** How long each step of an animated picture stays before the next one. */
-const STEP_MS = 1100;
+const STEP_MS = 700;
 
 /**
  * Steps through `length` frames while the picture is on screen, then starts over; a picture
@@ -303,7 +303,7 @@ const INITIATIVE = [
 
 /** One initiative, updated over several days: each dated update appears in turn. */
 function NoteSketch() {
-  const { ref, step, animated } = useLoop(INITIATIVE.length + 3);
+  const { ref, step, animated } = useLoop(INITIATIVE.length + 1);
   return (
     <div
       ref={ref}
@@ -331,7 +331,7 @@ const STORY_POINTS = [
 /** Points get picked from the notes one by one, then AI writes the story from them. */
 function StorySketch() {
   const points = STORY_POINTS.length;
-  const { ref, step, animated } = useLoop(points + 5);
+  const { ref, step, animated } = useLoop(points + 3);
   return (
     <div
       ref={ref}
@@ -373,7 +373,7 @@ function BoardSketch() {
     { title: 'Done', cards: ['Fix cart drop', 'Launch waitlist'] },
   ];
   // Frames: 0 board, 1 pointer on the card, 2 journal open, 3-5 updates, 6-7 hold.
-  const { ref, step, animated } = useLoop(8);
+  const { ref, step, animated } = useLoop(7);
   const open = step >= 2;
   return (
     <div
@@ -441,7 +441,7 @@ function Equation({
   parts: EquationPart[];
   animate?: boolean;
 }) {
-  const { ref, step: frame, animated } = useLoop(parts.length * 2 + 2);
+  const { ref, step: frame, animated } = useLoop(parts.length * 2);
   const step = animate ? frame : Infinity;
   const shown = (index: number) => (index <= step ? ' is-shown' : '');
   return (
