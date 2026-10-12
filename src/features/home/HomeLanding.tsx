@@ -1,4 +1,4 @@
-import { Fragment, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useState, type ReactNode } from 'react';
 import { Modal } from '@/components/ui/Modal';
 import { LegalFooter } from '@/features/legal/LegalPage';
 import {
@@ -94,6 +94,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             </a>
           </div>
           <Equation
+            animate
             label="Write notes, turn them into stories, show your work"
             parts={[
               { title: 'Write notes', caption: 'everyday, as you work', art: <NotesArt /> },
@@ -148,16 +149,11 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           <div className="home-beat-text">
             <p className="eyebrow">3 · SHOW YOUR WORK</p>
             <h2 id="home-beat-site">
-              Every story builds <mark>your personal website</mark>.
+              Every story is part of <mark>your professional journey</mark>.
             </h2>
-            <p>
-              What you publish is not just a blog post. It becomes part of your own website on Notis
-              at notis.swegrowth.id/@yourname, next to who you are, your projects and what you are
-              up to now.
-            </p>
+            <p>It all lives on your own website on Notis, at /@yourname.</p>
             <span className="home-ai">
-              <Sparkles size={15} /> Powered by AI: upload your resume and AI builds the rest of
-              your site in minutes.
+              <Sparkles size={15} /> Add your resume and AI sets up the rest in minutes.
             </span>
           </div>
           <Equation
@@ -192,11 +188,10 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
         <section className="home-beat" aria-labelledby="home-beat-boards">
           <div className="home-beat-text">
             <p className="eyebrow">AND EVERY DAY</p>
-            <h2 id="home-beat-boards">Track your work on boards built for writing.</h2>
+            <h2 id="home-beat-boards">Track your work, journal your progress.</h2>
             <p>
-              Plan and move work across lists to stay productive. Every card is an initiative you
-              update by writing, like a journal, so your progress is already written down when it is
-              time to tell the story.
+              Move initiatives across your board to stay productive, and write updates on each one
+              as you go.
             </p>
           </div>
           <BoardSketch />
@@ -365,17 +360,53 @@ interface EquationPart {
 }
 
 /** A picture read left to right: labelled drawings joined by +, = or arrows. */
-function Equation({ label, parts }: { label: string; parts: EquationPart[] }) {
+/** How long each step of an animated equation stays before the next one appears. */
+const STEP_MS = 1100;
+
+/**
+ * Plays an equation left to right, one step at a time, then starts over. Steps are the
+ * parts and the operators between them, plus a pause at the end. Without motion, all show.
+ */
+function useSteps(count: number, animate: boolean) {
+  const still =
+    !animate || Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
+  const [step, setStep] = useState(0);
+  useEffect(() => {
+    if (still) return;
+    const timer = window.setInterval(
+      () => setStep((current) => (current + 1) % (count + 3)),
+      STEP_MS,
+    );
+    return () => window.clearInterval(timer);
+  }, [count, still]);
+  return still ? count : step;
+}
+
+function Equation({
+  label,
+  parts,
+  animate = false,
+}: {
+  label: string;
+  parts: EquationPart[];
+  animate?: boolean;
+}) {
+  const step = useSteps(parts.length * 2 - 1, animate);
+  const shown = (index: number) => (index <= step ? ' is-shown' : '');
   return (
-    <div className="home-sketch" role="img" aria-label={label}>
-      {parts.map((part) => (
+    <div
+      className={animate ? 'home-sketch is-animated' : 'home-sketch'}
+      role="img"
+      aria-label={label}
+    >
+      {parts.map((part, index) => (
         <Fragment key={part.title}>
           {part.op && (
-            <span className="home-sketch-op" aria-hidden="true">
+            <span className={`home-sketch-op${shown(index * 2 - 1)}`} aria-hidden="true">
               {part.op}
             </span>
           )}
-          <figure className={part.result ? 'is-result' : undefined}>
+          <figure className={`${part.result ? 'is-result' : ''}${shown(index * 2)}`}>
             <div className="home-sketch-art" aria-hidden="true">
               {part.art}
             </div>

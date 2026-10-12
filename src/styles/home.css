@@ -684,3 +684,66 @@ a.home-logo {
     transform: none;
   }
 }
+
+/* The hero equation plays step by step: each part fades in, then its lines draw. */
+.home-sketch.is-animated figure,
+.home-sketch.is-animated .home-sketch-op {
+  opacity: 0.18;
+  transform: translateY(8px);
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s ease;
+}
+.home-sketch.is-animated .is-shown {
+  opacity: 1;
+  transform: none;
+}
+.home-sketch.is-animated .home-sketch-bar,
+.home-sketch.is-animated .home-sketch-posts,
+.home-sketch.is-animated .home-sketch-face,
+.home-sketch.is-animated .home-sketch-publish {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+.home-sketch.is-animated
+  .is-shown
+  :is(.home-sketch-bar, .home-sketch-posts, .home-sketch-face, .home-sketch-publish) {
+  transform: none;
+}
+.home-sketch.is-animated .home-sketch-art > :nth-child(2),
+.home-sketch.is-animated .home-sketch-site > :nth-child(2) {
+  transition-delay: 0.1s;
+}
+.home-sketch.is-animated .home-sketch-art > :nth-child(3),
+.home-sketch.is-animated .home-sketch-site > :nth-child(3) {
+  transition-delay: 0.2s;
+}
+.home-sketch.is-animated .home-sketch-art > :nth-child(4),
+.home-sketch.is-animated .home-sketch-site > :nth-child(4) {
+  transition-delay: 0.3s;
+}
+.home-sketch.is-animated .home-sketch-art > :nth-child(5),
+.home-sketch.is-animated .home-sketch-site > :nth-child(5) {
+  transition-delay: 0.4s;
+}
+.home-sketch.is-animated .home-sketch-site > :nth-child(6) {
+  transition-delay: 0.5s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-sketch.is-animated * {
+    transition: none;
+  }
+}
+.home-sketch.is-animated .home-sketch-note:nth-child(2) .home-sketch-bar {
+  transition-delay: 0.1s;
+}
+.home-sketch.is-animated .home-sketch-note:nth-child(3) .home-sketch-bar {
+  transition-delay: 0.2s;
+}
+.home-sketch.is-animated .home-sketch-note:nth-child(4) .home-sketch-bar {
+  transition-delay: 0.3s;
+}
+.home-sketch.is-animated .home-sketch-note:nth-child(5) .home-sketch-bar {
+  transition-delay: 0.4s;
+}

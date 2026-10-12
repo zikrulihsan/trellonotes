@@ -18,7 +18,7 @@ describe('signed-out home page', () => {
     expect(
       screen.getByRole('img', { name: 'Stories plus resume equals your personal website' }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /Every story builds/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Every story is part of/ })).toBeInTheDocument();
     expect(screen.getByText('Is everything I write public?')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'See a real one' })).toHaveAttribute(
       'href',
