@@ -5,13 +5,9 @@ import { Feather } from 'lucide-react';
 const UPDATED = '12 October 2026';
 
 /** Where people reach the team about their account or their data. */
-const CONTACT = 'https://swegrowth.id';
+const CONTACT = 'zikrulihsanmd@gmail.com';
 
-const contact = (
-  <a href={CONTACT} target="_blank" rel="noreferrer">
-    SWE Growth
-  </a>
-);
+const contact = <a href={`mailto:${CONTACT}`}>{CONTACT}</a>;
 
 const TERMS: { title: string; body: ReactNode }[] = [
   {
@@ -75,7 +71,7 @@ const TERMS: { title: string; body: ReactNode }[] = [
       <p>
         We may remove published content or suspend an account that breaks these terms, and we will
         tell you why when we can. You can unpublish your pages at any time, and ask us to delete
-        your account through {contact}.
+        your account by emailing {contact}.
       </p>
     ),
   },
@@ -159,8 +155,8 @@ const PRIVACY: { title: string; body: ReactNode }[] = [
     body: (
       <p>
         You can edit or unpublish any page at any time. You can ask for a copy of your data, a
-        correction, or the deletion of your account and content through {contact}. When an account
-        is deleted, its private and published content is removed.
+        correction, or the deletion of your account and content by emailing {contact}. When an
+        account is deleted, its private and published content is removed.
       </p>
     ),
   },
