@@ -1,6 +1,8 @@
 import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Modal } from '@/components/ui/Modal';
+import { ConsentCheckbox } from '@/features/legal/ConsentCheckbox';
 import { LegalFooter } from '@/features/legal/LegalPage';
+import { rememberConsent } from '@/lib/consent';
 import {
   ArrowRight,
   CircleCheck,
@@ -226,29 +228,15 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           onClose={() => !redirecting && setSigningIn(false)}
         >
           <p>Sign in and your first board is ready. Nothing is public until you publish it.</p>
-          <label className="home-consent">
-            <input
-              type="checkbox"
-              checked={agreed}
-              onChange={(event) => setAgreed(event.target.checked)}
-            />
-            <span>
-              I have read the{' '}
-              <a href="/terms" target="_blank" rel="noreferrer">
-                Terms
-              </a>{' '}
-              and agree to the{' '}
-              <a href="/privacy" target="_blank" rel="noreferrer">
-                Privacy Policy
-              </a>
-              .
-            </span>
-          </label>
+          <ConsentCheckbox checked={agreed} onChange={setAgreed} />
           <div className="home-signin-options">
             <button
               className="home-button is-primary"
               type="button"
-              onClick={onGoogle}
+              onClick={() => {
+                rememberConsent();
+                onGoogle();
+              }}
               disabled={redirecting || !agreed}
             >
               {redirecting ? <LoaderCircle size={18} className="auth-spinner" /> : <GoogleMark />}
@@ -257,7 +245,10 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             <button
               className="home-button"
               type="button"
-              onClick={onSwegrowth}
+              onClick={() => {
+                rememberConsent();
+                onSwegrowth();
+              }}
               disabled={redirecting || !agreed}
             >
               Continue with SWE Growth

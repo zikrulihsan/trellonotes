@@ -52,6 +52,13 @@ export function AuthProvider({ children }: PropsWithChildren) {
       signInWithSwegrowth() {
         window.location.assign(swegrowthSignInUrl());
       },
+      async acceptTerms() {
+        if (!supabase) return;
+        const { error } = await supabase.auth.updateUser({
+          data: { terms_accepted_at: new Date().toISOString() },
+        });
+        if (error) throw error;
+      },
       async signOut() {
         if (!supabase) return;
         const { error } = await supabase.auth.signOut();
