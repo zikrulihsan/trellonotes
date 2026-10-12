@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { slugify } from '@/lib/slug';
+import { HANDLE_PATTERN } from '@/lib/site-host';
 
 const TABLE = 'trellonotes_profiles';
 
@@ -9,8 +10,7 @@ export interface Profile {
   display_name: string | null;
 }
 
-/** 3–30 lowercase letters, digits and dashes, not starting or ending with a dash. */
-export const HANDLE_PATTERN = /^[a-z0-9][a-z0-9-]{1,28}[a-z0-9]$/;
+export { HANDLE_PATTERN };
 
 export class HandleTakenError extends Error {
   constructor(handle: string) {

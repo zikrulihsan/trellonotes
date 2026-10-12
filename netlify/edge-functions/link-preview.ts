@@ -1,6 +1,7 @@
 // Gives shared page links a preview with the page's own title and summary, since
 // link previews read the HTML without running the app. See src/lib/link-preview.ts.
 import { firstImage, summarize, withPreview, type Preview } from '../../src/lib/link-preview.ts';
+import { classifyHost } from '../../src/lib/site-host.ts';
 
 // Public values, the same ones the app is built with (netlify.toml).
 const SUPABASE_URL =
@@ -43,12 +44,36 @@ function pagePreview(page: PageRow, url: string, author?: string | null): Previe
   };
 }
 
+/** The handle whose pages a writer's own domain or subdomain shows; null on the app. */
+async function siteHandle(hostname: string): Promise<string | null> {
+  const site = classifyHost(hostname);
+  if (site.kind === 'subdomain') return site.handle;
+  if (site.kind === 'app') return null;
+  const owner = await one<{ user_id: string }>('trellonotes_custom_domains', {
+    select: 'user_id',
+    domain: `eq.${site.domain}`,
+    verified_at: 'not.is.null',
+  });
+  if (!owner) return null;
+  const profile = await one<{ handle: string }>('trellonotes_profiles', {
+    select: 'handle',
+    user_id: `eq.${owner.user_id}`,
+  });
+  return profile?.handle ?? null;
+}
+
 async function findPreview(url: URL): Promise<Preview | null> {
   let parts: string[];
   try {
     parts = url.pathname.split('/').filter(Boolean).map(decodeURIComponent);
   } catch {
     return null;
+  }
+  // On a writer's own domain "/" and "/slug" are their "/@handle" and "/@handle/slug".
+  if (parts.length <= 1 && classifyHost(url.hostname).kind !== 'app') {
+    const handle = await siteHandle(url.hostname);
+    if (!handle) return null;
+    parts = [`@${handle}`, ...parts];
   }
   const href = url.href;
   if (parts[0] === 's' && parts.length === 2) {
@@ -100,10 +125,14 @@ async function findPreview(url: URL): Promise<Preview | null> {
   return null;
 }
 
+const PUBLIC_PATH = /^\/(@|s\/|read\/)/;
+
 export default async function linkPreview(request: Request, context: Context) {
+  const url = new URL(request.url);
+  if (classifyHost(url.hostname).kind === 'app' && !PUBLIC_PATH.test(url.pathname)) return;
   const response = await context.next();
   if (!response.headers.get('content-type')?.includes('text/html')) return response;
-  const preview = await findPreview(new URL(request.url)).catch(() => null);
+  const preview = await findPreview(url).catch(() => null);
   if (!preview) return response;
   const headers = new Headers(response.headers);
   headers.delete('content-length');
@@ -113,4 +142,6 @@ export default async function linkPreview(request: Request, context: Context) {
   });
 }
 
-export const config = { path: ['/@*', '/s/*', '/read/*'] };
+// Writers' own domains serve their pages from any path, so this runs on every page; on
+// the app it returns at once unless the path is a public one.
+export const config = { path: '/*', excludedPath: ['/assets/*', '/api/*'] };

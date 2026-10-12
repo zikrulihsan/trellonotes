@@ -54,6 +54,8 @@ import {
   type SocialPlatform,
 } from '@/lib/supabase/landing';
 import { getProfile } from '@/lib/supabase/profiles';
+import { domainOwner } from '@/lib/supabase/custom-domains';
+import { classifyHost, setSiteHandle } from '@/lib/site-host';
 import { readCached, writeCached } from '@/lib/public-cache';
 import { writingExtensions } from '@/features/editor/extensions';
 import { useLandingFont } from './useLandingFont';
@@ -101,8 +103,14 @@ function usePublicData<T>(load: () => Promise<T>, deps: unknown[], name?: string
   return cached ? { status: 'ready', data: cached.data } : { status: 'loading' };
 }
 
+/** The writer's own domain or subdomain, where their pages sit at the root; else the app. */
+const SITE = classifyHost(window.location.hostname);
+
 type Address =
-  { handle: string; slug?: string } | { userId: string; slug?: string } | { code: string };
+  | { handle: string; slug?: string }
+  | { userId: string; slug?: string }
+  | { code: string }
+  | { domain: string; slug?: string };
 
 function parseAddress(pathname: string): Address | null {
   let parts: string[];
@@ -115,6 +123,9 @@ function parseAddress(pathname: string): Address | null {
     return { code: parts[1] };
   if (parts[0]?.startsWith('@')) return { handle: parts[0].slice(1), slug: parts[1] };
   if (parts[0] === 'read' && UUID.test(parts[1] ?? '')) return { userId: parts[1], slug: parts[2] };
+  if (SITE.kind === 'subdomain' && parts.length <= 1)
+    return { handle: SITE.handle, slug: parts[0] };
+  if (SITE.kind === 'custom' && parts.length <= 1) return { domain: SITE.domain, slug: parts[0] };
   return null;
 }
 
@@ -133,6 +144,11 @@ async function resolveAuthor(address: Address): Promise<Resolved> {
     if (!target) return null;
     const resolved = await resolveAuthor({ userId: target.userId });
     return resolved && { author: resolved.author, slug: target.slug };
+  }
+  if ('domain' in address) {
+    const userId = await domainOwner(supabase, address.domain);
+    const resolved = userId && (await resolveAuthor({ userId }));
+    return resolved ? { author: resolved.author } : null;
   }
   const profile = await getProfile(
     supabase,
@@ -168,6 +184,9 @@ export function PublicReader() {
     'author',
   );
   let body;
+  // On the writer's own domain, links to their pages drop the /@handle prefix.
+  if (SITE.kind !== 'app' && result.status === 'ready')
+    setSiteHandle(result.data?.author.handle ?? null);
   if (result.status !== 'ready')
     body = (
       <Status

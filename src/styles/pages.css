@@ -890,3 +890,87 @@
   flex-direction: column;
   gap: 20px;
 }
+
+/* Public page screen: the writer's own domain */
+.landing-domain h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #2d2737;
+}
+.landing-domain h2 svg {
+  color: #7954d8;
+}
+.landing-domain-form,
+.landing-domain-actions,
+.landing-domain-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 14px;
+}
+.landing-domain-form input {
+  flex: 1;
+  min-width: 180px;
+}
+.landing-domain-line a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #6a46c8;
+  font-weight: 500;
+  text-decoration: none;
+}
+.landing-domain-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #fff3dc;
+  color: #8a5a00;
+  font-size: 12px;
+  font-weight: 600;
+}
+.landing-domain-badge.is-live {
+  background: #e3f6e8;
+  color: #23733a;
+}
+.landing-domain-records {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  table-layout: fixed;
+}
+.landing-domain-records th {
+  padding: 6px 8px;
+  color: #8a8593;
+  font-weight: 500;
+  text-align: left;
+}
+.landing-domain-records th:first-child {
+  width: 64px;
+}
+.landing-domain-records td {
+  padding: 6px 8px;
+  border-top: 1px solid #ebe8f0;
+  vertical-align: top;
+}
+.domain-copy {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 6px;
+  color: #2d2737;
+  text-align: left;
+}
+.domain-copy code {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+.domain-copy svg {
+  flex: none;
+  color: #8a8593;
+}

@@ -31,6 +31,7 @@ import {
 import { useProfile } from '@/features/pages/useProfile';
 import { visibility } from '@/features/pages/publish-state';
 import { PublicAddress } from '@/features/pages/PublicAddress';
+import { CustomDomain } from './CustomDomain';
 import { applyResume } from '@/lib/resume-import';
 import { nowTitles } from '@/features/journal/journal';
 import { useLandingFont } from '@/features/reader/useLandingFont';
@@ -233,6 +234,7 @@ export function LandingSettingsPage() {
                 setStatus({});
               }}
             />
+            {user && <CustomDomain userId={user.id} handle={profile?.handle ?? null} />}
           </div>
           <form className="landing-form" onSubmit={submit}>
             <Section title="Theme" hint="How your page looks to visitors. You can switch any time.">

@@ -1,6 +1,7 @@
 import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js';
 import type { Page } from '@/features/workspace/types';
 import { slugify } from '@/lib/slug';
+import { getSiteHandle } from '@/lib/site-host';
 
 const TABLE = 'trellonotes_published_pages';
 
@@ -22,8 +23,12 @@ export interface PublicAuthor {
   handle: string | null;
 }
 
-/** "/@zikrul/catatan-rilis", or "/read/<account id>/catatan-rilis" without a handle. */
+/**
+ * "/@zikrul/catatan-rilis", or "/read/<account id>/catatan-rilis" without a handle. On the
+ * writer's own domain or subdomain their pages sit at the root: "/catatan-rilis".
+ */
 export function writerPath(author: PublicAuthor, slug?: string): string {
+  if (author.handle && author.handle === getSiteHandle()) return `/${slug ?? ''}`;
   const base = author.handle ? `/@${author.handle}` : `/read/${author.userId}`;
   return slug ? `${base}/${slug}` : base;
 }
