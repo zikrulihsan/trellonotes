@@ -9,6 +9,8 @@ export type AuthContextValue = {
   signInWithGoogle: () => Promise<void>;
   signInWithSwegrowth: () => void;
   signOut: () => Promise<void>;
+  /** Records that the signed-in account agreed to the Terms and the Privacy Policy. */
+  acceptTerms: () => Promise<void>;
 };
 
 export const AuthContext = createContext<AuthContextValue | null>(null);

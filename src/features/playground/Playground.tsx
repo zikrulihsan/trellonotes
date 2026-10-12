@@ -32,6 +32,7 @@ const GUEST: AuthContextValue = {
     window.location.assign(SIGN_IN_URL);
   },
   async signOut() {},
+  async acceptTerms() {},
 };
 
 /**
