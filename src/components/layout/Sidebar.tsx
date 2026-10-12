@@ -25,6 +25,8 @@ import { useFocus } from '@/features/focus/focus-context';
 import { formatClock } from '@/features/focus/focus-timer';
 import { useProfile } from '@/features/pages/useProfile';
 import { writerPath } from '@/lib/supabase/published-pages';
+import { usePlayground } from '@/features/playground/playground-context';
+import { PLAYGROUND_AUTHOR } from '@/features/playground/sample';
 export function Sidebar({
   board,
   section,
@@ -37,6 +39,7 @@ export function Sidebar({
     focus = useFocus(),
     { user, signOut } = useAuth(),
     { author } = useProfile(),
+    playground = usePlayground(),
     [signingOut, setSigningOut] = useState(false),
     { sidebarVisible, narrowScreen, hideSidebar, closeSidebarDrawer, openDialog } = useUI(),
     navigate = useNavigate(),
@@ -218,6 +221,23 @@ export function Sidebar({
                 )}
               </>
             )}
+            {playground && (
+              <>
+                <div className="side-section">
+                  <span>SHOW</span>
+                </div>
+                <button
+                  className="side-link"
+                  onClick={() => {
+                    navigate(writerPath(PLAYGROUND_AUTHOR));
+                    closeSidebarDrawer();
+                  }}
+                >
+                  <Globe size={18} />
+                  <span className="side-label">My website</span>
+                </button>
+              </>
+            )}
           </nav>
           <div className="side-section">
             <span>TOOLS</span>
@@ -286,13 +306,15 @@ export function Sidebar({
         <div className="sidebar-footer">
           <span className="profile-avatar">S</span>
           <div className="sidebar-text" title={user?.email ?? undefined}>
-            {user?.email ?? 'My workspace'}
+            {user?.email ?? (playground ? 'Playground' : 'My workspace')}
             <small>
-              {cloudEnabled
-                ? syncStatus === 'error'
-                  ? 'Sync paused'
-                  : 'SweGrowth sync'
-                : 'Saved on this device'}
+              {playground
+                ? 'Sample data, not saved'
+                : cloudEnabled
+                  ? syncStatus === 'error'
+                    ? 'Sync paused'
+                    : 'SweGrowth sync'
+                  : 'Saved on this device'}
             </small>
           </div>
           {cloudEnabled ? (
@@ -303,6 +325,14 @@ export function Sidebar({
               title="Sign out"
             >
               {signingOut ? 'Saving…' : 'Sign out'}
+            </button>
+          ) : playground ? (
+            <button
+              className="local-pill signout-pill"
+              onClick={() => navigate('/')}
+              title="Pick something else to try"
+            >
+              Exit
             </button>
           ) : (
             <span className="local-pill">Local</span>

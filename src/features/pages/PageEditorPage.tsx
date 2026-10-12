@@ -21,8 +21,12 @@ import {
   ensureShortCode,
   shortUrl,
   unpublishPage,
+  writerPath,
   writerUrl,
 } from '@/lib/supabase/published-pages';
+import { slugify } from '@/lib/slug';
+import { usePlayground } from '@/features/playground/playground-context';
+import { PLAYGROUND_AUTHOR } from '@/features/playground/sample';
 import { findByRef, pagePath } from '@/lib/app-paths';
 import { useProfile } from './useProfile';
 import type { Page } from '@/features/workspace/types';
@@ -65,6 +69,40 @@ export default function PageEditorPage() {
 }
 
 function PublishButton({ page }: { page: Page }) {
+  return usePlayground() ? <PlaygroundPublish page={page} /> : <CloudPublish page={page} />;
+}
+
+/** In the playground, publishing puts the page on the sample website in this tab only. */
+function PlaygroundPublish({ page }: { page: Page }) {
+  const { setPagePublished } = useWorkspaceActions(),
+    navigate = useNavigate();
+  const state = publishState(page);
+  function publish() {
+    const slug = page.published?.slug || slugify(page.title) || page.id.slice(0, 8);
+    setPagePublished(page.id, { slug, at: Date.now() });
+    navigate(writerPath(PLAYGROUND_AUTHOR, slug));
+  }
+  if (page.published && state === 'published')
+    return (
+      <button
+        className="publish-button is-live"
+        onClick={() => navigate(writerPath(PLAYGROUND_AUTHOR, page.published!.slug))}
+      >
+        <ExternalLink size={14} /> See it live
+      </button>
+    );
+  return (
+    <button
+      className="publish-button"
+      onClick={publish}
+      title="Put this page on your sample website"
+    >
+      {state === 'changed' ? 'Update' : 'Publish'}
+    </button>
+  );
+}
+
+function CloudPublish({ page }: { page: Page }) {
   const control = usePageVisibility(page),
     { canPublish, busy, error, publish } = control;
   const state = publishState(page);
@@ -110,6 +148,7 @@ function PublishButton({ page }: { page: Page }) {
 function PageOptions({ page }: { page: Page }) {
   const { setPagePublished, deletePage } = useWorkspaceActions(),
     { author } = useProfile(),
+    playground = usePlayground(),
     navigate = useNavigate(),
     menu = useDropdown();
   const [copied, setCopied] = useState<'link' | 'short' | null>(null),
@@ -162,7 +201,7 @@ function PageOptions({ page }: { page: Page }) {
   }
   async function remove() {
     // Take the public copy down first, so no live link is left without its page.
-    if (page.published && !(await unpublish())) return;
+    if (page.published && !playground && !(await unpublish())) return;
     deletePage(page.id);
     navigate('/pages');
   }

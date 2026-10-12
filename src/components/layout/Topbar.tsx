@@ -94,7 +94,9 @@ export function Topbar({
               ? syncStatus === 'error'
                 ? 'Sync paused'
                 : 'Synced with SweGrowth'
-              : 'Saved on this device'}
+              : syncStatus === 'memory'
+                ? 'Playground · not saved'
+                : 'Saved on this device'}
           </span>
         </span>
       </div>

@@ -44,3 +44,8 @@ export function isPublicPath(pathname: string): boolean {
 export function isLegalPath(pathname: string): boolean {
   return ['/terms', '/privacy'].includes(pathname.replace(/\/$/, ''));
 }
+
+/** The no-sign-in playground (/playground), whose sample workspace lives only in the tab. */
+export function isPlaygroundPath(pathname: string): boolean {
+  return pathname === '/playground' || pathname.startsWith('/playground/');
+}

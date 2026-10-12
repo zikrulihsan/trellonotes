@@ -2,6 +2,8 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './app/App';
 import { AppProviders } from './app/AppProviders';
+import { Playground } from './features/playground/Playground';
+import { isPlaygroundPath } from './lib/app-paths';
 import './styles/index.css';
 
 // Links from before clean URLs carried the route in the hash, e.g. /#/board/x.
@@ -11,8 +13,13 @@ if (window.location.hash.startsWith('#/'))
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <AppProviders>
-      <App />
-    </AppProviders>
+    {/* The playground keeps its own router and sample workspace, apart from any account. */}
+    {isPlaygroundPath(window.location.pathname) ? (
+      <Playground />
+    ) : (
+      <AppProviders>
+        <App />
+      </AppProviders>
+    )}
   </StrictMode>,
 );

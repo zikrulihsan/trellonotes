@@ -11,6 +11,8 @@ import { supabase } from '@/lib/supabase/client';
 import { pagePath } from '@/lib/app-paths';
 import { wordCount } from '@/lib/text';
 import { cardNotes, writeUp } from '@/lib/writeup';
+import { usePlayground } from '@/features/playground/playground-context';
+import { playgroundDraft } from '@/features/playground/sample';
 export function NoteOptions({ note, board }: { note: Note; board: Board }) {
   const { updateNote, moveNote, createPage } = useWorkspaceActions(),
     { workspace } = useWorkspace(),
@@ -18,13 +20,20 @@ export function NoteOptions({ note, board }: { note: Note; board: Board }) {
     { openDialog } = useUI(),
     menu = useDropdown(),
     navigate = useNavigate(),
+    playground = usePlayground(),
     [writing, setWriting] = useState<{ busy?: boolean; error?: string }>({});
   /** Drafts a private page about this card with Gemini, from its notes. */
   async function writeItUp() {
-    if (!supabase) return;
+    if (!supabase && !playground) return;
     setWriting({ busy: true });
     try {
-      const page = await writeUp(supabase, 'card', cardNotes(workspace, note), note.title);
+      // The playground never sends notes anywhere; it shows the draft a sample would get.
+      const page =
+        playground || !supabase
+          ? await new Promise<ReturnType<typeof playgroundDraft>>((done) =>
+              setTimeout(() => done(playgroundDraft(note)), 900),
+            )
+          : await writeUp(supabase, 'card', cardNotes(workspace, note), note.title);
       menu.close();
       navigate(pagePath({ id: createPage(page), title: page.title }));
     } catch (reason) {
@@ -78,14 +87,16 @@ export function NoteOptions({ note, board }: { note: Note; board: Board }) {
           </select>
         </label>
         <div className="menu-actions">
-          {supabase && (
+          {(supabase || playground) && (
             <button
               onClick={writeItUp}
               disabled={writing.busy || !wordCount(note.content)}
               title={
-                wordCount(note.content)
-                  ? 'Gemini drafts a private page about this work from the card’s notes'
-                  : 'Write some notes on this card first'
+                !wordCount(note.content)
+                  ? 'Write some notes on this card first'
+                  : playground
+                    ? 'Shows a sample draft. Signed in, Gemini drafts it from the card’s notes'
+                    : 'Gemini drafts a private page about this work from the card’s notes'
               }
             >
               <Sparkles size={15} />
