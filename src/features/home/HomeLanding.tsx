@@ -13,7 +13,9 @@ import {
   Lock,
   NotebookPen,
   PenLine,
+  Send,
   Sparkles,
+  Sprout,
 } from 'lucide-react';
 
 interface HomeLandingProps {
@@ -22,6 +24,28 @@ interface HomeLandingProps {
   onGoogle: () => void;
   onSwegrowth: () => void;
 }
+
+/** Notis in three steps: the notes and posts add up to a portfolio, not just a published page. */
+const LOOP: { icon: ReactNode; title: string; text: string }[] = [
+  {
+    icon: <NotebookPen size={20} />,
+    title: 'Note it',
+    text: 'Plans, progress and results, as you work. Private until you say so.',
+  },
+  {
+    icon: <Send size={20} />,
+    title: 'Publish it',
+    text: 'When something is worth telling, turn your notes into a post and put it live.',
+  },
+  {
+    icon: <Sprout size={20} />,
+    title: 'Grow your portfolio',
+    text: 'Every post adds to your page at /@you. It keeps growing with your work, week after week.',
+  },
+];
+
+/** What the portfolio is made of, shown on the third step. */
+const PORTFOLIO_PARTS = ['Me', 'Blog', 'About', "What I'm up to now"];
 
 /** The everyday loop: each moment of work, and what you do with it in Notis. */
 const STEPS = [
@@ -170,6 +194,34 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             <Lock size={13} /> Private until you choose to publish.
           </p>
           <HeroSketch />
+        </section>
+
+        <section className="home-loop" aria-labelledby="home-loop">
+          <p className="eyebrow">MORE THAN NOTE AND PUBLISH</p>
+          <h2 id="home-loop">
+            Note it. Publish it. <mark>Grow your portfolio.</mark>
+          </h2>
+          <p className="home-section-lead">
+            Publishing is not the finish line. Everything you publish builds a professional
+            portfolio that keeps growing as long as you work.
+          </p>
+          <ol className="home-loop-steps">
+            {LOOP.map((step, index) => (
+              <li key={step.title}>
+                <span className="home-pillar-icon">{step.icon}</span>
+                <span className="home-pillar-step">0{index + 1}</span>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
+                {index === LOOP.length - 1 && (
+                  <ul className="home-loop-parts" aria-label="Your portfolio">
+                    {PORTFOLIO_PARTS.map((part) => (
+                      <li key={part}>{part}</li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ol>
         </section>
 
         <section className="home-different" aria-labelledby="home-different">

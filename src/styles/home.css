@@ -760,3 +760,83 @@
     font-size: 20px;
   }
 }
+
+/* Three steps under the hero: note, publish, and the portfolio it all adds up to. */
+.home-loop {
+  text-align: center;
+}
+.home-loop-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 36px;
+  margin: 32px 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+.home-loop-steps > li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  border: 1px solid #e7e5ee;
+  border-radius: 16px;
+  background: #fff;
+}
+.home-loop-steps > li + li::before {
+  content: '→';
+  position: absolute;
+  top: 50%;
+  left: -28px;
+  transform: translateY(-50%);
+  color: var(--purple);
+  font-size: 20px;
+  font-weight: 600;
+}
+.home-loop-steps > li:last-child {
+  border-color: var(--home-ink);
+  background: #fffbe6;
+  box-shadow: 3px 3px 0 var(--home-ink);
+}
+.home-loop-steps > li:last-child .home-pillar-icon {
+  color: var(--home-ink);
+  background: var(--home-marker);
+}
+.home-loop-steps h3 {
+  margin: 20px 0 8px;
+  font-size: 24px;
+}
+.home-loop-steps p {
+  margin: 0;
+  color: var(--home-muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+.home-loop-parts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.home-loop-parts li {
+  padding: 3px 10px;
+  border: 1px solid var(--home-ink);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+@media (max-width: 760px) {
+  .home-loop-steps {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+  .home-loop-steps > li + li::before {
+    content: '↓';
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
