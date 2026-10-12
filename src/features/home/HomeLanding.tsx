@@ -6,16 +6,9 @@ import {
   CircleCheck,
   ExternalLink,
   Feather,
-  FileText,
-  Globe,
-  KanbanSquare,
-  ListChecks,
   LoaderCircle,
-  Lock,
-  NotebookPen,
   PenLine,
   Send,
-  Sparkles,
 } from 'lucide-react';
 
 interface HomeLandingProps {
@@ -25,57 +18,32 @@ interface HomeLandingProps {
   onSwegrowth: () => void;
 }
 
+/** Questions people ask before they start. */
+const FAQ: { q: string; a: string }[] = [
+  {
+    q: 'Is everything I write public?',
+    a: 'No. Notes, boards, to-do lists and your work journal are private by default. Only the pages you publish appear on your website, and you can unpublish them at any time.',
+  },
+  {
+    q: 'Do I have to write long articles?',
+    a: 'No. A post can be a short recap of what you finished this week. Notis starts it from your notes, so most of the writing is already done.',
+  },
+  {
+    q: 'What is on my website?',
+    a: 'A home page with who you are, your projects and what you are up to now, a blog of everything you publish, and an About page. It lives at notis.swegrowth.id/@yourname.',
+  },
+  {
+    q: 'What does uploading my resume do?',
+    a: 'It drafts your website from your resume: your headline, what you help with, your projects and your story. You review it before anything goes live.',
+  },
+  {
+    q: 'Can I use Notis just for notes?',
+    a: 'Yes. Boards, to-do lists and free writing work for any kind of work, and you never have to publish anything.',
+  },
+];
+
 /** A real Notis website to point visitors at. */
 const EXAMPLE_SITE = 'https://notis.swegrowth.id/@zikrul-ihsan-md';
-
-const COMPARE: { kind: string; text: string; ours?: boolean }[] = [
-  {
-    kind: 'Task apps',
-    text: 'Finished work disappears into a Done column and is forgotten.',
-  },
-  {
-    kind: 'Blogs and notes apps',
-    text: 'You have to stop and write it all from scratch, so it never happens.',
-  },
-  {
-    kind: 'Notis',
-    text: 'Note as you work, publish when it is worth telling.',
-    ours: true,
-  },
-];
-
-const FEATURES: { icon: ReactNode; title: string; text: string }[] = [
-  {
-    icon: <KanbanSquare size={18} />,
-    title: 'Boards',
-    text: 'Lists and cards for any kind of work.',
-  },
-  {
-    icon: <NotebookPen size={18} />,
-    title: 'Work journal',
-    text: 'Every week of finished work, kept for you.',
-  },
-  {
-    icon: <ListChecks size={18} />,
-    title: 'To-do lists',
-    text: 'Checklists for the days and the weeks.',
-  },
-  {
-    icon: <FileText size={18} />,
-    title: 'Pages',
-    text: 'Long-form writing, ready to publish.',
-  },
-  {
-    icon: <Globe size={18} />,
-    title: 'Your own site',
-    text: 'A home page, blog and About under one handle.',
-  },
-  {
-    icon: <Sparkles size={18} />,
-    title: 'AI from your resume',
-    text: 'Upload your CV and AI fills in your public page.',
-  },
-];
 
 /** What signed-out visitors see: what Notis is, and the way in. */
 export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeLandingProps) {
@@ -144,23 +112,48 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           />
         </section>
 
-        <section className="home-resume" aria-labelledby="home-resume">
-          <h2 id="home-resume">
-            Notes + resume = <mark>your own website</mark>.
-          </h2>
-          <p className="home-section-lead">
-            Upload your resume once and your website is ready in minutes. Every note you publish
-            keeps it growing.
-          </p>
+        <section className="home-beat" aria-labelledby="home-beat-notes">
+          <div className="home-beat-text">
+            <p className="eyebrow">1 · WRITE NOTES</p>
+            <h2 id="home-beat-notes">Note your work while it is fresh.</h2>
+            <p>
+              A line is enough: what you planned, what moved, what shipped. Notis gathers it into a
+              weekly work journal, so you never have to remember what you did.
+            </p>
+          </div>
+          <JournalSketch />
+        </section>
+
+        <section className="home-beat is-flipped" aria-labelledby="home-beat-publish">
+          <div className="home-beat-text">
+            <p className="eyebrow">2 · PUBLISH</p>
+            <h2 id="home-beat-publish">Your notes are already the first draft.</h2>
+            <p>
+              When something is worth sharing, turn a week or a project into a post, starting from
+              what you already wrote. No blank page.
+            </p>
+          </div>
+          <PostSketch />
+        </section>
+
+        <section className="home-beat is-wide" aria-labelledby="home-beat-noticed">
+          <div className="home-beat-text">
+            <p className="eyebrow">3 · GET NOTICED</p>
+            <h2 id="home-beat-noticed">Every post lands on your own website.</h2>
+            <p>
+              Upload your resume once and your website is ready in minutes. Each note you publish
+              keeps it growing.
+            </p>
+          </div>
           <Equation
             label="Notes plus resume equals your own website"
             parts={[
-              { title: 'Notes', caption: 'on your work', art: <NotesArt /> },
-              { op: '+', title: 'Resume', caption: 'upload once', art: <ResumeArt /> },
+              { title: 'Notes', caption: 'you published', art: <NotesArt /> },
+              { op: '+', title: 'Resume', caption: 'uploaded once', art: <ResumeArt /> },
               {
                 op: '=',
-                title: 'Your own website',
-                caption: 'ready in minutes',
+                title: 'Your website',
+                caption: 'at /@yourname',
                 art: <SiteArt />,
                 result: true,
               },
@@ -176,49 +169,15 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           </a>
         </section>
 
-        <section className="home-different" aria-labelledby="home-different">
-          <p className="eyebrow">WHAT MAKES NOTIS DIFFERENT</p>
-          <h2 id="home-different">
-            Your work deserves to be <mark>seen</mark>.
-          </h2>
-          <p className="home-different-lead">
-            Notis keeps a journal of what you finish, ready to turn into a post. A brag document
-            that writes itself.
-          </p>
-          <div className="home-different-grid">
-            <ul className="home-compare">
-              {COMPARE.map((item) => (
-                <li key={item.kind} className={item.ours ? 'is-ours' : undefined}>
-                  <strong>{item.kind}</strong>
-                  <span>{item.text}</span>
-                </li>
-              ))}
-            </ul>
-            <JournalSketch />
-          </div>
-        </section>
-
-        <section className="home-features" aria-labelledby="home-features">
-          <h2 id="home-features">One place, from first note to published page.</h2>
-          <ul>
-            {FEATURES.map((feature) => (
-              <li key={feature.title}>
-                <span className="home-feature-icon">{feature.icon}</span>
-                <strong>{feature.title}</strong>
-                <span>{feature.text}</span>
-              </li>
+        <section className="home-faq" aria-labelledby="home-faq">
+          <h2 id="home-faq">Questions</h2>
+          <div className="home-faq-list">
+            {FAQ.map((item) => (
+              <details key={item.q}>
+                <summary>{item.q}</summary>
+                <p>{item.a}</p>
+              </details>
             ))}
-          </ul>
-        </section>
-
-        <section className="home-private">
-          <Lock size={20} />
-          <div>
-            <h2>Private by default.</h2>
-            <p>
-              Boards, cards and to-do lists are yours alone. Only the pages you publish are public,
-              and you can take them down at any time.
-            </p>
           </div>
         </section>
 
@@ -297,6 +256,27 @@ function JournalSketch() {
       </span>
       <span className="home-journal-draft">
         <PenLine size={14} /> Draft a page from this week
+      </span>
+    </div>
+  );
+}
+
+/** A post drafted from the week's notes, one click from going live. */
+function PostSketch() {
+  return (
+    <div className="home-journal home-post" aria-hidden="true">
+      <span className="home-sketch-label">New page · from this week</span>
+      <strong className="home-post-title">What I shipped this week</strong>
+      <span className="home-journal-item">
+        <CircleCheck size={15} /> Sent the redesign to Studio Rana
+      </span>
+      <span className="home-journal-item">
+        <CircleCheck size={15} /> Launched the waitlist
+      </span>
+      <span className="home-post-line" />
+      <span className="home-post-line is-short" />
+      <span className="home-post-publish">
+        <Send size={14} /> Publish
       </span>
     </div>
   );

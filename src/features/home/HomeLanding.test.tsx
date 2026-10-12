@@ -18,7 +18,10 @@ describe('signed-out home page', () => {
     expect(
       screen.getByRole('img', { name: 'Notes plus resume equals your own website' }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /deserves to be seen/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Every post lands on your own website.' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Is everything I write public?')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'See a real one' })).toHaveAttribute(
       'href',
       'https://notis.swegrowth.id/@zikrul-ihsan-md',
