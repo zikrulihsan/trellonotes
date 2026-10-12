@@ -13,13 +13,13 @@ describe('signed-out home page', () => {
       'Write notes, get noticed.',
     );
     expect(
-      screen.getByRole('heading', { name: 'Everything starts with a note.' }),
+      screen.getByRole('img', { name: 'Write notes, publish, get noticed' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('img', { name: 'Notes plus resume equals portfolio website' }),
+      screen.getByRole('img', { name: 'Notes plus resume equals your own website' }),
     ).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /deserves to be seen/ })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /See a real one/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'See a real one' })).toHaveAttribute(
       'href',
       'https://notis.swegrowth.id/@zikrul-ihsan-md',
     );

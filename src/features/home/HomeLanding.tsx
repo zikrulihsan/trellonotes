@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { Fragment, useState, type ReactNode } from 'react';
 import { Modal } from '@/components/ui/Modal';
 import { LegalFooter } from '@/features/legal/LegalPage';
 import {
@@ -14,6 +14,7 @@ import {
   Lock,
   NotebookPen,
   PenLine,
+  Send,
   Sparkles,
 } from 'lucide-react';
 
@@ -24,66 +25,21 @@ interface HomeLandingProps {
   onSwegrowth: () => void;
 }
 
-/** The everyday loop: each moment of work, and what you do with it in Notis. */
-const STEPS = [
-  { moment: 'Plan', action: 'Note it', example: '“Ship the pricing page by Friday.”' },
-  { moment: 'Progress', action: 'Note it', example: '“Design done, copy in review.”' },
-  { moment: 'Result', action: 'Note it', example: '“Shipped. 40 sign-ups on day one.”' },
-  { moment: 'Share', action: 'Publish it', example: 'A post on your own website.' },
-] as const;
-
-const PILLARS: { icon: ReactNode; title: string; text: string; where: string }[] = [
-  {
-    icon: <KanbanSquare size={20} />,
-    title: 'Note',
-    text: 'Write down plans, progress and results as you work. Private, only for you.',
-    where: 'Boards · To-do lists · Free write',
-  },
-  {
-    icon: <NotebookPen size={20} />,
-    title: 'Look back',
-    text: 'Each week, see everything you finished in one place, without having to remember it.',
-    where: 'Work journal',
-  },
-  {
-    icon: <PenLine size={20} />,
-    title: 'Write',
-    text: 'Turn a week, a project or a lesson into a post, starting from what you already noted.',
-    where: 'Pages',
-  },
-  {
-    icon: <Globe size={20} />,
-    title: 'Show',
-    text: 'Publish it to your personal website at /@you for anyone to read.',
-    where: 'Public page',
-  },
-];
-
 /** A real Notis website to point visitors at. */
 const EXAMPLE_SITE = 'https://notis.swegrowth.id/@zikrul-ihsan-md';
-
-const SITE_PARTS: { title: string; text: string }[] = [
-  {
-    title: 'Me',
-    text: 'Who you are, what you help with, what you are working on and your projects.',
-  },
-  { title: 'Blog', text: 'Every page you publish, in one list people can follow.' },
-  { title: 'About', text: 'Your longer story, your experience and the things you hold onto.' },
-  { title: 'Short links', text: 'A tidy link for any post, ready for LinkedIn or your CV.' },
-];
 
 const COMPARE: { kind: string; text: string; ours?: boolean }[] = [
   {
     kind: 'Task apps',
-    text: 'Finished work disappears into a Done column. A month later, nobody remembers it, not even you.',
+    text: 'Finished work disappears into a Done column and is forgotten.',
   },
   {
     kind: 'Blogs and notes apps',
-    text: 'You have to stop, remember and write it all from scratch. So it never gets written.',
+    text: 'You have to stop and write it all from scratch, so it never happens.',
   },
   {
     kind: 'Notis',
-    text: 'Work, document and publish in one flow. Every week of your work becomes professional history you can share.',
+    text: 'Note as you work, publish when it is worth telling.',
     ours: true,
   },
 ];
@@ -167,7 +123,57 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               See an example page
             </a>
           </div>
-          <HeroSketch />
+          <Equation
+            label="Write notes, publish, get noticed"
+            parts={[
+              { title: 'Write notes', caption: 'while you work', art: <NotesArt /> },
+              {
+                op: <ArrowRight size={30} />,
+                title: 'Publish',
+                caption: 'when it is worth telling',
+                art: <PostArt />,
+              },
+              {
+                op: <ArrowRight size={30} />,
+                title: 'Get noticed',
+                caption: 'on your own website',
+                art: <SiteArt />,
+                result: true,
+              },
+            ]}
+          />
+        </section>
+
+        <section className="home-resume" aria-labelledby="home-resume">
+          <h2 id="home-resume">
+            Notes + resume = <mark>your own website</mark>.
+          </h2>
+          <p className="home-section-lead">
+            Upload your resume once and your website is ready in minutes. Every note you publish
+            keeps it growing.
+          </p>
+          <Equation
+            label="Notes plus resume equals your own website"
+            parts={[
+              { title: 'Notes', caption: 'on your work', art: <NotesArt /> },
+              { op: '+', title: 'Resume', caption: 'upload once', art: <ResumeArt /> },
+              {
+                op: '=',
+                title: 'Your own website',
+                caption: 'ready in minutes',
+                art: <SiteArt />,
+                result: true,
+              },
+            ]}
+          />
+          <a
+            className="home-button is-primary"
+            href={EXAMPLE_SITE}
+            target="_blank"
+            rel="noreferrer"
+          >
+            See a real one <ExternalLink size={16} />
+          </a>
         </section>
 
         <section className="home-different" aria-labelledby="home-different">
@@ -176,9 +182,8 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             Your work deserves to be <mark>seen</mark>.
           </h2>
           <p className="home-different-lead">
-            Don't wait until you find time to write about it. As you work, Notis keeps a journal of
-            what you finish, and turns each week into a page for your public profile. A brag
-            document that writes itself.
+            Notis keeps a journal of what you finish, ready to turn into a post. A brag document
+            that writes itself.
           </p>
           <div className="home-different-grid">
             <ul className="home-compare">
@@ -190,74 +195,6 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               ))}
             </ul>
             <JournalSketch />
-          </div>
-        </section>
-
-        <section className="home-flow" aria-labelledby="home-flow">
-          <h2 id="home-flow">Everything starts with a note.</h2>
-          <p className="home-section-lead">
-            Whatever moment of work you are in, the move is the same: note it. When it is worth
-            telling, publish it.
-          </p>
-          <ol>
-            {STEPS.map((step) => (
-              <li key={step.moment}>
-                <strong>{step.moment}</strong>
-                <span className="home-flow-action">
-                  <ArrowRight size={14} /> {step.action}
-                </span>
-                <span className="home-flow-example">{step.example}</span>
-              </li>
-            ))}
-          </ol>
-          <p>And along the way, you build a public presence.</p>
-        </section>
-
-        <section className="home-how" aria-labelledby="home-how">
-          <h2 id="home-how">How it works in Notis</h2>
-          <p className="home-section-lead">Four steps, each with its own place in the app.</p>
-          <div className="home-pillars">
-            {PILLARS.map((pillar, index) => (
-              <article key={pillar.title}>
-                <span className="home-pillar-icon">{pillar.icon}</span>
-                <span className="home-pillar-step">0{index + 1}</span>
-                <h3>{pillar.title}</h3>
-                <p>{pillar.text}</p>
-                <span className="home-pillar-where">In Notis: {pillar.where}</span>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="home-site" aria-labelledby="home-site">
-          <p className="eyebrow">YOUR PUBLIC PRESENCE</p>
-          <h2 id="home-site">
-            A personal website, <mark>built from your notes</mark>.
-          </h2>
-          <p className="home-section-lead">
-            Every Notis account comes with its own website at notis.swegrowth.id/@you. No code, no
-            hosting, no design work. Publish a page and it is live.
-          </p>
-          <div className="home-site-grid">
-            <SiteSketch />
-            <div className="home-site-parts">
-              <ul>
-                {SITE_PARTS.map((part) => (
-                  <li key={part.title}>
-                    <strong>{part.title}</strong>
-                    <span>{part.text}</span>
-                  </li>
-                ))}
-              </ul>
-              <a
-                className="home-button is-primary"
-                href={EXAMPLE_SITE}
-                target="_blank"
-                rel="noreferrer"
-              >
-                See a real one: @zikrul-ihsan-md <ExternalLink size={16} />
-              </a>
-            </div>
           </div>
         </section>
 
@@ -365,114 +302,95 @@ function JournalSketch() {
   );
 }
 
-/** A personal website made with Notis: the Me page, with projects and writing. */
-function SiteSketch() {
+interface EquationPart {
+  op?: ReactNode;
+  title: string;
+  caption: string;
+  art: ReactNode;
+  result?: boolean;
+}
+
+/** A picture read left to right: labelled drawings joined by +, = or arrows. */
+function Equation({ label, parts }: { label: string; parts: EquationPart[] }) {
   return (
-    <div className="home-site-sketch" aria-hidden="true">
-      <div className="home-site-bar">
-        <span className="home-site-dots">
-          <i />
-          <i />
-          <i />
-        </span>
-        <span className="home-site-url">notis.swegrowth.id/@ayu</span>
-      </div>
-      <div className="home-site-body">
-        <nav className="home-site-nav">
-          <b>Ayu Lestari</b>
-          <span className="is-active">Me</span>
-          <span>Blog</span>
-          <span>About</span>
-        </nav>
-        <strong className="home-site-hello">
-          Hi, I'm Ayu. I build <mark>payment systems</mark>.
-        </strong>
-        <span className="home-site-label">Working on</span>
-        <span className="home-site-now">Leading the checkout rewrite · Learning Rust</span>
-        <span className="home-site-label">Projects</span>
-        <div className="home-site-projects">
-          <span>Checkout v2</span>
-          <span>Fraud alerts</span>
-          <span>Open-source SDK</span>
-        </div>
-        <span className="home-site-label">Writing</span>
-        <span className="home-site-post">What I learned shipping checkout v2</span>
-        <span className="home-site-post">My week: 5 things finished</span>
-      </div>
+    <div className="home-sketch" role="img" aria-label={label}>
+      {parts.map((part) => (
+        <Fragment key={part.title}>
+          {part.op && (
+            <span className="home-sketch-op" aria-hidden="true">
+              {part.op}
+            </span>
+          )}
+          <figure className={part.result ? 'is-result' : undefined}>
+            <div className="home-sketch-art" aria-hidden="true">
+              {part.art}
+            </div>
+            <figcaption>
+              <strong>{part.result ? <mark>{part.title}</mark> : part.title}</strong>
+              <span>{part.caption}</span>
+            </figcaption>
+          </figure>
+        </Fragment>
+      ))}
     </div>
   );
 }
 
-/** The idea in one picture: notes plus a resume make a portfolio website. */
-function HeroSketch() {
-  return (
-    <div className="home-sketch" role="img" aria-label="Notes plus resume equals portfolio website">
-      <figure>
-        <div className="home-sketch-art" aria-hidden="true">
-          {[0, 1, 2, 3, 4].map((line) => (
-            <span key={line} className="home-sketch-note">
-              <CircleCheck size={14} />
-              <span className={line % 2 ? 'home-sketch-bar is-short' : 'home-sketch-bar'} />
-            </span>
-          ))}
-        </div>
-        <figcaption>
-          <strong>Notes</strong>
-          <span>on your work</span>
-        </figcaption>
-      </figure>
-      <span className="home-sketch-op" aria-hidden="true">
-        +
+const NotesArt = () =>
+  [0, 1, 2, 3, 4].map((line) => (
+    <span key={line} className="home-sketch-note">
+      <CircleCheck size={14} />
+      <span className={line % 2 ? 'home-sketch-bar is-short' : 'home-sketch-bar'} />
+    </span>
+  ));
+
+const ResumeArt = () => (
+  <>
+    <span className="home-sketch-tag">CV</span>
+    <span className="home-sketch-face" />
+    <span className="home-sketch-bar is-dark is-short" />
+    <span className="home-sketch-bar" />
+    <span className="home-sketch-bar" />
+    <span className="home-sketch-bar is-short" />
+  </>
+);
+
+/** A written post with its publish button. */
+const PostArt = () => (
+  <>
+    <span className="home-sketch-bar is-dark is-short" />
+    <span className="home-sketch-bar" />
+    <span className="home-sketch-bar" />
+    <span className="home-sketch-bar is-short" />
+    <span className="home-sketch-publish">
+      <Send size={14} />
+    </span>
+  </>
+);
+
+const SiteArt = () => (
+  <>
+    <span className="home-sketch-browser">
+      <i />
+      <i />
+      <i />
+    </span>
+    <span className="home-sketch-site">
+      <span className="home-sketch-tabs">
+        <i />
+        <i />
+        <i />
       </span>
-      <figure>
-        <div className="home-sketch-art" aria-hidden="true">
-          <span className="home-sketch-tag">CV</span>
-          <span className="home-sketch-face" />
-          <span className="home-sketch-bar is-dark is-short" />
-          <span className="home-sketch-bar" />
-          <span className="home-sketch-bar" />
-          <span className="home-sketch-bar is-short" />
-        </div>
-        <figcaption>
-          <strong>Resume</strong>
-          <span>upload once</span>
-        </figcaption>
-      </figure>
-      <span className="home-sketch-op" aria-hidden="true">
-        =
+      <span className="home-sketch-face" />
+      <span className="home-sketch-bar is-dark" />
+      <span className="home-sketch-bar is-short" />
+      <span className="home-sketch-posts">
+        <i />
+        <i />
       </span>
-      <figure className="is-result">
-        <div className="home-sketch-art" aria-hidden="true">
-          <span className="home-sketch-browser">
-            <i />
-            <i />
-            <i />
-          </span>
-          <span className="home-sketch-site">
-            <span className="home-sketch-tabs">
-              <i />
-              <i />
-              <i />
-            </span>
-            <span className="home-sketch-face" />
-            <span className="home-sketch-bar is-dark" />
-            <span className="home-sketch-bar is-short" />
-            <span className="home-sketch-posts">
-              <i />
-              <i />
-            </span>
-          </span>
-        </div>
-        <figcaption>
-          <strong>
-            <mark>Portfolio website</mark>
-          </strong>
-          <span>ready instantly</span>
-        </figcaption>
-      </figure>
-    </div>
-  );
-}
+    </span>
+  </>
+);
 
 function GoogleMark() {
   return (
