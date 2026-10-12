@@ -144,19 +144,12 @@
 .home-signin-dialog .auth-error {
   margin-top: 12px;
 }
-.home-footnote {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin: 18px 0 0;
-  color: #92919c;
-  font-size: 13px;
-}
 
 /* Notes plus a resume making a portfolio website, drawn as an equation. */
 .home-sketch {
+  --home-sketch-art: clamp(116px, 24vw, 220px);
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   justify-content: center;
   gap: clamp(6px, 2.5vw, 24px);
   margin: clamp(40px, 6vw, 64px) 0 0;
@@ -175,6 +168,7 @@
   width: clamp(120px, 32vw, 300px);
 }
 .home-sketch figcaption {
+  order: -1;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -196,8 +190,7 @@
   letter-spacing: 0.4px;
 }
 .home-sketch-op {
-  align-self: flex-start;
-  margin-top: clamp(30px, 7vw, 70px);
+  margin-bottom: calc(var(--home-sketch-art) / 2 - 0.5em);
   color: var(--purple);
   font-family: 'Literata', Georgia, serif;
   font-size: clamp(28px, 5vw, 44px);
@@ -210,7 +203,7 @@
   gap: clamp(5px, 1vw, 8px);
   justify-content: center;
   width: 100%;
-  height: clamp(116px, 24vw, 220px);
+  height: var(--home-sketch-art);
   padding: clamp(10px, 2vw, 18px);
   border: 1px solid #e3e1ea;
   border-radius: 14px;

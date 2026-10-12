@@ -166,9 +166,6 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               See an example page
             </a>
           </div>
-          <p className="home-footnote">
-            <Lock size={13} /> Private until you choose to publish.
-          </p>
           <HeroSketch />
         </section>
 
