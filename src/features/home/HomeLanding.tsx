@@ -7,7 +7,9 @@ import {
   ExternalLink,
   Feather,
   LoaderCircle,
-  PenLine,
+  NotebookPen,
+  Sparkles,
+  ArrowDown,
   Send,
 } from 'lucide-react';
 
@@ -117,43 +119,58 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             <p className="eyebrow">1 · WRITE NOTES</p>
             <h2 id="home-beat-notes">Just write it down.</h2>
             <p>
-              Plans, progress, wins, lessons. Short everyday notes are enough, and Notis keeps them
-              as a weekly work journal.
+              What you worked on, what went wrong, what you figured out. Write it the way you would
+              tell a friend, a few lines at a time. Every note keeps its date.
             </p>
           </div>
-          <JournalSketch />
+          <NoteSketch />
         </section>
 
-        <section className="home-beat is-flipped" aria-labelledby="home-beat-publish">
+        <section className="home-beat is-flipped" aria-labelledby="home-beat-stories">
           <div className="home-beat-text">
             <p className="eyebrow">2 · TURN INTO STORIES</p>
-            <h2 id="home-beat-publish">Your notes grow into stories.</h2>
+            <h2 id="home-beat-stories">
+              Turn your notes into <mark>stories worth sharing</mark>.
+            </h2>
             <p>
-              Turn a week, a project or a lesson into a post full of insight, starting from what you
-              already noted. No blank page.
+              The points you noted over a week or a project are already the bones of a story. Notis
+              drafts a post from them, and you shape it into a lesson, an insight or a project
+              recap.
             </p>
           </div>
-          <PostSketch />
+          <StorySketch />
         </section>
 
-        <section className="home-beat is-wide" aria-labelledby="home-beat-noticed">
+        <section className="home-beat is-wide" aria-labelledby="home-beat-site">
           <div className="home-beat-text">
             <p className="eyebrow">3 · SHOW YOUR WORK</p>
-            <h2 id="home-beat-noticed">Show your work on your own website.</h2>
+            <h2 id="home-beat-site">
+              Every story builds <mark>your personal website</mark>.
+            </h2>
             <p>
-              Your stories and projects live at /@yourname. Upload your resume once and it is ready
-              in minutes, then every story keeps it growing.
+              What you publish is not just a blog post. It becomes part of your own website on Notis
+              at notis.swegrowth.id/@yourname, next to who you are, your projects and what you are
+              up to now.
             </p>
+            <span className="home-ai">
+              <Sparkles size={15} /> Powered by AI: upload your resume and AI builds the rest of
+              your site in minutes.
+            </span>
           </div>
           <Equation
-            label="Stories plus resume equals your own website"
+            label="Stories plus resume equals your personal website"
             parts={[
               { title: 'Stories', caption: 'from your notes', art: <PostArt /> },
-              { op: '+', title: 'Resume', caption: 'uploaded once', art: <ResumeArt /> },
+              {
+                op: '+',
+                title: 'Resume',
+                caption: 'read by AI',
+                art: <ResumeArt />,
+              },
               {
                 op: '=',
                 title: 'Your website',
-                caption: 'at /@yourname',
+                caption: 'on Notis',
                 art: <SiteArt />,
                 result: true,
               },
@@ -167,6 +184,18 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           >
             See a real one <ExternalLink size={16} />
           </a>
+        </section>
+
+        <section className="home-beat" aria-labelledby="home-beat-boards">
+          <div className="home-beat-text">
+            <p className="eyebrow">AND EVERY DAY</p>
+            <h2 id="home-beat-boards">Track your work on boards built for writing.</h2>
+            <p>
+              Plan and move work across lists to stay productive. Every card opens into a note, so
+              the progress you track is already written down when it is time to tell the story.
+            </p>
+          </div>
+          <BoardSketch />
         </section>
 
         <section className="home-faq" aria-labelledby="home-faq">
@@ -227,57 +256,77 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
   );
 }
 
-/** A week in the work journal, the thing no task app or notes app keeps for you. */
-function JournalSketch() {
+/** One dated note, written the way people actually write. */
+function NoteSketch() {
   return (
-    <div className="home-journal" aria-hidden="true">
-      <span className="home-sketch-label">Work journal · This week</span>
-      <div className="home-journal-stats">
-        <span>
-          <b>5</b> finished
-        </span>
-        <span>
-          <b>3</b> in progress
-        </span>
-        <span>
-          <b>1</b> written
-        </span>
-      </div>
-      <span className="home-journal-board">Clients</span>
-      <span className="home-journal-item">
-        <CircleCheck size={15} /> Sent the redesign to Studio Rana
-      </span>
-      <span className="home-journal-item">
-        <CircleCheck size={15} /> Invoiced October
-      </span>
-      <span className="home-journal-board">Side project</span>
-      <span className="home-journal-item">
-        <CircleCheck size={15} /> Launched the waitlist
-      </span>
-      <span className="home-journal-draft">
-        <PenLine size={14} /> Draft a page from this week
-      </span>
+    <div className="home-paper home-note" aria-hidden="true">
+      <span className="home-sketch-label">Tue, 14 Oct · Checkout</span>
+      <strong className="home-paper-title">Why carts were dropping</strong>
+      <p>
+        Finally found it: the promo field reset the address form, so people gave up. Fixed it with
+        Rana and shipped after lunch.
+      </p>
+      <p>Next: watch conversion for a week. Lesson: test the boring paths too.</p>
     </div>
   );
 }
 
-/** A story drafted from the week's notes, one click from going live. */
-function PostSketch() {
+/** Points picked from the notes, and the story drafted from them. */
+function StorySketch() {
   return (
-    <div className="home-journal home-post" aria-hidden="true">
-      <span className="home-sketch-label">Story · from your notes</span>
-      <strong className="home-post-title">What I learned shipping the waitlist</strong>
-      <span className="home-journal-item">
-        <CircleCheck size={15} /> Sent the redesign to Studio Rana
-      </span>
-      <span className="home-journal-item">
-        <CircleCheck size={15} /> Launched the waitlist
-      </span>
+    <div className="home-paper home-story" aria-hidden="true">
+      <span className="home-sketch-label">From your notes</span>
+      <ul className="home-story-points">
+        <li>
+          <mark>Promo field reset the address form</mark>
+        </li>
+        <li>
+          <mark>Fixed and shipped the same day</mark>
+        </li>
+        <li>
+          <mark>Test the boring paths too</mark>
+        </li>
+      </ul>
+      <ArrowDown className="home-story-arrow" size={18} />
+      <span className="home-sketch-label">Story</span>
+      <strong className="home-paper-title">The boring bug that cost us sales</strong>
       <span className="home-post-line" />
       <span className="home-post-line is-short" />
       <span className="home-post-publish">
         <Send size={14} /> Publish
       </span>
+    </div>
+  );
+}
+
+/** A board whose cards are notes: one is open, already written in. */
+function BoardSketch() {
+  const lists = [
+    { title: 'To do', cards: ['Pricing page copy', 'Interview Dimas'] },
+    { title: 'Doing', cards: ['Checkout redesign'], open: true },
+    { title: 'Done', cards: ['Fix cart drop', 'Launch waitlist'] },
+  ];
+  return (
+    <div className="home-board" aria-hidden="true">
+      {lists.map((list) => (
+        <div key={list.title} className="home-board-list">
+          <span className="home-sketch-label">{list.title}</span>
+          {list.cards.map((card) => (
+            <span key={card} className={list.open ? 'home-board-card is-open' : 'home-board-card'}>
+              {card}
+              {list.open && (
+                <>
+                  <span className="home-post-line" />
+                  <span className="home-post-line is-short" />
+                  <span className="home-board-meta">
+                    <NotebookPen size={12} /> 3 notes
+                  </span>
+                </>
+              )}
+            </span>
+          ))}
+        </div>
+      ))}
     </div>
   );
 }

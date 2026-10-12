@@ -373,73 +373,6 @@
     transition: none;
   }
 }
-.home-journal {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 20px;
-  border: 1px solid #e3e1ea;
-  border-radius: 16px;
-  background: #fff;
-  box-shadow: 0 18px 50px rgba(42, 33, 59, 0.08);
-  transform: rotate(1deg);
-}
-.home-journal-stats {
-  display: flex;
-  gap: 8px;
-  margin: 4px 0 6px;
-}
-.home-journal-stats span {
-  flex: 1;
-  padding: 8px 10px;
-  border: 1px solid #ecebf0;
-  border-radius: 9px;
-  color: var(--home-muted);
-  font-size: 12px;
-}
-.home-journal-stats b {
-  display: block;
-  color: var(--home-ink);
-  font-family: 'Literata', Georgia, serif;
-  font-size: 20px;
-  font-weight: 500;
-}
-.home-journal-board {
-  margin-top: 6px;
-  color: #92919c;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
-}
-.home-journal-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-}
-.home-journal-item svg {
-  flex: none;
-  color: #2f9e6a;
-}
-.home-journal-draft {
-  display: inline-flex;
-  align-items: center;
-  align-self: flex-start;
-  gap: 7px;
-  margin-top: 10px;
-  padding: 9px 12px;
-  border: 1px solid var(--home-ink);
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  box-shadow: 2px 2px 0 var(--home-ink);
-}
-@media (max-width: 760px) {
-  .home-journal {
-    transform: none;
-  }
-}
 .home-sketch-publish {
   display: grid;
   place-items: center;
@@ -481,27 +414,117 @@
 .home .home-beat h2 {
   text-align: inherit;
 }
-.home-beat-text p:last-child {
+.home-beat-text > p:not(.eyebrow) {
   max-width: 30rem;
   margin: 14px 0 0;
   color: var(--home-muted);
   font-size: 18px;
   line-height: 1.6;
 }
-.home-beat.is-wide .home-beat-text p:last-child {
+.home-beat.is-wide .home-beat-text > p:not(.eyebrow) {
   margin-inline: auto;
 }
 .home-beat.is-wide .home-button {
   margin-top: 32px;
 }
-.home-post {
+.home-paper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: clamp(18px, 3vw, 26px);
+  border: 1px solid #e3e1ea;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 18px 50px rgba(42, 33, 59, 0.08);
+}
+.home-note {
+  transform: rotate(1deg);
+}
+.home-story {
   transform: rotate(-1deg);
 }
-.home-post-title {
-  margin: 4px 0 6px;
+.home-paper-title {
   font-family: 'Literata', Georgia, serif;
   font-size: 22px;
   font-weight: 500;
+  line-height: 1.25;
+}
+.home-paper p {
+  margin: 0;
+  color: #4a4953;
+  font-size: 15px;
+  line-height: 1.65;
+}
+.home-story-points {
+  display: grid;
+  gap: 6px;
+  margin: 2px 0 0;
+  padding-left: 18px;
+  font-size: 14px;
+}
+.home-story-arrow {
+  align-self: center;
+  margin: 4px 0;
+  color: var(--purple);
+}
+.home-ai {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 34rem;
+  margin-top: 18px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  color: var(--purple);
+  background: #f0eaff;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: left;
+}
+.home-ai svg {
+  flex: none;
+  margin-top: 2px;
+}
+.home-board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 14px;
+  border-radius: 16px;
+  background: #f1eef8;
+  box-shadow: 0 18px 50px rgba(42, 33, 59, 0.08);
+}
+.home-board-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.home-board-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid #e3e1ea;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 550;
+}
+.home-board-card.is-open {
+  border-color: var(--home-ink);
+  box-shadow: 2px 2px 0 var(--home-ink);
+}
+.home-board-card .home-post-line {
+  height: 6px;
+  margin-top: 0;
+}
+.home-board-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--purple);
+  font-size: 11px;
 }
 .home-post-line {
   height: 8px;
@@ -569,9 +592,6 @@
   .home-beat.is-flipped .home-beat-text {
     order: 0;
   }
-  .home-post {
-    transform: none;
-  }
 }
 
 /* Footer links, and the terms and privacy pages. */
@@ -626,4 +646,10 @@ a.home-logo {
 }
 .legal-doc a {
   color: var(--purple);
+}
+@media (max-width: 760px) {
+  .home-note,
+  .home-story {
+    transform: none;
+  }
 }
