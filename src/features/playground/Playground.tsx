@@ -7,6 +7,8 @@ import {
   Globe,
   LayoutGrid,
   Lock,
+  LogIn,
+  ExternalLink,
   NotebookPen,
   Sparkles,
 } from 'lucide-react';
@@ -30,6 +32,9 @@ import {
 
 /** Where the landing page opens its sign-in choices. */
 const SIGN_IN_URL = '/?start';
+
+/** A real Notis website, for the Example section. */
+const EXAMPLE_SITE = 'https://notis.swegrowth.id/@zikrul-ihsan-md';
 
 /** Nobody is signed in here; anything that would need an account goes to the sign-in page. */
 const GUEST: AuthContextValue = {
@@ -151,58 +156,77 @@ function Picker() {
             Try Notis, <mark>no sign&#8209;up</mark>.
           </h1>
           <p className="home-lead">
-            Pick what to try. It all runs on sample data in this tab: nothing you change is saved,
-            and nothing is published.
+            Explore the app, see an example, or start for real. The first two run on sample data in
+            this tab: nothing you change is saved, and nothing is published.
           </p>
         </section>
-        <ol className="playground-options">
-          <Option
-            to={board ? boardPath(board) : '/board'}
-            icon={<LayoutGrid size={20} />}
-            step="1"
-            title="A board of initiatives"
-            text="Move work across To do, Doing and Done, and open a card to see its updates."
-          />
-          <Option
-            to={initiative ? initiativePath(initiative) : '/board'}
-            icon={<NotebookPen size={20} />}
-            step="2"
-            title="Updates on an initiative"
-            text="Add a dated update to the checkout redesign, the way you would at the end of a day."
-          />
-          <Option
-            to={story ? pagePath(story) : '/pages'}
-            icon={<Sparkles size={20} />}
-            step="3"
-            title="The story it turns into"
-            text="Read the post drafted from those updates, edit it, and publish it."
-          />
-          <Option
-            to={writerPath(PLAYGROUND_AUTHOR)}
-            icon={<Globe size={20} />}
-            step="4"
-            title="Your public website"
-            text="A home page, blog and About page, with what you’re working on taken from the board."
-          />
-        </ol>
-        <a className="playground-option is-locked" href={SIGN_IN_URL}>
-          <span className="playground-option-icon">
-            <FileUser size={20} />
-          </span>
-          <span className="playground-option-text">
-            <strong>
-              Build your website from your resume
-              <span className="playground-badge">
-                <Lock size={12} /> Sign-in needed
-              </span>
-            </strong>
-            <span>
-              Upload your resume and AI drafts your website. It uses your own details, so it needs
-              an account.
-            </span>
-          </span>
-          <ArrowRight size={18} className="playground-option-go" />
-        </a>
+        <section className="playground-group" aria-labelledby="playground-explore">
+          <h2 id="playground-explore">
+            <span>1</span> Explore
+          </h2>
+          <p>Use the app on sample work, from a board to the story it turns into.</p>
+          <ul className="playground-options">
+            <Option
+              to={board ? boardPath(board) : '/board'}
+              icon={<LayoutGrid size={20} />}
+              title="A board of initiatives"
+              text="Move work across To do, Doing and Done, and open a card to see its updates."
+            />
+            <Option
+              to={initiative ? initiativePath(initiative) : '/board'}
+              icon={<NotebookPen size={20} />}
+              title="Updates on an initiative"
+              text="Add a dated update to the checkout redesign, the way you would at the end of a day."
+            />
+            <Option
+              to={story ? pagePath(story) : '/pages'}
+              icon={<Sparkles size={20} />}
+              title="The story it turns into"
+              text="Read the post drafted from those updates, edit it, and publish it."
+            />
+          </ul>
+        </section>
+        <section className="playground-group" aria-labelledby="playground-example">
+          <h2 id="playground-example">
+            <span>2</span> Example
+          </h2>
+          <p>See what visitors find on a Notis website.</p>
+          <ul className="playground-options">
+            <Option
+              to={writerPath(PLAYGROUND_AUTHOR)}
+              icon={<Globe size={20} />}
+              title="A sample website"
+              text="A home page, blog and About page, with what you’re working on taken from the board."
+            />
+            <Option
+              href={EXAMPLE_SITE}
+              icon={<ExternalLink size={20} />}
+              title="A real one"
+              text="The Notis website of Zikrul, who builds Notis. Opens in a new tab."
+            />
+          </ul>
+        </section>
+        <section className="playground-group" aria-labelledby="playground-real">
+          <h2 id="playground-real">
+            <span>3</span> Try it for real
+          </h2>
+          <p>With an account, your work is saved and you can publish.</p>
+          <ul className="playground-options">
+            <Option
+              href={SIGN_IN_URL}
+              icon={<FileUser size={20} />}
+              title="Build your website from your resume"
+              badge="Sign-in needed"
+              text="Upload your resume and AI drafts your website from your own details."
+            />
+            <Option
+              href={SIGN_IN_URL}
+              icon={<LogIn size={20} />}
+              title="Sign in and start writing"
+              text="Your first board is ready. Nothing is public until you publish it."
+            />
+          </ul>
+        </section>
         <p className="playground-back">
           <a href="/">← Back to how Notis works</a>
         </p>
@@ -211,30 +235,55 @@ function Picker() {
   );
 }
 
+/** One choice: a screen in the playground (`to`), or a page outside it (`href`). */
 function Option({
   to,
+  href,
   icon,
-  step,
   title,
   text,
+  badge,
 }: {
-  to: string;
+  to?: string;
+  href?: string;
   icon: ReactNode;
-  step: string;
   title: string;
   text: string;
+  badge?: string;
 }) {
+  const body = (
+    <>
+      <span className="playground-option-icon">{icon}</span>
+      <span className="playground-option-text">
+        <strong>
+          {title}
+          {badge && (
+            <span className="playground-badge">
+              <Lock size={12} /> {badge}
+            </span>
+          )}
+        </strong>
+        <span>{text}</span>
+      </span>
+      <ArrowRight size={18} className="playground-option-go" />
+    </>
+  );
+  const external = href?.startsWith('http');
   return (
     <li>
-      <Link className="playground-option" to={to}>
-        <span className="playground-option-icon">{icon}</span>
-        <span className="playground-option-text">
-          <small>{step}</small>
-          <strong>{title}</strong>
-          <span>{text}</span>
-        </span>
-        <ArrowRight size={18} className="playground-option-go" />
-      </Link>
+      {to ? (
+        <Link className="playground-option" to={to}>
+          {body}
+        </Link>
+      ) : (
+        <a
+          className="playground-option"
+          href={href}
+          {...(external && { target: '_blank', rel: 'noreferrer' })}
+        >
+          {body}
+        </a>
+      )}
     </li>
   );
 }

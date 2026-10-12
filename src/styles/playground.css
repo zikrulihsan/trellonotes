@@ -14,14 +14,11 @@
 }
 .playground-options {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
   gap: 14px;
   margin: 0;
   padding: 0;
   list-style: none;
-}
-.home .playground-options + * {
-  margin-top: 14px;
 }
 .playground-option {
   display: flex;
@@ -48,10 +45,6 @@
   outline: 2px solid var(--purple);
   outline-offset: 2px;
 }
-.playground-option.is-locked {
-  background: rgba(255, 255, 255, 0.6);
-  border-style: dashed;
-}
 .playground-option-icon {
   display: grid;
   flex: none;
@@ -68,12 +61,6 @@
   flex-direction: column;
   gap: 4px;
   min-width: 0;
-}
-.playground-option-text small {
-  color: var(--home-muted);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
 }
 .playground-option-text strong {
   display: flex;
@@ -178,4 +165,31 @@
   .playground-bar-link {
     padding: 6px 10px;
   }
+}
+
+/* Explore, Example, Try it for real: numbered groups of choices. */
+.home .playground-group {
+  margin-top: clamp(24px, 4vw, 36px);
+}
+.home .playground-group h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: clamp(22px, 3vw, 28px);
+}
+.playground-group h2 span {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--home-marker);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+}
+.playground-group > p {
+  margin: 6px 0 14px;
+  color: var(--home-muted);
 }
