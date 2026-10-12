@@ -1095,6 +1095,8 @@ const PREVIEW_READY = 'notis:landing-preview-ready';
 export interface PreviewMessage {
   landing: Landing;
   author: Author;
+  /** The posts to draw when the parent has them (the playground); else they are fetched. */
+  pages?: PublishedPage[];
   view: Section;
   /** The section the writer just moved or restyled, brought into view; `focusKey` counts changes. */
   focus?: string;
@@ -1108,7 +1110,7 @@ export interface PreviewMessage {
  */
 export function LandingPreview() {
   const [draft, setDraft] = useState<PreviewMessage | null>(null);
-  const [pages, setPages] = useState<PublishedPage[]>([]);
+  const [fetched, setPages] = useState<PublishedPage[]>([]);
   useLandingFont();
   useEffect(() => {
     const receive = (event: MessageEvent) => {
@@ -1118,6 +1120,7 @@ export function LandingPreview() {
       setDraft({
         landing: normalizeLanding(data.landing) ?? defaultLanding(data.author.name),
         author: data.author,
+        pages: Array.isArray(data.pages) ? data.pages : undefined,
         view: data.view === 'blog' || data.view === 'about' ? data.view : 'me',
         focus: data.focus,
         focusKey: data.focusKey,
@@ -1127,7 +1130,9 @@ export function LandingPreview() {
     window.parent.postMessage({ type: PREVIEW_READY }, window.location.origin);
     return () => window.removeEventListener('message', receive);
   }, []);
-  const userId = draft?.author.userId;
+  const given = Boolean(draft?.pages);
+  // Without posts from the parent, the writer's published pages are fetched.
+  const userId = given ? undefined : draft?.author.userId;
   useEffect(() => {
     if (!supabase || !userId) return;
     listPublishedPages(supabase, userId).then(setPages, () => {
@@ -1150,6 +1155,7 @@ export function LandingPreview() {
   }, [focus, focusKey]);
   if (!draft) return null;
   const { landing, author, view } = draft;
+  const pages = draft.pages ?? fetched;
   return (
     <div
       className="reader landing-preview"

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { ArrowDown, ArrowUp, Eye, ExternalLink, Plus, Trash2 } from 'lucide-react';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useAuth } from '@/context/auth-context';
@@ -37,6 +38,8 @@ import { useLandingFont } from '@/features/reader/useLandingFont';
 import { ResumeImport } from './ResumeImport';
 import { LandingPreviewPane } from './LandingPreviewPane';
 import type { Section } from '@/features/reader/PublicReader';
+import { usePlayground } from '@/features/playground/playground-context';
+import { PLAYGROUND_AUTHOR, playgroundPosts } from '@/features/playground/sample';
 
 type ListKey = 'links' | 'helps' | 'projects';
 
@@ -53,8 +56,10 @@ export function LandingSettingsPage() {
   const { user } = useAuth();
   const { profile, author, displayName, ensure } = useProfile();
   const userId = user?.id;
-  const [draft, setDraft] = useState<Landing>();
-  const [saved, setSaved] = useState('');
+  // The playground edits its sample page in memory; everything else works as signed in.
+  const playground = usePlayground();
+  const [draft, setDraft] = useState<Landing | undefined>(() => playground?.landing);
+  const [saved, setSaved] = useState(() => (playground ? JSON.stringify(playground.landing) : ''));
   const [loadError, setLoadError] = useState('');
   const [status, setStatus] = useState<{ busy?: boolean; error?: string; done?: boolean }>({});
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -96,11 +101,14 @@ export function LandingSettingsPage() {
     [draft, workingKey],
   );
   const previewAuthor = useMemo(
-    () => ({ userId: userId ?? '', handle: profile?.handle ?? null, name: displayName }),
-    [userId, profile?.handle, displayName],
+    () =>
+      playground
+        ? PLAYGROUND_AUTHOR
+        : { userId: userId ?? '', handle: profile?.handle ?? null, name: displayName },
+    [playground, userId, profile?.handle, displayName],
   );
 
-  if (!cloudEnabled || !userId)
+  if (!playground && (!cloudEnabled || !userId))
     return (
       <div className="pages-view landing-admin">
         <Header />
@@ -167,7 +175,7 @@ export function LandingSettingsPage() {
 
   async function submit(event: FormEvent) {
     event.preventDefault();
-    if (!supabase || !userId || !draft) return;
+    if (!draft) return;
     const badLink = draft.links.find((link) => link.label.trim() && !toLinkUrl(link.url));
     if (badLink)
       return setStatus({
@@ -175,6 +183,13 @@ export function LandingSettingsPage() {
       });
     const badSocial = draft.socials.find((url) => url.trim() && !toLinkUrl(url));
     if (badSocial) return setStatus({ error: `"${badSocial}" isn't a link to a profile.` });
+    if (playground) {
+      const kept = { ...draft, working: nowTitles(workspace) };
+      playground.saveLanding(kept);
+      setSaved(JSON.stringify(kept));
+      return setStatus({ done: true });
+    }
+    if (!supabase || !userId) return;
     setStatus({ busy: true });
     try {
       // The landing page lives on the profile, which also holds the public address. A known
@@ -198,6 +213,7 @@ export function LandingSettingsPage() {
     <LandingPreviewPane
       landing={previewLanding!}
       author={previewAuthor}
+      pages={playground ? playgroundPosts(workspace) : undefined}
       view={tab}
       focus={focus?.id}
       focusKey={focus?.key}
@@ -210,6 +226,11 @@ export function LandingSettingsPage() {
   return (
     <div className="pages-view landing-admin">
       <Header>
+        {playground && (
+          <Link className="landing-admin-view" to={writerPath(PLAYGROUND_AUTHOR)}>
+            View page <ExternalLink size={14} />
+          </Link>
+        )}
         {author && profile && (
           <a
             className="landing-admin-view"
