@@ -34,6 +34,12 @@ describe('signed-out home page', () => {
     expect(starts).toHaveLength(2);
     fireEvent.click(starts[0]);
     expect(screen.getByRole('dialog', { name: 'Start writing in Notis' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Continue with Google' })).toBeDisabled();
+    expect(screen.getByRole('link', { name: 'Privacy Policy' })).toHaveAttribute(
+      'href',
+      '/privacy',
+    );
+    fireEvent.click(screen.getByRole('checkbox', { name: /agree to the Privacy Policy/ }));
     fireEvent.click(screen.getByRole('button', { name: 'Continue with Google' }));
     fireEvent.click(screen.getByRole('button', { name: 'Continue with SWE Growth' }));
     expect(onGoogle).toHaveBeenCalledTimes(1);

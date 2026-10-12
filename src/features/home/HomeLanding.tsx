@@ -1,6 +1,8 @@
 import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Modal } from '@/components/ui/Modal';
+import { ConsentCheckbox } from '@/features/legal/ConsentCheckbox';
 import { LegalFooter } from '@/features/legal/LegalPage';
+import { rememberConsent } from '@/lib/consent';
 import {
   ArrowRight,
   CircleCheck,
@@ -52,7 +54,8 @@ const EXAMPLE_SITE = 'https://notis.swegrowth.id/@zikrul-ihsan-md';
 export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeLandingProps) {
   // The sign-in choices open only once the visitor asks to start; a failed sign-in reopens them.
   const [asked, setAsked] = useState(false),
-    [dismissedError, setDismissedError] = useState('');
+    [dismissedError, setDismissedError] = useState(''),
+    [agreed, setAgreed] = useState(false);
   const signingIn = asked || Boolean(error && error !== dismissedError);
   const setSigningIn = (open: boolean) => {
     setAsked(open);
@@ -225,12 +228,16 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           onClose={() => !redirecting && setSigningIn(false)}
         >
           <p>Sign in and your first board is ready. Nothing is public until you publish it.</p>
+          <ConsentCheckbox checked={agreed} onChange={setAgreed} />
           <div className="home-signin-options">
             <button
               className="home-button is-primary"
               type="button"
-              onClick={onGoogle}
-              disabled={redirecting}
+              onClick={() => {
+                rememberConsent();
+                onGoogle();
+              }}
+              disabled={redirecting || !agreed}
             >
               {redirecting ? <LoaderCircle size={18} className="auth-spinner" /> : <GoogleMark />}
               {redirecting ? 'Opening Google…' : 'Continue with Google'}
@@ -238,8 +245,11 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             <button
               className="home-button"
               type="button"
-              onClick={onSwegrowth}
-              disabled={redirecting}
+              onClick={() => {
+                rememberConsent();
+                onSwegrowth();
+              }}
+              disabled={redirecting || !agreed}
             >
               Continue with SWE Growth
             </button>
@@ -258,7 +268,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
 }
 
 /** How long each step of an animated picture stays before the next one. */
-const STEP_MS = 1100;
+const STEP_MS = 700;
 
 /**
  * Steps through `length` frames while the picture is on screen, then starts over; a picture
@@ -303,7 +313,7 @@ const INITIATIVE = [
 
 /** One initiative, updated over several days: each dated update appears in turn. */
 function NoteSketch() {
-  const { ref, step, animated } = useLoop(INITIATIVE.length + 3);
+  const { ref, step, animated } = useLoop(INITIATIVE.length + 1);
   return (
     <div
       ref={ref}
@@ -331,7 +341,7 @@ const STORY_POINTS = [
 /** Points get picked from the notes one by one, then AI writes the story from them. */
 function StorySketch() {
   const points = STORY_POINTS.length;
-  const { ref, step, animated } = useLoop(points + 5);
+  const { ref, step, animated } = useLoop(points + 3);
   return (
     <div
       ref={ref}
@@ -373,7 +383,7 @@ function BoardSketch() {
     { title: 'Done', cards: ['Fix cart drop', 'Launch waitlist'] },
   ];
   // Frames: 0 board, 1 pointer on the card, 2 journal open, 3-5 updates, 6-7 hold.
-  const { ref, step, animated } = useLoop(8);
+  const { ref, step, animated } = useLoop(7);
   const open = step >= 2;
   return (
     <div
@@ -441,7 +451,7 @@ function Equation({
   parts: EquationPart[];
   animate?: boolean;
 }) {
-  const { ref, step: frame, animated } = useLoop(parts.length * 2 + 2);
+  const { ref, step: frame, animated } = useLoop(parts.length * 2);
   const step = animate ? frame : Infinity;
   const shown = (index: number) => (index <= step ? ' is-shown' : '');
   return (
