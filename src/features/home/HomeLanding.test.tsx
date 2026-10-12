@@ -13,10 +13,14 @@ describe('signed-out home page', () => {
       'Write notes, get noticed.',
     );
     expect(
-      screen.getByRole('heading', { name: 'Everything starts with a note.' }),
+      screen.getByRole('img', { name: 'Write notes, turn them into stories, show your work' }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /deserves to be seen/ })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /See a real one/ })).toHaveAttribute(
+    expect(
+      screen.getByRole('img', { name: 'Stories plus resume equals your personal website' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Every story is part of/ })).toBeInTheDocument();
+    expect(screen.getByText('Is everything I write public?')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'See a real one' })).toHaveAttribute(
       'href',
       'https://notis.swegrowth.id/@zikrul-ihsan-md',
     );
@@ -24,6 +28,7 @@ describe('signed-out home page', () => {
       'href',
       'https://notis.swegrowth.id/@zikrul-ihsan-md',
     );
+    expect(screen.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy');
     expect(screen.queryByRole('button', { name: 'Continue with Google' })).toBeNull();
     const starts = screen.getAllByRole('button', { name: /Start writing/ });
     expect(starts).toHaveLength(2);

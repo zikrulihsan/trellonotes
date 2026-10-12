@@ -14,5 +14,5 @@
     "types": [],
     "tsBuildInfoFile": "./node_modules/.cache/tsconfig.edge.tsbuildinfo"
   },
-  "include": ["netlify/edge-functions", "netlify/edge-env.d.ts"]
+  "include": ["netlify/edge-functions", "netlify/shared", "netlify/edge-env.d.ts"]
 }

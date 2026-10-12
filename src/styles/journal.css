@@ -183,3 +183,63 @@
   padding-left: 18px;
   font-size: 14px;
 }
+/* Picking what Gemini may read for a week's write-up. */
+.journal-writeup {
+  margin-bottom: 28px;
+  padding: 18px 20px;
+  border: 1px solid #e4dcf5;
+  border-radius: 14px;
+  background: #faf8ff;
+}
+.journal-writeup-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.journal-writeup h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 16px;
+}
+.journal-writeup > p {
+  margin: 6px 0 12px;
+  font-size: 14px;
+  color: #6f6878;
+}
+.journal-writeup fieldset {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 12px;
+  padding: 0;
+  border: 0;
+}
+.journal-writeup legend {
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8d8696;
+}
+.journal-writeup label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 14px;
+  color: #2d2737;
+}
+.journal-writeup input {
+  margin-top: 3px;
+}
+.journal-writeup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.journal-writeup-actions .journal-private {
+  margin: 0;
+}
