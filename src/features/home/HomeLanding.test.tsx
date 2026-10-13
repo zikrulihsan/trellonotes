@@ -31,19 +31,19 @@ describe('signed-out home page', () => {
       'href',
       '/playground',
     );
-    expect(screen.getByRole('link', { name: /Try the board/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Notis Board/ })).toHaveAttribute(
       'href',
       '/playground',
     );
-    expect(screen.getByRole('link', { name: /Try writing a page/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Notis Pages/ })).toHaveAttribute(
       'href',
       '/playground/pages',
     );
-    expect(screen.getByRole('link', { name: /See an example blog/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Notis Blog/ })).toHaveAttribute(
       'href',
       '/playground/@alya?blog',
     );
-    expect(screen.getByRole('link', { name: /See an example page/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Notis Portfolio/ })).toHaveAttribute(
       'href',
       '/playground/@alya',
     );

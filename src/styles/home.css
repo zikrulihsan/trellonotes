@@ -1097,36 +1097,24 @@ a.home-logo {
   font-weight: 600;
   white-space: nowrap;
 }
-
-/* A step's way to see the real thing, under its description: a link, not a button. */
-.home-beat-link {
+.home-notis.is-link {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  margin-top: 18px;
-  color: var(--purple);
-  font-weight: 600;
+  gap: 2px;
   text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 4px;
+  text-decoration-color: #c9b8ff;
+  text-underline-offset: 3px;
+  transition: background-color 0.15s ease;
 }
-.home-beat-link:hover {
-  text-decoration-thickness: 2px;
+.home-notis.is-link:hover {
+  background: #e4d9ff;
+  text-decoration-color: currentColor;
 }
-.home-beat-link svg {
-  transition: transform 0.15s ease;
-}
-.home-beat-link:hover svg {
-  transform: translate(2px, -2px);
-}
-.home-beat-link:focus-visible {
+.home-notis.is-link:focus-visible {
   outline: 2px solid var(--purple);
-  outline-offset: 3px;
-  border-radius: 4px;
+  outline-offset: 2px;
 }
-.home-beat.is-wide .home-beat-link {
-  margin-bottom: 8px;
-}
+
 /* The hero's second way in: lighter than Start writing, so the two don't read as twins. */
 .home-button.is-quiet {
   border-color: transparent;
