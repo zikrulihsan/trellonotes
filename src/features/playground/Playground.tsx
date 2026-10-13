@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { ArrowRight } from 'lucide-react';
 import { BrowserRouter, Link, Navigate, useLocation } from 'react-router-dom';
 import { App } from '@/app/App';
 import { AuthContext, type AuthContextValue } from '@/context/auth-context';
@@ -129,7 +130,7 @@ function PlaygroundBar({ tip, back }: { tip: string; back?: { label: string; to:
         </Link>
       )}
       <a className="playground-bar-link is-primary" href={SIGN_IN_URL}>
-        Make your own
+        Make your own <ArrowRight size={15} aria-hidden="true" />
       </a>
     </aside>
   );

@@ -65,9 +65,28 @@
 .playground-bar-link:hover {
   background: rgba(39, 40, 46, 0.07);
 }
+/* The one call to act: Notis purple, with the same drawn shadow as the bar. */
 .playground-bar-link.is-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid #27282e;
   color: #fff;
-  background: #27282e;
+  background: var(--purple);
+  box-shadow: 2px 2px 0 #27282e;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+.playground-bar-link.is-primary:hover {
+  background: #6a46c8;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #27282e;
+}
+.playground-bar-link.is-primary:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 #27282e;
 }
 .playground-site .reader {
   padding-bottom: 72px;
