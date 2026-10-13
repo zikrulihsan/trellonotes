@@ -1097,23 +1097,6 @@ a.home-logo {
   font-weight: 600;
   white-space: nowrap;
 }
-.home-notis.is-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  text-decoration: underline;
-  text-decoration-color: #c9b8ff;
-  text-underline-offset: 3px;
-  transition: background-color 0.15s ease;
-}
-.home-notis.is-link:hover {
-  background: #e4d9ff;
-  text-decoration-color: currentColor;
-}
-.home-notis.is-link:focus-visible {
-  outline: 2px solid var(--purple);
-  outline-offset: 2px;
-}
 
 /* The hero's second way in: lighter than Start writing, so the two don't read as twins. */
 .home-button.is-quiet {
@@ -1125,4 +1108,49 @@ a.home-logo {
   border-color: #dedde5;
   background: #fff;
   color: var(--home-ink);
+}
+
+/* A step's way to see the real thing: a link, not a button. Under the text, or under the picture. */
+.home-beat-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 18px;
+  color: var(--purple);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+.home-beat-link:hover {
+  text-decoration-thickness: 2px;
+}
+.home-beat-link svg {
+  transition: transform 0.15s ease;
+}
+.home-beat-link:hover svg {
+  transform: translate(2px, -2px);
+}
+.home-beat-link:focus-visible {
+  outline: 2px solid var(--purple);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.home-beat.is-wide .home-beat-text .home-beat-link {
+  margin-bottom: 8px;
+}
+.home-beat.is-wide > .home-beat-link {
+  margin-top: 28px;
+}
+.home-beat-art {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+.home-beat-art > .home-paper {
+  align-self: stretch;
+}
+.home-beat-art .home-beat-link {
+  margin-top: 22px;
 }

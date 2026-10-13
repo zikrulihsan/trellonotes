@@ -91,7 +91,43 @@ const USES: {
     log: [{ date: 'Thu, 9 Oct', text: 'Rewrote the CLI in Go. Goroutines finally clicked.' }],
     post: 'What rewriting a CLI taught me about Go',
   },
+  {
+    label: 'Journal',
+    title: 'Daily journal',
+    log: [
+      { date: 'Mon, 6 Oct', text: 'Walked before opening the laptop. Calmer all morning.' },
+      { date: 'Thu, 9 Oct', text: 'Skipped the walk. Scattered by noon. Noted.' },
+    ],
+    post: 'What a month of morning walks did to my focus',
+  },
+  {
+    label: 'Family',
+    title: "Raka's first year",
+    log: [
+      { date: 'Sun, 5 Oct', text: 'First tooth! He will not stop chewing the spoon.' },
+      { date: 'Sat, 11 Oct', text: 'Tried solids: loves banana, refuses spinach.' },
+    ],
+    post: 'Six months in: notes from our first year as parents',
+  },
+  {
+    label: 'Hobby',
+    title: 'Sourdough',
+    log: [
+      { date: 'Tue, 7 Oct', text: 'Starter doubled in six hours. Finally alive.' },
+      { date: 'Sun, 12 Oct', text: 'Loaf #4: better crumb, crust still too pale.' },
+    ],
+    post: 'Four loaves in: what sourdough taught me about patience',
+  },
 ];
+
+/** A step's way to see the real thing in the playground: a text link, not a button. */
+function BeatLink({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <a className="home-beat-link" href={href}>
+      {children} <ArrowUpRight size={16} />
+    </a>
+  );
+}
 
 /** What signed-out visitors see: what Notis is, and the way in. */
 export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeLandingProps) {
@@ -154,8 +190,9 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             <h2 id="home-beat-write">Each task holds its own notes.</h2>
             <p>
               No more digging through chats and docs to remember what you did. Everything about a
-              task lives inside <NotisMark href={PLAYGROUND}>Notis Board</NotisMark>.
+              task lives inside <NotisMark>Notis Board</NotisMark>.
             </p>
+            <BeatLink href={PLAYGROUND}>Try the board</BeatLink>
           </div>
           <div className="home-hero-board">
             <BoardSketch />
@@ -170,11 +207,13 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             </h2>
             <p>
               Turn what you worked on into something people read. Write it yourself, or let{' '}
-              <AiMark>AI draft</AiMark> it from your notes on{' '}
-              <NotisMark href={EXAMPLE_PAGES}>Notis Pages</NotisMark>.
+              <AiMark>AI draft</AiMark> it from your notes on <NotisMark>Notis Pages</NotisMark>.
             </p>
           </div>
-          <WriteSketch />
+          <div className="home-beat-art">
+            <WriteSketch />
+            <BeatLink href={EXAMPLE_PAGES}>See sample pages</BeatLink>
+          </div>
         </section>
 
         <section className="home-beat is-flipped" aria-labelledby="home-beat-blog">
@@ -184,12 +223,14 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               Publish your writing as <mark>a blog page</mark>.
             </h2>
             <p>
-              Every post is a story of your work.{' '}
-              <NotisMark href={EXAMPLE_BLOG}>Notis Blog</NotisMark> shows them all on your own blog
-              page, for anyone to read.
+              Every post is a story of your work. <NotisMark>Notis Blog</NotisMark> shows them all
+              on your own blog page, for anyone to read.
             </p>
           </div>
-          <BlogSketch />
+          <div className="home-beat-art">
+            <BlogSketch />
+            <BeatLink href={EXAMPLE_BLOG}>See an example blog</BeatLink>
+          </div>
         </section>
 
         <section className="home-beat is-wide" aria-labelledby="home-beat-show">
@@ -200,8 +241,8 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             </h2>
             <p>
               Your posts show how you think. Your resume shows what you&apos;ve done. Put them
-              together with the <AiMark>AI-powered</AiMark>{' '}
-              <NotisMark href={EXAMPLE_SITE}>Notis Portfolio</NotisMark> generator.
+              together with the <AiMark>AI-powered</AiMark> <NotisMark>Notis Portfolio</NotisMark>{' '}
+              generator.
             </p>
           </div>
           <Equation
@@ -219,11 +260,12 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               },
             ]}
           />
+          <BeatLink href={EXAMPLE_SITE}>See an example page</BeatLink>
         </section>
 
         <section className="home-uses" aria-labelledby="home-uses">
           <p className="eyebrow">EXAMPLES</p>
-          <h2 id="home-uses">Track any kind of progress.</h2>
+          <h2 id="home-uses">Write about anything.</h2>
           <div className="home-uses-list">
             {USES.map((use) => (
               <div key={use.title} className="home-paper">
@@ -241,6 +283,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               </div>
             ))}
           </div>
+          <div className="home-signin">{start}</div>
         </section>
 
         <section className="home-faq" aria-labelledby="home-faq">
@@ -318,15 +361,8 @@ function AiMark({ children }: { children: ReactNode }) {
 }
 
 /** A Notis feature named in the copy ("Notis Board"), highlighted and kept on one line. */
-function NotisMark({ href, children }: { href?: string; children: ReactNode }) {
-  if (!href) return <span className="home-notis">{children}</span>;
-  // Named in its step, the feature links to it in the playground, so the copy itself is the way in.
-  return (
-    <a className="home-notis is-link" href={href}>
-      {children}
-      <ArrowUpRight size={13} aria-hidden />
-    </a>
-  );
+function NotisMark({ children }: { children: ReactNode }) {
+  return <span className="home-notis">{children}</span>;
 }
 
 /** How long each step of an animated picture stays before the next one. */
