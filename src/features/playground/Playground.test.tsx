@@ -34,6 +34,8 @@ describe('playground', () => {
       'Pages3',
       'Landing page',
     ]);
+    // Inside the app the bar offers only Make your own.
+    expect(screen.queryByRole('link', { name: 'Back to the app' })).toBeNull();
     for (const link of screen.getAllByRole('link', { name: 'Make your own' }))
       expect(link).toHaveAttribute('href', '/?start');
   });
@@ -76,6 +78,7 @@ describe('playground', () => {
     expect(screen.getByText('Shipping a waitlist in a week')).toBeInTheDocument();
     // The story is still a draft until the visitor publishes it.
     expect(screen.queryByText('The boring bug that cost us sales')).toBeNull();
+    expect(screen.getByRole('link', { name: 'Back to the app' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Make your own' })).toHaveAttribute('href', '/?start');
   });
 });

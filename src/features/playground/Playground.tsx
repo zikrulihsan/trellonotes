@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { BrowserRouter, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Link, Navigate, useLocation } from 'react-router-dom';
 import { App } from '@/app/App';
 import { AuthContext, type AuthContextValue } from '@/context/auth-context';
 import { UIProvider } from '@/context/UIProvider';
@@ -71,7 +71,10 @@ function PlaygroundRoutes() {
     return (
       <div className="playground-site">
         <PlaygroundSite />
-        <PlaygroundBar tip="A sample landing page: what visitors see on Notis." />
+        <PlaygroundBar
+          tip="A sample landing page: what visitors see on Notis."
+          back={{ label: 'Back to the app', to: boardPath(workspace.boards[0]) }}
+        />
       </div>
     );
   return (
@@ -109,14 +112,22 @@ function tipFor(pathname: string) {
   return 'Sample data. Nothing you change is saved.';
 }
 
-/** On every playground screen: what this is, the next thing to try, and one way on, to an account of one's own. */
-function PlaygroundBar({ tip }: { tip: string }) {
+/**
+ * On every playground screen: what this is, the next thing to try, and the way on, to an
+ * account of one's own. The sample website, outside the app, also gets a way `back` into it.
+ */
+function PlaygroundBar({ tip, back }: { tip: string; back?: { label: string; to: string } }) {
   return (
     <aside className="playground-bar" aria-label="Playground">
       <span className="playground-bar-text">
         <strong>Playground</strong>
         <span>{tip}</span>
       </span>
+      {back && (
+        <Link className="playground-bar-link" to={back.to}>
+          {back.label}
+        </Link>
+      )}
       <a className="playground-bar-link is-primary" href={SIGN_IN_URL}>
         Make your own
       </a>
