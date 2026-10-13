@@ -102,6 +102,7 @@ describe('public reader', () => {
   });
 
   it('moves older account-id links to the handle address', async () => {
+    landing = {};
     renderAt(`/read/${AUTHOR}/catatan-rilis`);
     expect(await screen.findByText('Isi tulisan.')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Me' })).toHaveAttribute('href', '/@zikrul');
