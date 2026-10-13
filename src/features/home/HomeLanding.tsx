@@ -58,6 +58,8 @@ const PLAYGROUND = '/playground';
 const EXAMPLE_SITE = `/playground${writerPath(PLAYGROUND_AUTHOR)}`;
 /** The same sample writer's Blog page. */
 const EXAMPLE_BLOG = `${EXAMPLE_SITE}?blog`;
+/** The sample workspace's landing page editor, with its live preview. */
+const EXAMPLE_LANDING_EDITOR = `${PLAYGROUND}/landing`;
 /** The sample workspace's Pages list. */
 const EXAMPLE_PAGES = `${PLAYGROUND}/pages`;
 
@@ -248,7 +250,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               },
             ]}
           />
-          <BeatLink href={EXAMPLE_SITE}>See an example page</BeatLink>
+          <BeatLink href={EXAMPLE_LANDING_EDITOR}>Try the page editor</BeatLink>
         </section>
 
         <section className="home-uses" aria-labelledby="home-uses">

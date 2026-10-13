@@ -46,9 +46,9 @@ describe('signed-out home page', () => {
       'href',
       '/playground/@alya?blog',
     );
-    expect(screen.getByRole('link', { name: /See an example page/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Try the page editor/ })).toHaveAttribute(
       'href',
-      '/playground/@alya',
+      '/playground/landing',
     );
     expect(screen.getByRole('heading', { name: 'Start your first board.' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy');
