@@ -1,9 +1,11 @@
 import { useState, type PropsWithChildren } from 'react';
 import { LoaderCircle } from 'lucide-react';
+import { Navigate, useLocation } from 'react-router-dom';
 import { WorkspaceProvider } from '@/context/WorkspaceProvider';
 import { useAuth } from '@/context/auth-context';
 import { HomeLanding } from '@/features/home/HomeLanding';
 import { ConsentGate } from '@/features/legal/ConsentGate';
+import { isLoginPath } from '@/lib/app-paths';
 import { hasAcceptedTerms } from '@/lib/consent';
 
 export function WorkspaceSession({ children }: PropsWithChildren) {
@@ -18,12 +20,17 @@ export function WorkspaceSession({ children }: PropsWithChildren) {
   } = useAuth();
   const [redirecting, setRedirecting] = useState(false);
   const [error, setError] = useState('');
+  const { pathname } = useLocation();
+  const onLogin = isLoginPath(pathname);
+
+  if (onLogin && session) return <Navigate to="/" replace />;
 
   if (configured && session && !hasAcceptedTerms(session.user)) {
     return <ConsentGate onAccept={acceptTerms} onSignOut={signOut} />;
   }
 
-  if (!configured || session) {
+  // Without Supabase the app runs locally with no sign-in, except at /login, which still shows the landing page.
+  if ((!configured && !onLogin) || session) {
     return <WorkspaceProvider key={session?.user.id ?? 'local'}>{children}</WorkspaceProvider>;
   }
 

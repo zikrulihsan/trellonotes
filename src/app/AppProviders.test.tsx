@@ -37,4 +37,16 @@ describe('app shell', () => {
     expect(screen.getByTestId('dialog')).toHaveTextContent('none');
     expect(mounts).toBe(1);
   });
+
+  it('shows the landing page at /login even when sign-in is not set up', () => {
+    window.history.pushState({}, '', '/login');
+    render(
+      <AppProviders>
+        <Probe />
+      </AppProviders>,
+    );
+    expect(screen.getByText('Is everything public?')).toBeInTheDocument();
+    expect(screen.queryByText('open')).not.toBeInTheDocument();
+    window.history.pushState({}, '', '/');
+  });
 });
