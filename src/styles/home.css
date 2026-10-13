@@ -675,9 +675,28 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-@media (max-width: 560px) {
+/* On phones the boards slide sideways, the next one peeking in, instead of stacking four deep. */
+@media (max-width: 760px) {
   .home-uses-list {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: min(82%, 320px);
+    gap: 12px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 16px;
+    scrollbar-width: none;
+    /* Bleed to the screen edges, with room below for the cards' shadows. */
+    margin-inline: -16px;
+    padding: 4px 16px 32px;
+    margin-bottom: -20px;
+  }
+  .home-uses-list::-webkit-scrollbar {
+    display: none;
+  }
+  .home-uses-list > .home-paper {
+    scroll-snap-align: start;
   }
 }
 .home-faq-list {
