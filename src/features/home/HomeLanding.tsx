@@ -49,6 +49,8 @@ const FAQ: { q: string; a: string }[] = [
   },
 ];
 
+/** The playground: the app on a sample workspace, to try without signing in. */
+const PLAYGROUND = '/playground';
 /** The sample professional page in the playground, to point visitors at. */
 const EXAMPLE_SITE = `/playground${writerPath(PLAYGROUND_AUTHOR)}`;
 /** The same sample writer's Blog page. */
@@ -130,8 +132,8 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           </p>
           <div className="home-signin">
             {start}
-            <a className="home-button" href={EXAMPLE_SITE}>
-              See an example page <ArrowRight size={18} />
+            <a className="home-button" href={PLAYGROUND}>
+              Explore it first, no login <ArrowRight size={18} />
             </a>
           </div>
           <p className="home-micro">

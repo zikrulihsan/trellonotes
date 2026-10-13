@@ -27,9 +27,14 @@ describe('signed-out home page', () => {
     expect(screen.getByRole('heading', { name: /your professional profile/ })).toBeInTheDocument();
     expect(screen.getByText('Learning Go')).toBeInTheDocument();
     expect(screen.getByText('Why not Notion or Trello?')).toBeInTheDocument();
-    const profiles = screen.getAllByRole('link', { name: /See an example page/ });
-    expect(profiles).toHaveLength(2);
-    profiles.forEach((link) => expect(link).toHaveAttribute('href', '/playground/@alya'));
+    expect(screen.getByRole('link', { name: /Explore it first, no login/ })).toHaveAttribute(
+      'href',
+      '/playground',
+    );
+    expect(screen.getByRole('link', { name: /See an example page/ })).toHaveAttribute(
+      'href',
+      '/playground/@alya',
+    );
     expect(screen.getByRole('heading', { name: 'Start your first board.' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy');
     expect(screen.queryByRole('button', { name: 'Continue with Google' })).toBeNull();
