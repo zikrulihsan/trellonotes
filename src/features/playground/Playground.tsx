@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { BrowserRouter, Link, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Navigate, useLocation } from 'react-router-dom';
 import { App } from '@/app/App';
 import { AuthContext, type AuthContextValue } from '@/context/auth-context';
 import { UIProvider } from '@/context/UIProvider';
@@ -8,7 +8,6 @@ import { FocusProvider } from '@/features/focus/FocusProvider';
 import { SampleSite } from '@/features/reader/PublicReader';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { boardPath } from '@/lib/app-paths';
-import { writerPath } from '@/lib/supabase/published-pages';
 import { nowTitles } from '@/features/journal/journal';
 import type { Landing } from '@/lib/supabase/landing';
 import { PlaygroundContext, usePlayground } from './playground-context';
@@ -72,19 +71,13 @@ function PlaygroundRoutes() {
     return (
       <div className="playground-site">
         <PlaygroundSite />
-        <PlaygroundBar
-          tip="A sample landing page: what visitors see on Notis."
-          back={{ label: 'Back to the app', to: boardPath(workspace.boards[0]) }}
-        />
+        <PlaygroundBar tip="A sample landing page: what visitors see on Notis." />
       </div>
     );
   return (
     <>
       <App />
-      <PlaygroundBar
-        tip={tipFor(pathname)}
-        back={{ label: 'See the live page', to: writerPath(PLAYGROUND_AUTHOR) }}
-      />
+      <PlaygroundBar tip={tipFor(pathname)} />
     </>
   );
 }
@@ -111,22 +104,19 @@ function tipFor(pathname: string) {
     return 'Add an update, then try ··· › Write it up.';
   if (pathname.startsWith('/page/')) return 'Publish it to see it on your website.';
   if (pathname === '/journal') return 'Your week, gathered from the board, ready to write up.';
-  if (pathname === '/landing') return 'Edit the form, save, then see the live page.';
+  if (pathname === '/landing') return 'Edit the form, save, then press View page.';
   if (pathname === '/pages') return 'Published pages make up the blog on your landing page.';
   return 'Sample data. Nothing you change is saved.';
 }
 
-/** The way on from every playground screen: to the example, or to an account of one's own. */
-function PlaygroundBar({ tip, back }: { tip: string; back: { label: string; to: string } }) {
+/** On every playground screen: what this is, the next thing to try, and one way on, to an account of one's own. */
+function PlaygroundBar({ tip }: { tip: string }) {
   return (
     <aside className="playground-bar" aria-label="Playground">
       <span className="playground-bar-text">
         <strong>Playground</strong>
         <span>{tip}</span>
       </span>
-      <Link className="playground-bar-link" to={back.to}>
-        {back.label}
-      </Link>
       <a className="playground-bar-link is-primary" href={SIGN_IN_URL}>
         Make your own
       </a>

@@ -59,9 +59,6 @@
   font-weight: 600;
   text-decoration: none;
 }
-.playground-bar-link:not(.is-primary) {
-  border: 1px solid #d6d4dc;
-}
 .playground-bar-link:hover {
   background: rgba(39, 40, 46, 0.07);
 }
