@@ -144,9 +144,21 @@
   border-color: #c9c4d2;
   transform: translateY(-1px);
 }
+/* The main action: flat Notis purple, like the Publish button in the app. */
 .home-button.is-primary {
-  border-color: var(--home-ink);
-  box-shadow: 3px 3px 0 var(--home-ink);
+  border-color: var(--purple);
+  color: #fff;
+  background: var(--purple);
+}
+.home-button.is-primary:hover {
+  border-color: #6a46c8;
+  background: #6a46c8;
+}
+/* Signing in, Google keeps its own white button, so its colored mark reads. */
+.home-signin-dialog .home-button.is-primary {
+  border-color: #dedde5;
+  color: var(--home-ink);
+  background: #fff;
 }
 .home-button:disabled {
   opacity: 0.65;
@@ -397,9 +409,6 @@
 }
 .home-start .home-button {
   border-color: #fff;
-}
-.home-start .home-button.is-primary {
-  box-shadow: 3px 3px 0 var(--home-marker);
 }
 
 .home-footer {
