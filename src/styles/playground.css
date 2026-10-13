@@ -29,8 +29,21 @@
 }
 .playground-bar-text {
   display: flex;
+  align-items: center;
   gap: 8px;
   min-width: 0;
+}
+/* A tag, not a link: it names the mode the visitor is in. */
+.playground-bar-text strong {
+  flex: none;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: #5b3fc4;
+  background: #f0eaff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 .playground-bar-text span {
   overflow: hidden;
@@ -46,6 +59,9 @@
   font-weight: 600;
   text-decoration: none;
 }
+.playground-bar-link:not(.is-primary) {
+  border: 1px solid #d6d4dc;
+}
 .playground-bar-link:hover {
   background: rgba(39, 40, 46, 0.07);
 }
@@ -56,17 +72,32 @@
 .playground-site .reader {
   padding-bottom: 72px;
 }
+/* On a phone the bar becomes a card: what this is on top, the two ways on below. */
 @media (max-width: 640px) {
   .playground-bar {
     bottom: 10px;
-    padding-left: 12px;
-    font-size: 12px;
+    flex-wrap: wrap;
+    width: calc(100% - 24px);
+    padding: 10px;
+    border-radius: 14px;
+    font-size: 13px;
+  }
+  .playground-bar-text {
+    flex: 1 0 100%;
+    align-items: flex-start;
+    padding: 0 2px 2px;
   }
   .playground-bar-text span {
-    display: none;
+    white-space: normal;
+    line-height: 1.4;
   }
   .playground-bar-link {
-    padding: 6px 10px;
+    flex: 1;
+    padding: 9px 10px;
+    text-align: center;
+  }
+  .playground-site .reader {
+    padding-bottom: 140px;
   }
 }
 .modal-actions a.button {

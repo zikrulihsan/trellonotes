@@ -158,6 +158,21 @@ function useReaderTheme(theme: LandingTheme | undefined) {
   }, [theme, setTheme]);
 }
 
+/**
+ * "Written with Notis" under every public page, leading readers to the Notis home page. A plain
+ * link, not the router's, so it leaves the playground too.
+ */
+function ReaderFooter() {
+  return (
+    <footer className="reader-footer">
+      <a href="/">
+        <Feather size={13} />
+        Written with Notis
+      </a>
+    </footer>
+  );
+}
+
 /** Public pages anyone can open without signing in. */
 export function PublicReader() {
   const [theme, setTheme] = useState<LandingTheme>('sketch');
@@ -187,10 +202,7 @@ export function PublicReader() {
     <ThemeContext.Provider value={setTheme}>
       <div className="reader" data-landing-theme={theme === 'sketch' ? undefined : theme}>
         {body}
-        <footer className="reader-footer">
-          <Feather size={13} />
-          Written with Notis
-        </footer>
+        <ReaderFooter />
       </div>
     </ThemeContext.Provider>
   );
@@ -1002,10 +1014,7 @@ export function SampleSite({
       data-landing-theme={landing.theme === 'sketch' ? undefined : landing.theme}
     >
       {body}
-      <footer className="reader-footer">
-        <Feather size={13} />
-        Written with Notis
-      </footer>
+      <ReaderFooter />
     </div>
   );
 }
