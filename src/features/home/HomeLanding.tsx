@@ -182,7 +182,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               Every post is a story of your work. <NotisMark>Notis Blog</NotisMark> shows them all
               on your own blog page, for anyone to read.
             </p>
-            <a className="home-button home-beat-link" href={EXAMPLE_BLOG}>
+            <a className="home-button is-primary home-beat-link" href={EXAMPLE_BLOG}>
               See an example blog <ArrowRight size={18} />
             </a>
           </div>
