@@ -257,6 +257,8 @@ function normalizeBlog(value: unknown): LandingBlog {
 
 /** What the writer's public page (/@handle) shows above and around their notes. */
 export interface Landing {
+  /** Off, the public address shows only the Blog: no Me or About page. */
+  enabled: boolean;
   theme: LandingTheme;
   layout: LandingLayout;
   greeting: string;
@@ -276,6 +278,9 @@ export interface Landing {
   about: LandingAbout;
   blog: LandingBlog;
 }
+
+/** True when the writer has a landing page switched on; otherwise their address shows only the Blog. */
+export const hasLandingPage = (landing: Landing | null) => Boolean(landing?.enabled);
 
 /** True when the About page has something to show, so the menu can leave it out otherwise. */
 export const hasAbout = (about: LandingAbout) =>
@@ -324,6 +329,7 @@ export const defaultAbout = (): LandingAbout => ({
 export function defaultLanding(name: string | null): Landing {
   const first = name?.trim().split(/\s+/)[0];
   return {
+    enabled: true,
     theme: 'sketch',
     layout: defaultLayout(),
     greeting: first ? `Hi, ${first} Here` : 'Hi, welcome',
@@ -479,6 +485,8 @@ export function normalizeLanding(value: unknown): Landing | null {
   const fallback = defaultLanding(null);
   const count = Number(raw.notesCount);
   return {
+    // Pages saved before the switch existed stay on.
+    enabled: raw.enabled !== false,
     theme: isTheme(raw.theme) ? raw.theme : 'sketch',
     layout: normalizeLayout(raw.layout),
     greeting: text(raw.greeting, 80),

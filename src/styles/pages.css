@@ -644,6 +644,21 @@
 .landing-fieldset > .button {
   align-self: flex-start;
 }
+.landing-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #2d2737;
+  cursor: pointer;
+}
+.landing-switch input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--purple);
+}
 .landing-admin-hint {
   margin: 0;
   font-size: 13px;

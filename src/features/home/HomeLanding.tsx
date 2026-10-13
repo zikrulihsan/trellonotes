@@ -51,6 +51,8 @@ const FAQ: { q: string; a: string }[] = [
 
 /** The sample professional page in the playground, to point visitors at. */
 const EXAMPLE_SITE = `/playground${writerPath(PLAYGROUND_AUTHOR)}`;
+/** The same sample writer's Blog page. */
+const EXAMPLE_BLOG = `${EXAMPLE_SITE}?blog`;
 
 /** Boards for things other than code, each with a line or two of its log. */
 const USES: {
@@ -178,6 +180,9 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               Every post is a story of your work. <NotisMark>Notis Blog</NotisMark> shows them all
               on your own blog page, for anyone to read.
             </p>
+            <a className="home-button home-beat-link" href={EXAMPLE_BLOG}>
+              See an example blog <ArrowRight size={18} />
+            </a>
           </div>
           <BlogSketch />
         </section>

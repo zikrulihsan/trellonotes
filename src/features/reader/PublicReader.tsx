@@ -45,6 +45,7 @@ import {
   normalizeLanding,
   socialPlatform,
   type AboutSectionId,
+  hasLandingPage,
   type Landing,
   type LandingAbout,
   type LandingBlog,
@@ -207,14 +208,19 @@ function AuthorPage({ author }: { author: Author }) {
   const result = useSiteData(author, true);
   const name =
     author.name ?? (result.status === 'ready' ? result.data[0][0]?.author_name : null) ?? null;
+  // Without a landing page switched on, the address is just the Blog.
+  const blogOnly = result.status === 'ready' && !hasLandingPage(result.data[1]);
   useEffect(() => {
     const who = name ?? (author.handle ? `@${author.handle}` : 'Writing');
-    document.title = view === 'me' ? who : `${view === 'blog' ? 'Blog' : 'About'} · ${who}`;
-  }, [name, author.handle, view]);
+    document.title =
+      view === 'me' || blogOnly ? who : `${view === 'blog' ? 'Blog' : 'About'} · ${who}`;
+  }, [name, author.handle, view, blogOnly]);
   useLandingFont();
   useReaderTheme(result.status === 'ready' ? (result.data[1]?.theme ?? 'sketch') : undefined);
   if (result.status !== 'ready') return <Status result={result} kind="page" />;
   const [pages, landing] = result.data;
+  if (!hasLandingPage(landing))
+    return <BlogView author={author} name={name} pages={pages} blog={landing?.blog} />;
   const about = landing && hasAbout(landing.about) ? landing.about : null;
   return (
     <>
@@ -907,8 +913,8 @@ function ArticleView({
   const name = author.name ?? page.author_name;
   return (
     <>
-      {listed && (
-        <PublicNav author={author} showAbout={Boolean(site?.[1] && hasAbout(site[1].about))} />
+      {listed && site && hasLandingPage(site[1]) && (
+        <PublicNav author={author} showAbout={Boolean(site[1] && hasAbout(site[1].about))} />
       )}
       <main className="reader-column">
         <article>
@@ -964,7 +970,10 @@ export function SampleSite({
     if (!slug)
       document.title = view === 'me' ? who : `${view === 'blog' ? 'Blog' : 'About'} · ${who}`;
   }, [slug, view, author.name]);
-  useEffect(() => window.scrollTo(0, 0), [pathname, search]);
+  // Braced: newer browsers return a promise from scrollTo, which React would take for a cleanup.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname, search]);
   let body;
   if (slug)
     body = page ? (
@@ -972,6 +981,8 @@ export function SampleSite({
     ) : (
       <NotFound />
     );
+  else if (!hasLandingPage(landing))
+    body = <BlogView author={author} name={author.name} pages={pages} blog={landing.blog} />;
   else
     body = (
       <>

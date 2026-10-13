@@ -256,6 +256,20 @@ export function LandingSettingsPage() {
             />
           </div>
           <form className="landing-form" onSubmit={submit}>
+            <Section
+              title="Landing page"
+              hint="On, your address opens on your Me page, with Blog and About in the menu. Off, it shows only your blog."
+            >
+              <label className="landing-switch">
+                <input
+                  type="checkbox"
+                  checked={draft.enabled}
+                  onChange={(event) => set({ enabled: event.target.checked })}
+                />
+                Show my landing page
+              </label>
+            </Section>
+
             <Section title="Theme" hint="How your page looks to visitors. You can switch any time.">
               <div className="theme-picker" role="radiogroup" aria-label="Theme">
                 {LANDING_THEMES.map((theme) => (

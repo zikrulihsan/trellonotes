@@ -224,14 +224,32 @@ describe('public reader', () => {
     expect(screen.getByRole('link', { name: 'Me' })).toHaveAttribute('aria-current', 'page');
   });
 
-  it('greets by name and lists notes when no landing page is set up', async () => {
+  it('shows only the Blog when no landing page is set up', async () => {
     landing = null;
     renderAt('/@zikrul');
-    expect(await screen.findByRole('heading', { name: 'Hi, Zikrul Here' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Blog' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /How Folio was built/ })).toBeInTheDocument();
+    expect(screen.queryByRole('navigation')).toBeNull();
+  });
+
+  it('shows only the Blog, at every address, when the landing page is switched off', async () => {
+    landing = { enabled: false, greeting: 'Hi, Hidden', blog: { heading: 'Tulisan' } };
+    renderAt('/@zikrul?about');
+    expect(await screen.findByRole('heading', { name: 'Tulisan' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Hi, Hidden' })).toBeNull();
+    expect(screen.queryByRole('navigation')).toBeNull();
+  });
+
+  it('keeps the menu off a listed page when there is no landing page', async () => {
+    landing = null;
+    renderAt('/@zikrul/catatan-rilis');
+    expect(await screen.findByText('Isi tulisan.')).toBeInTheDocument();
+    expect(screen.queryByRole('navigation')).toBeNull();
+    expect(screen.getByRole('link', { name: 'Back to Blog' })).toBeInTheDocument();
   });
 
   it('lists every listed page on the Blog page', async () => {
+    landing = {};
     renderAt('/@zikrul?blog');
     expect(await screen.findByRole('heading', { name: 'Blog' })).toBeInTheDocument();
     expect(screen.getByText('Everything Zikrul Ihsan has written.')).toBeInTheDocument();
@@ -319,7 +337,7 @@ describe('public reader', () => {
   });
 
   it('leaves About out of the menu until it has content', async () => {
-    landing = null;
+    landing = {};
     renderAt('/@zikrul');
     expect(await screen.findByRole('link', { name: 'Me' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'About' })).toBeNull();

@@ -1104,3 +1104,8 @@ a.home-logo {
   font-weight: 600;
   white-space: nowrap;
 }
+
+/* A step's way to see the real thing, under its description. */
+.home-beat-link {
+  margin-top: 24px;
+}
