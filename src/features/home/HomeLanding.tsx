@@ -5,6 +5,8 @@ import { LegalFooter } from '@/features/legal/LegalPage';
 import { rememberConsent } from '@/lib/consent';
 import {
   ArrowRight,
+  Circle,
+  CircleCheck,
   ExternalLink,
   Feather,
   LoaderCircle,
@@ -34,7 +36,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'Why not Notion or Trello?',
-    a: 'Trello tracks where a card is, and Notion holds documents. In Notis every card keeps a running log of what you wrote as you worked, so when the work is done the story is already there to summarize and share.',
+    a: 'In Trello a card is a title, a few fields and a comment thread. In Notis a card is a page you write freely, and that writing is what becomes your posts. Notion can hold the writing, but it does not turn it into posts and a professional page for you.',
   },
   {
     q: 'Why not LinkedIn or Medium?',
@@ -115,12 +117,11 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
       <main>
         <section className="home-hero">
           <h1>
-            Write updates, track progress, and <mark>share your work</mark>.{' '}
-            <span className="home-hero-tail">All in one place.</span>
+            Track progress by <mark>writing</mark>.
           </h1>
           <p className="home-lead">
-            A board where every update is something you write: thoughts, findings, progress. Turn
-            them into posts and a professional page when you&apos;re ready.
+            A writing app with a progress board. Every card is a page you write freely, and it
+            becomes posts and a professional page when you&apos;re ready.
           </p>
           <div className="home-signin">
             {start}
@@ -137,10 +138,10 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
         <section className="home-beat" aria-labelledby="home-beat-write">
           <div className="home-beat-text">
             <p className="eyebrow">1 · WRITE</p>
-            <h2 id="home-beat-write">Updates you write, not statuses you pick.</h2>
+            <h2 id="home-beat-write">Every card is a page, not a form.</h2>
             <p>
-              Every card keeps a running log. Add a few lines whenever something moves: what you
-              tried, what broke, what you learned.
+              Open a card and just write: headings, code, tables, screenshots, half-formed thoughts.
+              No fields to fill, no statuses to pick.
             </p>
           </div>
           <NoteSketch />
@@ -314,24 +315,91 @@ function useLoop(length: number) {
 
 const shownFrom = (from: number, step: number) => (step >= from ? ' is-shown' : '');
 
-const INITIATIVE = [
-  { date: 'Mon, 13 Oct', text: 'Carts are dropping at the address step. No idea why yet.' },
+/** One block of a card's page: whatever was written, in whatever shape. */
+type Block =
+  | { kind: 'date'; date: string; text: ReactNode }
+  | { kind: 'text'; text: ReactNode }
+  | { kind: 'code'; code: string }
+  | { kind: 'heading'; text: string }
+  | { kind: 'checks'; items: [done: boolean, text: string][] };
+
+function PageBlock({ block, className }: { block: Block; className: string }) {
+  const name = `home-block is-${block.kind}${className}`;
+  switch (block.kind) {
+    case 'date':
+      return (
+        <div className={name}>
+          <time>{block.date}</time>
+          <p>{block.text}</p>
+        </div>
+      );
+    case 'text':
+      return <p className={name}>{block.text}</p>;
+    case 'code':
+      return <code className={name}>{block.code}</code>;
+    case 'heading':
+      return <strong className={name}>{block.text}</strong>;
+    case 'checks':
+      return (
+        <ul className={name}>
+          {block.items.map(([done, text]) => (
+            <li key={text} className={done ? 'is-done' : ''}>
+              {done ? <CircleCheck size={14} /> : <Circle size={14} />}
+              {text}
+            </li>
+          ))}
+        </ul>
+      );
+  }
+}
+
+/** The card from the Write section: notes, code, a finding and a checklist on one page. */
+const CHECKOUT: Block[] = [
+  { kind: 'date', date: 'Mon, 13 Oct', text: 'Carts drop at the address step. Only on mobile?' },
+  { kind: 'code', code: 'promo.onChange → resetForm(address)' },
   {
-    date: 'Tue, 14 Oct',
-    text: 'Found it: the promo field resets the address form. Fixed it with Rana, shipped after lunch.',
+    kind: 'text',
+    text: (
+      <>
+        Found it: <mark>the promo field resets the address form</mark>. Fixed with Rana.
+      </>
+    ),
   },
-  { date: 'Thu, 16 Oct', text: 'Checkouts back up 12%. Lesson: test the boring paths too.' },
+  {
+    kind: 'checks',
+    items: [
+      [true, 'Patch the form state'],
+      [true, 'Ship after lunch'],
+      [false, 'Test the boring paths too'],
+    ],
+  },
 ];
 
-const REDESIGN = [
-  { date: 'Mon, 6 Oct', text: 'Mapped the old flow: five steps, two of them just confirmations.' },
-  { date: 'Wed, 8 Oct', text: 'One-page checkout prototype is up. Rana is testing it on mobile.' },
-  { date: 'Fri, 10 Oct', text: 'Shipped to 10% of users. Conversion up 6% so far.' },
+/** The card that opens on the hero board. */
+const REDESIGN: Block[] = [
+  { kind: 'heading', text: 'Plan' },
+  {
+    kind: 'checks',
+    items: [
+      [true, 'Map the old flow'],
+      [true, 'One-page prototype'],
+      [false, 'Roll out to everyone'],
+    ],
+  },
+  {
+    kind: 'text',
+    text: (
+      <>
+        Rana tested it on mobile: <mark>two taps fewer</mark> to pay.
+      </>
+    ),
+  },
+  { kind: 'code', code: 'rollout: one_page_checkout = 10%' },
 ];
 
-/** One card, updated over several days: each dated update appears in turn. */
+/** One card, written as a page: each block appears in turn. */
 function NoteSketch() {
-  const { ref, step, animated } = useLoop(INITIATIVE.length + 1);
+  const { ref, step, animated } = useLoop(CHECKOUT.length + 1);
   return (
     <div
       ref={ref}
@@ -340,11 +408,8 @@ function NoteSketch() {
     >
       <span className="home-sketch-label">Card · Checkout</span>
       <strong className="home-paper-title">Why carts were dropping</strong>
-      {INITIATIVE.map((entry, index) => (
-        <div key={entry.date} className={`home-note-entry${shownFrom(index, step)}`}>
-          <time>{entry.date}</time>
-          <p>{entry.text}</p>
-        </div>
+      {CHECKOUT.map((block, index) => (
+        <PageBlock key={index} block={block} className={shownFrom(index, step)} />
       ))}
     </div>
   );
@@ -391,8 +456,8 @@ function StorySketch() {
 }
 
 /**
- * A board whose cards are initiatives. The pointer clicks one, its journal opens, and the
- * updates appear one by one; then it closes and starts again.
+ * A board whose cards are pages. The pointer clicks one, its page opens, and what was written
+ * appears block by block; then it closes and starts again.
  */
 function BoardSketch() {
   const lists = [
@@ -400,8 +465,8 @@ function BoardSketch() {
     { title: 'Doing', cards: ['Checkout redesign'], open: true },
     { title: 'Done', cards: ['Fix cart drop', 'Launch waitlist'] },
   ];
-  // Frames: 0 board, 1 pointer on the card, 2 journal open, 3-5 updates, 6-7 hold.
-  const { ref, step, animated } = useLoop(7);
+  // Frames: 0 board, 1 pointer on the card, 2 page open, 3-6 blocks, 7 hold.
+  const { ref, step, animated } = useLoop(8);
   const open = step >= 2;
   return (
     <div
@@ -440,11 +505,8 @@ function BoardSketch() {
       <div className="home-board-panel">
         <span className="home-sketch-label">Card · Doing</span>
         <strong className="home-paper-title">Checkout redesign</strong>
-        {REDESIGN.map((entry, index) => (
-          <div key={entry.date} className={`home-note-entry${shownFrom(index + 3, step)}`}>
-            <time>{entry.date}</time>
-            <p>{entry.text}</p>
-          </div>
+        {REDESIGN.map((block, index) => (
+          <PageBlock key={index} block={block} className={shownFrom(index + 3, step)} />
         ))}
       </div>
     </div>

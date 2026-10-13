@@ -10,14 +10,14 @@ describe('signed-out home page', () => {
       <HomeLanding redirecting={false} error="" onGoogle={onGoogle} onSwegrowth={onSwegrowth} />,
     );
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'Write updates, track progress, and share your work. All in one place.',
+      'Track progress by writing.',
     );
     expect(screen.getByText('Free · Private by default')).toBeInTheDocument();
     expect(
       screen.getByRole('img', { name: 'Posts plus resume equals your professional page' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: 'Updates you write, not statuses you pick.' }),
+      screen.getByRole('heading', { name: 'Every card is a page, not a form.' }),
     ).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /One link for/ })).toBeInTheDocument();
     expect(screen.getByText('Learning English')).toBeInTheDocument();
