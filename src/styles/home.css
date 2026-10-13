@@ -144,16 +144,22 @@
   border-color: #c9c4d2;
   transform: translateY(-1px);
 }
-/* The main action: filled in Notis purple, so it never reads as one more card. */
+/* The main action: filled in ink with a marker shadow, so it never reads as one more card. */
 .home-button.is-primary {
   border-color: var(--home-ink);
   color: #fff;
-  background: var(--purple);
-  box-shadow: 3px 3px 0 var(--home-ink);
+  background: var(--home-ink);
+  box-shadow: 3px 3px 0 var(--home-marker);
 }
 .home-button.is-primary:hover {
   border-color: var(--home-ink);
-  background: #6a46c8;
+  background: #3a3b42;
+}
+/* On the dark closing panel it turns over: white, so it still stands out. */
+.home-start .home-button.is-primary {
+  border-color: #fff;
+  color: var(--home-ink);
+  background: #fff;
 }
 /* Signing in, Google keeps its own white button, so its colored mark reads. */
 .home-signin-dialog .home-button.is-primary {
@@ -409,9 +415,6 @@
 }
 .home-start .home-button {
   border-color: #fff;
-}
-.home-start .home-button.is-primary {
-  box-shadow: 3px 3px 0 var(--home-marker);
 }
 
 .home-footer {
