@@ -621,10 +621,6 @@
   font-size: 13px;
   font-weight: 550;
 }
-.home-board-card.is-target {
-  border-color: var(--home-ink);
-  box-shadow: 2px 2px 0 var(--home-ink);
-}
 .home-board-meta {
   display: inline-flex;
   align-items: center;

@@ -597,7 +597,7 @@ function BoardSketch() {
           : '';
   const cardClass = (card: string) => {
     if (card === 'Checkout redesign') {
-      return `home-board-card is-target${step === 4 ? ' is-pressed' : ''}`;
+      return `home-board-card${step === 4 ? ' is-pressed' : ''}`;
     }
     if (card === 'Pricing page copy' && !dropped && step >= 1) {
       return `home-board-card is-grabbed${step === 2 ? ' is-dragging' : ''}`;
