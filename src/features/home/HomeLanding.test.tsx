@@ -31,6 +31,18 @@ describe('signed-out home page', () => {
       'href',
       '/playground',
     );
+    expect(screen.getByRole('link', { name: /Try the board/ })).toHaveAttribute(
+      'href',
+      '/playground',
+    );
+    expect(screen.getByRole('link', { name: /Try writing a page/ })).toHaveAttribute(
+      'href',
+      '/playground/pages',
+    );
+    expect(screen.getByRole('link', { name: /See an example blog/ })).toHaveAttribute(
+      'href',
+      '/playground/@alya?blog',
+    );
     expect(screen.getByRole('link', { name: /See an example page/ })).toHaveAttribute(
       'href',
       '/playground/@alya',

@@ -7,7 +7,9 @@ import { rememberConsent } from '@/lib/consent';
 import { writerPath } from '@/lib/supabase/published-pages';
 import {
   ArrowRight,
+  ArrowUpRight,
   Circle,
+  Compass,
   CircleCheck,
   Feather,
   LoaderCircle,
@@ -55,6 +57,8 @@ const PLAYGROUND = '/playground';
 const EXAMPLE_SITE = `/playground${writerPath(PLAYGROUND_AUTHOR)}`;
 /** The same sample writer's Blog page. */
 const EXAMPLE_BLOG = `${EXAMPLE_SITE}?blog`;
+/** The sample workspace's Pages list. */
+const EXAMPLE_PAGES = `${PLAYGROUND}/pages`;
 
 /** Boards for things other than code, each with a line or two of its log. */
 const USES: {
@@ -88,6 +92,15 @@ const USES: {
     post: 'What rewriting a CLI taught me about Go',
   },
 ];
+
+/** A step's way to see the real thing in the playground: a text link, not a button. */
+function BeatLink({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <a className="home-beat-link" href={href}>
+      {children} <ArrowUpRight size={16} />
+    </a>
+  );
+}
 
 /** What signed-out visitors see: what Notis is, and the way in. */
 export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeLandingProps) {
@@ -132,8 +145,8 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           </p>
           <div className="home-signin">
             {start}
-            <a className="home-button" href={PLAYGROUND}>
-              Explore it first, no login <ArrowRight size={18} />
+            <a className="home-button is-quiet" href={PLAYGROUND}>
+              <Compass size={18} /> Explore it first, no login
             </a>
           </div>
           <p className="home-micro">
@@ -152,6 +165,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               No more digging through chats and docs to remember what you did. Everything about a
               task lives inside <NotisMark>Notis Board</NotisMark>.
             </p>
+            <BeatLink href={PLAYGROUND}>Try the board</BeatLink>
           </div>
           <div className="home-hero-board">
             <BoardSketch />
@@ -168,6 +182,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               Turn what you worked on into something people read. Write it yourself, or let{' '}
               <AiMark>AI draft</AiMark> it from your notes on <NotisMark>Notis Pages</NotisMark>.
             </p>
+            <BeatLink href={EXAMPLE_PAGES}>Try writing a page</BeatLink>
           </div>
           <WriteSketch />
         </section>
@@ -182,9 +197,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               Every post is a story of your work. <NotisMark>Notis Blog</NotisMark> shows them all
               on your own blog page, for anyone to read.
             </p>
-            <a className="home-button is-primary home-beat-link" href={EXAMPLE_BLOG}>
-              See an example blog <ArrowRight size={18} />
-            </a>
+            <BeatLink href={EXAMPLE_BLOG}>See an example blog</BeatLink>
           </div>
           <BlogSketch />
         </section>
@@ -200,6 +213,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               together with the <AiMark>AI-powered</AiMark> <NotisMark>Notis Portfolio</NotisMark>{' '}
               generator.
             </p>
+            <BeatLink href={EXAMPLE_SITE}>See an example page</BeatLink>
           </div>
           <Equation
             animate
@@ -216,9 +230,6 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               },
             ]}
           />
-          <a className="home-button is-primary" href={EXAMPLE_SITE}>
-            See an example page <ArrowRight size={18} />
-          </a>
         </section>
 
         <section className="home-uses" aria-labelledby="home-uses">
