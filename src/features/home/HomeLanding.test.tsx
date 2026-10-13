@@ -10,23 +10,24 @@ describe('signed-out home page', () => {
       <HomeLanding redirecting={false} error="" onGoogle={onGoogle} onSwegrowth={onSwegrowth} />,
     );
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'Write notes, get noticed.',
+      'Track progress by writing.',
     );
+    expect(screen.getByText('Free · Private by default')).toBeInTheDocument();
     expect(
-      screen.getByRole('img', { name: 'Write notes, turn them into stories, show your work' }),
+      screen.getByRole('img', { name: 'Posts plus resume equals your professional page' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('img', { name: 'Stories plus resume equals your personal website' }),
+      screen.getByRole('heading', { name: 'Every card is a page, not a form.' }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /Every story is part of/ })).toBeInTheDocument();
-    expect(screen.getByText('Is everything I write public?')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'See a real one' })).toHaveAttribute(
-      'href',
-      'https://notis.swegrowth.id/@zikrul-ihsan-md',
+    expect(screen.getByRole('heading', { name: /One link for/ })).toBeInTheDocument();
+    expect(screen.getByText('Learning English')).toBeInTheDocument();
+    expect(screen.getByText('Why not Notion or Trello?')).toBeInTheDocument();
+    const profiles = screen.getAllByRole('link', { name: /See a real profile/ });
+    expect(profiles).toHaveLength(2);
+    profiles.forEach((link) =>
+      expect(link).toHaveAttribute('href', 'https://notis.swegrowth.id/@zikrul-ihsan-md'),
     );
-    const explore = screen.getAllByRole('link', { name: 'Explore it first' });
-    expect(explore).toHaveLength(2);
-    explore.forEach((link) => expect(link).toHaveAttribute('href', '/playground'));
+    expect(screen.getByRole('heading', { name: 'Start with one update.' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy');
     expect(screen.queryByRole('button', { name: 'Continue with Google' })).toBeNull();
     const starts = screen.getAllByRole('button', { name: /Start writing/ });
