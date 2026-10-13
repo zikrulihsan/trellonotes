@@ -7,6 +7,7 @@ import { HomeLanding } from '@/features/home/HomeLanding';
 import { ConsentGate } from '@/features/legal/ConsentGate';
 import { isLoginPath } from '@/lib/app-paths';
 import { hasAcceptedTerms } from '@/lib/consent';
+import { mightHaveSession } from '@/lib/supabase/client';
 
 export function WorkspaceSession({ children }: PropsWithChildren) {
   const {
@@ -34,7 +35,8 @@ export function WorkspaceSession({ children }: PropsWithChildren) {
     return <WorkspaceProvider key={session?.user.id ?? 'local'}>{children}</WorkspaceProvider>;
   }
 
-  if (loading) {
+  // Signed-out visitors get the landing page at once; only a likely session waits for Supabase.
+  if (loading && mightHaveSession()) {
     return (
       <div className="auth-loading" role="status">
         <LoaderCircle size={22} className="auth-spinner" />

@@ -1094,3 +1094,13 @@ a.home-logo {
   vertical-align: 0.05em;
   white-space: nowrap;
 }
+
+/* A Notis feature named in a description ("Notis Board"), tinted like the step tags above it. */
+.home-notis {
+  padding: 1px 4px;
+  border-radius: 6px;
+  color: var(--purple);
+  background: #f0eaff;
+  font-weight: 600;
+  white-space: nowrap;
+}

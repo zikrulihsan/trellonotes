@@ -2,12 +2,13 @@ import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Modal } from '@/components/ui/Modal';
 import { ConsentCheckbox } from '@/features/legal/ConsentCheckbox';
 import { LegalFooter } from '@/features/legal/LegalPage';
+import { PLAYGROUND_AUTHOR } from '@/features/playground/sample';
 import { rememberConsent } from '@/lib/consent';
+import { writerPath } from '@/lib/supabase/published-pages';
 import {
   ArrowRight,
   Circle,
   CircleCheck,
-  ExternalLink,
   Feather,
   LoaderCircle,
   MousePointer2,
@@ -48,8 +49,8 @@ const FAQ: { q: string; a: string }[] = [
   },
 ];
 
-/** A real Notis profile to point visitors at. */
-const EXAMPLE_SITE = 'https://notis.swegrowth.id/@zikrul-ihsan-md';
+/** The sample professional page in the playground, to point visitors at. */
+const EXAMPLE_SITE = `/playground${writerPath(PLAYGROUND_AUTHOR)}`;
 
 /** Boards for things other than code, each with a line or two of its log. */
 const USES: {
@@ -127,7 +128,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           </p>
           <div className="home-signin">
             {start}
-            <a className="home-button" href={EXAMPLE_SITE} target="_blank" rel="noreferrer">
+            <a className="home-button" href={EXAMPLE_SITE}>
               See an example page <ArrowRight size={18} />
             </a>
           </div>
@@ -145,7 +146,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             <h2 id="home-beat-write">Each task holds its own notes.</h2>
             <p>
               No more digging through chats and docs to remember what you did. Everything about a
-              task lives inside Notis&nbsp;Board.
+              task lives inside <NotisMark>Notis Board</NotisMark>.
             </p>
           </div>
           <div className="home-hero-board">
@@ -153,7 +154,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           </div>
         </section>
 
-        <section className="home-beat is-flipped" aria-labelledby="home-beat-summarize">
+        <section className="home-beat" aria-labelledby="home-beat-summarize">
           <div className="home-beat-text">
             <p className="eyebrow">2 · NOTIS PAGES</p>
             <h2 id="home-beat-summarize">
@@ -161,21 +162,21 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             </h2>
             <p>
               Turn what you worked on into something people read. Write it yourself, or let{' '}
-              <AiMark>AI draft</AiMark> it from your notes on Notis&nbsp;Pages.
+              <AiMark>AI draft</AiMark> it from your notes on <NotisMark>Notis Pages</NotisMark>.
             </p>
           </div>
           <WriteSketch />
         </section>
 
-        <section className="home-beat" aria-labelledby="home-beat-blog">
+        <section className="home-beat is-flipped" aria-labelledby="home-beat-blog">
           <div className="home-beat-text">
             <p className="eyebrow">3 · NOTIS BLOG</p>
             <h2 id="home-beat-blog">
               Publish your writing as <mark>a blog page</mark>.
             </h2>
             <p>
-              Every post is a story of your work. Notis shows them all on your own blog page, for
-              anyone to read.
+              Every post is a story of your work. <NotisMark>Notis Blog</NotisMark> shows them all
+              on your own blog page, for anyone to read.
             </p>
           </div>
           <BlogSketch />
@@ -189,7 +190,8 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             </h2>
             <p>
               Your posts show how you think. Your resume shows what you&apos;ve done. Put them
-              together with the <AiMark>AI-powered</AiMark> Notis portfolio generator.
+              together with the <AiMark>AI-powered</AiMark> <NotisMark>Notis Portfolio</NotisMark>{' '}
+              generator.
             </p>
           </div>
           <Equation
@@ -207,13 +209,8 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               },
             ]}
           />
-          <a
-            className="home-button is-primary"
-            href={EXAMPLE_SITE}
-            target="_blank"
-            rel="noreferrer"
-          >
-            See an example page <ExternalLink size={16} />
+          <a className="home-button is-primary" href={EXAMPLE_SITE}>
+            See an example page <ArrowRight size={18} />
           </a>
         </section>
 
@@ -311,6 +308,11 @@ function AiMark({ children }: { children: ReactNode }) {
       {children}
     </span>
   );
+}
+
+/** A Notis feature named in the copy ("Notis Board"), highlighted and kept on one line. */
+function NotisMark({ children }: { children: ReactNode }) {
+  return <span className="home-notis">{children}</span>;
 }
 
 /** How long each step of an animated picture stays before the next one. */

@@ -29,9 +29,7 @@ describe('signed-out home page', () => {
     expect(screen.getByText('Why not Notion or Trello?')).toBeInTheDocument();
     const profiles = screen.getAllByRole('link', { name: /See an example page/ });
     expect(profiles).toHaveLength(2);
-    profiles.forEach((link) =>
-      expect(link).toHaveAttribute('href', 'https://notis.swegrowth.id/@zikrul-ihsan-md'),
-    );
+    profiles.forEach((link) => expect(link).toHaveAttribute('href', '/playground/@alya'));
     expect(screen.getByRole('heading', { name: 'Start your first board.' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy');
     expect(screen.queryByRole('button', { name: 'Continue with Google' })).toBeNull();
