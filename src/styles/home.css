@@ -83,6 +83,16 @@
   font-size: clamp(17px, 2vw, 19px);
   line-height: 1.6;
 }
+.home-micro {
+  margin: 14px 0 0;
+  color: var(--home-muted);
+  font-size: 14px;
+}
+.home-hero-board {
+  max-width: 820px;
+  margin: clamp(40px, 6vw, 56px) auto 0;
+  text-align: left;
+}
 .home-signin {
   display: flex;
   flex-wrap: wrap;
@@ -262,15 +272,6 @@
   overflow: hidden;
   border-color: var(--home-ink);
   box-shadow: 4px 4px 0 var(--home-ink);
-}
-.home-sketch-note {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--purple);
-}
-.home-sketch-note svg {
-  flex-shrink: 0;
 }
 .home-sketch-bar {
   display: block;
@@ -506,6 +507,54 @@
   padding-left: 12px;
   border-left: 2px solid #e3dcf7;
 }
+.home-block.is-date {
+  display: grid;
+  gap: 2px;
+}
+.home-block time {
+  color: var(--purple);
+  font-size: 12px;
+  font-weight: 600;
+}
+.home-block.is-code {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 6px;
+  color: #3d3a4a;
+  background: #f3f1f8;
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  font-size: 12.5px;
+  overflow-wrap: anywhere;
+}
+.home-block.is-heading {
+  font-size: 14px;
+  font-weight: 700;
+}
+.home-block.is-checks {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: #4a4953;
+  font-size: 14px;
+}
+.home-block.is-checks li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.home-block.is-checks svg {
+  flex: none;
+  color: #b5b0c4;
+}
+.home-block.is-checks .is-done {
+  color: #8a8896;
+  text-decoration: line-through;
+}
+.home-block.is-checks .is-done svg {
+  color: var(--purple);
+}
 .home-note-entry time {
   color: var(--purple);
   font-size: 12px;
@@ -530,25 +579,6 @@
   background: #f0eaff;
   font-size: 12px;
   font-weight: 600;
-}
-.home-ai {
-  display: inline-flex;
-  align-items: flex-start;
-  gap: 8px;
-  max-width: 34rem;
-  margin-top: 18px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  color: var(--purple);
-  background: #f0eaff;
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.5;
-  text-align: left;
-}
-.home-ai svg {
-  flex: none;
-  margin-top: 2px;
 }
 .home-board {
   display: grid;
@@ -608,6 +638,25 @@
   background: var(--purple);
   font-size: 13px;
   font-weight: 600;
+}
+.home-uses {
+  text-align: center;
+}
+.home-uses .eyebrow {
+  margin: 0 0 12px;
+  color: var(--purple);
+}
+.home-uses-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 32px;
+  text-align: left;
+}
+@media (max-width: 760px) {
+  .home-uses-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 .home-faq-list {
   max-width: 44rem;
@@ -764,20 +813,9 @@ a.home-logo {
     transition: none;
   }
 }
-.home-sketch.is-animated .home-sketch-note:nth-child(2) .home-sketch-bar {
-  transition-delay: 0.1s;
-}
-.home-sketch.is-animated .home-sketch-note:nth-child(3) .home-sketch-bar {
-  transition-delay: 0.2s;
-}
-.home-sketch.is-animated .home-sketch-note:nth-child(4) .home-sketch-bar {
-  transition-delay: 0.3s;
-}
-.home-sketch.is-animated .home-sketch-note:nth-child(5) .home-sketch-bar {
-  transition-delay: 0.4s;
-}
 
 /* The other pictures play too: updates appear, points get highlighted, a card opens. */
+.is-animated .home-block,
 .is-animated .home-note-entry {
   opacity: 0;
   transform: translateY(6px);
@@ -785,6 +823,7 @@ a.home-logo {
     opacity 0.45s ease,
     transform 0.45s ease;
 }
+.is-animated .home-block.is-shown,
 .is-animated .home-note-entry.is-shown {
   opacity: 1;
   transform: none;

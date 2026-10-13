@@ -211,7 +211,7 @@ export function LegalPage({ pathname }: { pathname: string }) {
 export function LegalFooter() {
   return (
     <footer className="home-footer">
-      <span>Notis · Write notes, get noticed.</span>
+      <span>Notis by SWE Growth · Write notes, get noticed.</span>
       <nav className="home-footer-links">
         <a href="/terms">Terms</a>
         <a href="/privacy">Privacy</a>
