@@ -28,23 +28,23 @@ interface HomeLandingProps {
 const FAQ: { q: string; a: string }[] = [
   {
     q: 'Is everything public?',
-    a: 'No. Your board, cards and updates are private by default. Only the posts you publish appear on your professional page, and you can unpublish them at any time.',
-  },
-  {
-    q: 'Do I need to be an engineer?',
-    a: 'No. Notis started with software engineers, but a board of written updates works for anything you are working on: a project at work, a community event, or something you are learning.',
+    a: 'No. Your notes are private. Only the posts you publish appear on your page, and you can unpublish them any time.',
   },
   {
     q: 'Why not Notion or Trello?',
-    a: 'In Trello a card is a title, a few fields and a comment thread. In Notis a card is a page you write freely, and that writing is what becomes your posts. Notion can hold the writing, but it does not turn it into posts and a professional page for you.',
+    a: 'In Trello a task is a few fields. In Notis it is a page you write. And Notis turns that writing into posts, which Notion does not.',
   },
   {
     q: 'Why not LinkedIn or Medium?',
-    a: 'Those are places to post once something is written. Notis is where the writing starts: you add a few lines as you work, AI drafts the post, and it lives on a page you own next to your resume. You can still share the link anywhere.',
+    a: 'Those are where you post. Notis is where the writing starts, and you can still share your link there.',
   },
   {
     q: 'What does uploading my resume do?',
-    a: 'It drafts your professional page from your resume: your headline, what you help with, your projects and your story. You review it before anything goes live.',
+    a: 'It drafts your professional page: headline, projects and story. You review it before anything goes live.',
+  },
+  {
+    q: 'What happens to my data?',
+    a: 'We do not sell it or show ads. You can ask for a copy, or delete your account and everything in it, at any time.',
   },
 ];
 
@@ -52,7 +52,12 @@ const FAQ: { q: string; a: string }[] = [
 const EXAMPLE_SITE = 'https://notis.swegrowth.id/@zikrul-ihsan-md';
 
 /** Boards for things other than code, each with a line or two of its log. */
-const USES: { label: string; title: string; log: { date: string; text: string }[] }[] = [
+const USES: {
+  label: string;
+  title: string;
+  log: { date: string; text: string }[];
+  post: string;
+}[] = [
   {
     label: 'Work',
     title: 'API performance',
@@ -60,6 +65,7 @@ const USES: { label: string; title: string; log: { date: string; text: string }[
       { date: 'Mon, 6 Oct', text: 'p95 on /orders is 1.8s. Suspect the N+1 on order items.' },
       { date: 'Wed, 8 Oct', text: 'Added the index and batched the query. p95 down to 320ms.' },
     ],
+    post: 'How one index took our p95 from 1.8s to 320ms',
   },
   {
     label: 'Community',
@@ -68,16 +74,13 @@ const USES: { label: string; title: string; log: { date: string; text: string }[
       { date: 'Tue, 7 Oct', text: 'Venue confirmed for the 25th. 40 RSVPs so far.' },
       { date: 'Fri, 10 Oct', text: 'Still need one talk on testing. Asked Rana.' },
     ],
+    post: 'Behind our October meetup: a venue, four talks and 40 RSVPs',
   },
   {
     label: 'Learning',
-    title: 'Learning English',
-    log: [
-      {
-        date: 'Thu, 9 Oct',
-        text: 'Gave my standup update in English without notes. Past tense still slips.',
-      },
-    ],
+    title: 'Learning Go',
+    log: [{ date: 'Thu, 9 Oct', text: 'Rewrote the CLI in Go. Goroutines finally clicked.' }],
+    post: 'What rewriting a CLI taught me about Go',
   },
 ];
 
@@ -117,59 +120,76 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
       <main>
         <section className="home-hero">
           <h1>
-            Track progress by <mark>writing</mark>.
+            Notes that show <mark>your progress</mark>.
           </h1>
           <p className="home-lead">
-            A writing app with a progress board. Every card is a page you write freely, and it
-            becomes posts and a professional page when you&apos;re ready.
+            Track your work. Write your thoughts. Share it as your professional journey.
           </p>
           <div className="home-signin">
             {start}
             <a className="home-button" href={EXAMPLE_SITE} target="_blank" rel="noreferrer">
-              See a real profile <ArrowRight size={18} />
+              See an example page <ArrowRight size={18} />
             </a>
           </div>
-          <p className="home-micro">Free · Private by default</p>
+          <p className="home-micro">
+            Powered by{' '}
+            <a href="https://swegrowth.id" target="_blank" rel="noreferrer">
+              Software Engineer Growth Community
+            </a>
+          </p>
+        </section>
+
+        <section className="home-beat is-wide" aria-labelledby="home-beat-write">
+          <div className="home-beat-text">
+            <p className="eyebrow">1 · NOTIS BOARD</p>
+            <h2 id="home-beat-write">Each task holds its own notes.</h2>
+            <p>
+              No more digging through chats and docs to remember what you did. Everything about a
+              task lives inside Notis&nbsp;Board.
+            </p>
+          </div>
           <div className="home-hero-board">
             <BoardSketch />
           </div>
         </section>
 
-        <section className="home-beat" aria-labelledby="home-beat-write">
-          <div className="home-beat-text">
-            <p className="eyebrow">1 · WRITE</p>
-            <h2 id="home-beat-write">Every card is a page, not a form.</h2>
-            <p>
-              Open a card and just write: headings, code, tables, screenshots, half-formed thoughts.
-              No fields to fill, no statuses to pick.
-            </p>
-          </div>
-          <NoteSketch />
-        </section>
-
         <section className="home-beat is-flipped" aria-labelledby="home-beat-summarize">
           <div className="home-beat-text">
-            <p className="eyebrow">2 · SUMMARIZE</p>
+            <p className="eyebrow">2 · NOTIS PAGES</p>
             <h2 id="home-beat-summarize">
-              From scattered notes to <mark>a story worth sharing</mark>.
+              Write stories, <mark>like blog posts</mark>.
             </h2>
             <p>
-              AI turns a week of updates into a draft: a recap, a lesson, or a project write-up. You
-              edit before anything goes out.
+              Turn what you worked on into something people read. Write it yourself, or let{' '}
+              <AiMark>AI draft</AiMark> it from your notes on Notis&nbsp;Pages.
             </p>
           </div>
-          <StorySketch />
+          <WriteSketch />
+        </section>
+
+        <section className="home-beat" aria-labelledby="home-beat-blog">
+          <div className="home-beat-text">
+            <p className="eyebrow">3 · NOTIS BLOG</p>
+            <h2 id="home-beat-blog">
+              Publish your writing as <mark>a blog page</mark>.
+            </h2>
+            <p>
+              Every post is a story of your work. Notis shows them all on your own blog page, for
+              anyone to read.
+            </p>
+          </div>
+          <BlogSketch />
         </section>
 
         <section className="home-beat is-wide" aria-labelledby="home-beat-show">
           <div className="home-beat-text">
-            <p className="eyebrow">3 · SHOW</p>
+            <p className="eyebrow">4 · NOTIS PORTFOLIO</p>
             <h2 id="home-beat-show">
-              One link for <mark>your resume and your writing</mark>.
+              Show it with <mark>your professional profile</mark>.
             </h2>
             <p>
-              Upload your resume and Notis builds your professional page, filled with the posts you
-              choose to publish.
+              Your posts show how you think. Your resume shows what you&apos;ve done. Put them
+              together with the <AiMark>AI-powered</AiMark> Notis portfolio generator.
             </p>
           </div>
           <Equation
@@ -193,17 +213,17 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             target="_blank"
             rel="noreferrer"
           >
-            See a real profile <ExternalLink size={16} />
+            See an example page <ExternalLink size={16} />
           </a>
         </section>
 
         <section className="home-uses" aria-labelledby="home-uses">
-          <p className="eyebrow">NOT JUST CODE</p>
-          <h2 id="home-uses">For anything you&apos;re working on.</h2>
+          <p className="eyebrow">EXAMPLES</p>
+          <h2 id="home-uses">Track any kind of progress.</h2>
           <div className="home-uses-list">
             {USES.map((use) => (
               <div key={use.title} className="home-paper">
-                <span className="home-sketch-label">Card · {use.label}</span>
+                <span className="home-sketch-label">{use.label}</span>
                 <strong className="home-paper-title">{use.title}</strong>
                 {use.log.map((entry) => (
                   <div key={entry.date} className="home-note-entry">
@@ -211,6 +231,9 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
                     <p>{entry.text}</p>
                   </div>
                 ))}
+                <p className="home-uses-post">
+                  <Sparkles size={14} /> Post: {use.post}
+                </p>
               </div>
             ))}
           </div>
@@ -229,7 +252,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
         </section>
 
         <section className="home-start" id="start" aria-labelledby="home-start">
-          <h2 id="home-start">Start with one update.</h2>
+          <h2 id="home-start">Start your first board.</h2>
           <div className="home-signin">{start}</div>
         </section>
       </main>
@@ -277,6 +300,16 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
 
       <LegalFooter />
     </div>
+  );
+}
+
+/** An AI feature named in the copy ("AI draft", "AI-powered"), marked so it stands out. */
+function AiMark({ children }: { children: ReactNode }) {
+  return (
+    <span className="home-ai">
+      <Sparkles size={12} aria-hidden="true" />
+      {children}
+    </span>
   );
 }
 
@@ -353,29 +386,7 @@ function PageBlock({ block, className }: { block: Block; className: string }) {
   }
 }
 
-/** The card from the Write section: notes, code, a finding and a checklist on one page. */
-const CHECKOUT: Block[] = [
-  { kind: 'date', date: 'Mon, 13 Oct', text: 'Carts drop at the address step. Only on mobile?' },
-  { kind: 'code', code: 'promo.onChange → resetForm(address)' },
-  {
-    kind: 'text',
-    text: (
-      <>
-        Found it: <mark>the promo field resets the address form</mark>. Fixed with Rana.
-      </>
-    ),
-  },
-  {
-    kind: 'checks',
-    items: [
-      [true, 'Patch the form state'],
-      [true, 'Ship after lunch'],
-      [false, 'Test the boring paths too'],
-    ],
-  },
-];
-
-/** The card that opens on the hero board. */
+/** The task that opens on the board in the Plan and write section. */
 const REDESIGN: Block[] = [
   { kind: 'heading', text: 'Plan' },
   {
@@ -397,40 +408,37 @@ const REDESIGN: Block[] = [
   { kind: 'code', code: 'rollout: one_page_checkout = 10%' },
 ];
 
-/** One card, written as a page: each block appears in turn. */
-function NoteSketch() {
-  const { ref, step, animated } = useLoop(CHECKOUT.length + 1);
-  return (
-    <div
-      ref={ref}
-      className={`home-paper home-note${animated ? ' is-animated' : ''}`}
-      aria-hidden="true"
-    >
-      <span className="home-sketch-label">Card · Checkout</span>
-      <strong className="home-paper-title">Why carts were dropping</strong>
-      {CHECKOUT.map((block, index) => (
-        <PageBlock key={index} block={block} className={shownFrom(index, step)} />
-      ))}
-    </div>
-  );
-}
+/** A post written from a blank page, the way it would be on a blog. */
+const BLOG: Block[] = [
+  {
+    kind: 'text',
+    text: 'For two weeks our checkout lost people at the address step, and only on mobile.',
+  },
+  { kind: 'heading', text: 'Test the boring paths' },
+  {
+    kind: 'text',
+    text: (
+      <>
+        The bug was in the promo field, the one place <mark>nobody thought to test</mark>.
+      </>
+    ),
+  },
+];
+// Frames: the blocks one by one, the publish button, then a pause.
+const BLOG_FRAMES = BLOG.length + 3;
 
 const STORY_POINTS = [
   'Promo field reset the address form',
   'Fixed and shipped the same day',
   'Test the boring paths too',
 ];
+const STORY_FRAMES = STORY_POINTS.length + 3;
 
 /** Points get picked from the notes one by one, then AI writes the story from them. */
-function StorySketch() {
+function StoryScene({ step }: { step: number }) {
   const points = STORY_POINTS.length;
-  const { ref, step, animated } = useLoop(points + 3);
   return (
-    <div
-      ref={ref}
-      className={`home-paper home-story${animated ? ' is-animated' : ''}`}
-      aria-hidden="true"
-    >
+    <>
       <span className="home-sketch-label">From your notes</span>
       <ul className="home-story-points">
         {STORY_POINTS.map((point, index) => (
@@ -451,23 +459,142 @@ function StorySketch() {
           <Send size={14} /> Publish
         </span>
       </div>
+    </>
+  );
+}
+
+/** A post written by hand: its paragraphs appear in turn, then it is ready to publish. */
+function BlogScene({ step }: { step: number }) {
+  return (
+    <>
+      <span className="home-sketch-label">Blank page</span>
+      <strong className="home-paper-title">The boring bug that cost us sales</strong>
+      {BLOG.map((block, index) => (
+        <PageBlock key={index} block={block} className={shownFrom(index, step)} />
+      ))}
+      <span className={`home-post-publish${shownFrom(BLOG.length, step)}`}>
+        <Send size={14} /> Publish
+      </span>
+    </>
+  );
+}
+
+/**
+ * The two ways to write a post, taking turns: by hand on a blank page, then drafted by AI from
+ * the week's notes. Without motion, both are shown one above the other.
+ */
+function WriteSketch() {
+  const { ref, step, animated } = useLoop(BLOG_FRAMES + STORY_FRAMES);
+  const byHand = animated && step < BLOG_FRAMES;
+  const scene = (current: boolean) => `home-write-scene${current ? ' is-current' : ''}`;
+  return (
+    <div
+      ref={ref}
+      className={`home-paper home-story home-write${animated ? ' is-animated' : ''}`}
+      aria-hidden="true"
+    >
+      {animated && (
+        <div className="home-write-tabs">
+          <span className={byHand ? 'is-active' : ''}>Write it yourself</span>
+          <span className={byHand ? '' : 'is-active'}>Draft with AI</span>
+        </div>
+      )}
+      <div className="home-write-scenes">
+        <div className={scene(byHand)}>
+          <BlogScene step={animated ? step : BLOG_FRAMES} />
+        </div>
+        <div className={scene(!byHand)}>
+          <StoryScene step={byHand ? 0 : step - (animated ? BLOG_FRAMES : 0)} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Published posts, newest first, listed the way the real blog page lists them. */
+const BLOG_POSTS = [
+  {
+    date: '14 October 2026 · 4 min',
+    title: 'The boring bug that cost us sales',
+    excerpt: 'For two weeks our checkout lost people at the address step, and only on mobile.',
+  },
+  {
+    date: '2 October 2026 · 3 min',
+    title: 'How one index took our p95 from 1.8s to 320ms',
+    excerpt: 'The orders page was slow for months. The fix took one afternoon.',
+  },
+  {
+    date: '22 September 2026 · 5 min',
+    title: 'What rewriting a CLI taught me about Go',
+    excerpt: 'I rewrote a small tool to learn Go. Goroutines finally clicked.',
+  },
+];
+
+/** Someone's blog page, as readers see it: its posts appear one by one from the top. */
+function BlogSketch() {
+  const posts = BLOG_POSTS.length;
+  const { ref, step, animated } = useLoop(posts + 2);
+  return (
+    <div
+      ref={ref}
+      className={`home-paper home-note home-blog${animated ? ' is-animated' : ''}`}
+      aria-hidden="true"
+    >
+      <div className="home-blog-head">
+        <strong className="home-paper-title">
+          <mark>Blog</mark>
+        </strong>
+        <span>Everything Rana has written.</span>
+      </div>
+      {BLOG_POSTS.map((post, index) => (
+        <div key={post.title} className={`home-note-entry${shownFrom(index, step)}`}>
+          <time>{post.date}</time>
+          <strong className="home-paper-title">{post.title}</strong>
+          <p>{post.excerpt}</p>
+        </div>
+      ))}
     </div>
   );
 }
 
 /**
- * A board whose cards are pages. The pointer clicks one, its page opens, and what was written
- * appears block by block; then it closes and starts again.
+ * A board whose cards are pages. The pointer drags a card from To do to Doing, then clicks
+ * another; its page opens and what was written appears block by block. Then it starts again.
  */
 function BoardSketch() {
+  // Frames: 0 board, 1 pointer grabs a card, 2 drags it, 3 drops it in Doing, 4 pointer on the
+  // card to open, 5 page open, 6-9 blocks, 10 hold.
+  const { ref, step, animated } = useLoop(11);
+  const dropped = step >= 3;
   const lists = [
-    { title: 'To do', cards: ['Pricing page copy', 'Interview Dimas'] },
-    { title: 'Doing', cards: ['Checkout redesign'], open: true },
+    {
+      title: 'To do',
+      cards: dropped ? ['Interview Dimas'] : ['Pricing page copy', 'Interview Dimas'],
+    },
+    {
+      title: 'Doing',
+      cards: dropped ? ['Checkout redesign', 'Pricing page copy'] : ['Checkout redesign'],
+    },
     { title: 'Done', cards: ['Fix cart drop', 'Launch waitlist'] },
   ];
-  // Frames: 0 board, 1 pointer on the card, 2 page open, 3-6 blocks, 7 hold.
-  const { ref, step, animated } = useLoop(8);
-  const open = step >= 2;
+  const open = step >= 5;
+  const pointer =
+    step === 1
+      ? ' is-on-todo'
+      : step === 2 || step === 3
+        ? ' is-dragging'
+        : step === 4
+          ? ' is-on-card'
+          : '';
+  const cardClass = (card: string) => {
+    if (card === 'Checkout redesign') {
+      return `home-board-card is-target${step === 4 ? ' is-pressed' : ''}`;
+    }
+    if (card === 'Pricing page copy' && !dropped && step >= 1) {
+      return `home-board-card is-grabbed${step === 2 ? ' is-dragging' : ''}`;
+    }
+    return 'home-board-card';
+  };
   return (
     <div
       ref={ref}
@@ -478,16 +605,9 @@ function BoardSketch() {
         <div key={list.title} className="home-board-list">
           <span className="home-sketch-label">{list.title}</span>
           {list.cards.map((card) => (
-            <span
-              key={card}
-              className={
-                list.open
-                  ? `home-board-card is-target${step === 1 ? ' is-pressed' : ''}`
-                  : 'home-board-card'
-              }
-            >
+            <span key={card} className={cardClass(card)}>
               {card}
-              {list.open && (
+              {card === 'Checkout redesign' && (
                 <span className="home-board-meta">
                   <NotebookPen size={12} /> 3 updates
                 </span>
@@ -496,17 +616,12 @@ function BoardSketch() {
           ))}
         </div>
       ))}
-      {animated && (
-        <MousePointer2
-          className={`home-board-pointer${step >= 1 && step < 2 ? ' is-on-card' : ''}`}
-          size={20}
-        />
-      )}
+      {animated && <MousePointer2 className={`home-board-pointer${pointer}`} size={20} />}
       <div className="home-board-panel">
-        <span className="home-sketch-label">Card · Doing</span>
+        <span className="home-sketch-label">Doing</span>
         <strong className="home-paper-title">Checkout redesign</strong>
         {REDESIGN.map((block, index) => (
-          <PageBlock key={index} block={block} className={shownFrom(index + 3, step)} />
+          <PageBlock key={index} block={block} className={shownFrom(index + 6, step)} />
         ))}
       </div>
     </div>

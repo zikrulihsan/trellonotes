@@ -49,3 +49,8 @@ export function isLegalPath(pathname: string): boolean {
 export function isPlaygroundPath(pathname: string): boolean {
   return pathname === '/playground' || pathname.startsWith('/playground/');
 }
+
+/** The sign-in page (/login), which shows the landing page even without Supabase set up. */
+export function isLoginPath(pathname: string): boolean {
+  return pathname.replace(/\/$/, '') === '/login';
+}
