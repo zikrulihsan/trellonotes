@@ -655,14 +655,27 @@
   margin: 0 0 12px;
   color: var(--purple);
 }
+.home-uses-lead {
+  max-width: 34rem;
+  text-wrap: balance;
+  margin: 14px auto 0;
+  color: var(--home-muted);
+  font-size: 18px;
+  line-height: 1.6;
+}
 .home-uses-list {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
   margin-top: 32px;
   text-align: left;
 }
-@media (max-width: 760px) {
+@media (max-width: 980px) {
+  .home-uses-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 560px) {
   .home-uses-list {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -972,6 +985,31 @@ a.home-logo {
 .home-uses-post svg {
   flex: none;
   color: var(--purple);
+}
+/* Whether the board's writing goes out, as a small tag before the post or the note. */
+.home-uses-tag {
+  display: inline-block;
+  margin-right: 4px;
+  padding: 0 6px;
+  border-radius: 999px;
+  color: var(--purple);
+  background: #f0eaff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  vertical-align: 0.1em;
+}
+.home-paper p.home-uses-post.is-private {
+  color: var(--home-muted);
+  font-weight: 500;
+}
+.home-uses-post.is-private svg {
+  color: var(--home-muted);
+}
+.home-uses-post.is-private .home-uses-tag {
+  color: var(--home-ink);
+  background: #ecebf0;
 }
 
 /* The Write picture takes turns between a post written by hand and one drafted by AI. */

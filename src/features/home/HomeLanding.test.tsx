@@ -25,9 +25,10 @@ describe('signed-out home page', () => {
       screen.getByRole('heading', { name: /Publish your writing as a blog page/ }),
     ).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /your professional profile/ })).toBeInTheDocument();
-    expect(screen.getByText('Learning Go')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'You choose what you share.' })).toBeInTheDocument();
     expect(screen.getByText('Daily journal')).toBeInTheDocument();
-    expect(screen.getByText('Sourdough')).toBeInTheDocument();
+    expect(screen.getAllByText('Only you can see this')).toHaveLength(2);
+    expect(screen.getAllByText('Public post')).toHaveLength(2);
     expect(screen.getByText('Why not Notion or Trello?')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Explore it first, no login/ })).toHaveAttribute(
       'href',

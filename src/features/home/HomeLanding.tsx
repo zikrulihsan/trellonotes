@@ -13,6 +13,7 @@ import {
   CircleCheck,
   Feather,
   LoaderCircle,
+  Lock,
   MousePointer2,
   NotebookPen,
   Sparkles,
@@ -60,12 +61,16 @@ const EXAMPLE_BLOG = `${EXAMPLE_SITE}?blog`;
 /** The sample workspace's Pages list. */
 const EXAMPLE_PAGES = `${PLAYGROUND}/pages`;
 
-/** Boards for things other than code, each with a line or two of its log. */
+/**
+ * Boards from different parts of life, each with a line or two of its log. Some stay
+ * private; for the others AI drafts a post the writer can choose to publish.
+ */
 const USES: {
   label: string;
   title: string;
   log: { date: string; text: string }[];
-  post: string;
+  /** The post AI drafted from the notes; none means the board stays private. */
+  post?: string;
 }[] = [
   {
     label: 'Work',
@@ -77,37 +82,12 @@ const USES: {
     post: 'How one index took our p95 from 1.8s to 320ms',
   },
   {
-    label: 'Community',
-    title: 'Monthly meetup',
-    log: [
-      { date: 'Tue, 7 Oct', text: 'Venue confirmed for the 25th. 40 RSVPs so far.' },
-      { date: 'Fri, 10 Oct', text: 'Still need one talk on testing. Asked Rana.' },
-    ],
-    post: 'Behind our October meetup: a venue, four talks and 40 RSVPs',
-  },
-  {
-    label: 'Learning',
-    title: 'Learning Go',
-    log: [{ date: 'Thu, 9 Oct', text: 'Rewrote the CLI in Go. Goroutines finally clicked.' }],
-    post: 'What rewriting a CLI taught me about Go',
-  },
-  {
     label: 'Journal',
     title: 'Daily journal',
     log: [
       { date: 'Mon, 6 Oct', text: 'Walked before opening the laptop. Calmer all morning.' },
       { date: 'Thu, 9 Oct', text: 'Skipped the walk. Scattered by noon. Noted.' },
     ],
-    post: 'What a month of morning walks did to my focus',
-  },
-  {
-    label: 'Family',
-    title: "Raka's first year",
-    log: [
-      { date: 'Sun, 5 Oct', text: 'First tooth! He will not stop chewing the spoon.' },
-      { date: 'Sat, 11 Oct', text: 'Tried solids: loves banana, refuses spinach.' },
-    ],
-    post: 'Six months in: notes from our first year as parents',
   },
   {
     label: 'Hobby',
@@ -117,6 +97,14 @@ const USES: {
       { date: 'Sun, 12 Oct', text: 'Loaf #4: better crumb, crust still too pale.' },
     ],
     post: 'Four loaves in: what sourdough taught me about patience',
+  },
+  {
+    label: 'Family',
+    title: "Raka's first year",
+    log: [
+      { date: 'Sun, 5 Oct', text: 'First tooth! He will not stop chewing the spoon.' },
+      { date: 'Sat, 11 Oct', text: 'Tried solids: loves banana, refuses spinach.' },
+    ],
   },
 ];
 
@@ -264,8 +252,12 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
         </section>
 
         <section className="home-uses" aria-labelledby="home-uses">
-          <p className="eyebrow">EXAMPLES</p>
-          <h2 id="home-uses">Write about anything.</h2>
+          <p className="eyebrow">PRIVATE BY DEFAULT</p>
+          <h2 id="home-uses">You choose what you share.</h2>
+          <p className="home-uses-lead">
+            Write about anything. Your notes stay private. When something is worth sharing,{' '}
+            <AiMark>AI</AiMark> helps turn it into a post you can publish.
+          </p>
           <div className="home-uses-list">
             {USES.map((use) => (
               <div key={use.title} className="home-paper">
@@ -277,9 +269,21 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
                     <p>{entry.text}</p>
                   </div>
                 ))}
-                <p className="home-uses-post">
-                  <Sparkles size={14} /> Post: {use.post}
-                </p>
+                {use.post ? (
+                  <p className="home-uses-post">
+                    <Sparkles size={14} />
+                    <span>
+                      <span className="home-uses-tag">Public post</span> {use.post}
+                    </span>
+                  </p>
+                ) : (
+                  <p className="home-uses-post is-private">
+                    <Lock size={14} />
+                    <span>
+                      <span className="home-uses-tag">Private</span> Only you can see this
+                    </span>
+                  </p>
+                )}
               </div>
             ))}
           </div>
