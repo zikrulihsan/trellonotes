@@ -5,7 +5,6 @@ import { LegalFooter } from '@/features/legal/LegalPage';
 import { rememberConsent } from '@/lib/consent';
 import {
   ArrowRight,
-  CircleCheck,
   ExternalLink,
   Feather,
   LoaderCircle,
@@ -26,32 +25,59 @@ interface HomeLandingProps {
 /** Questions people ask before they start. */
 const FAQ: { q: string; a: string }[] = [
   {
-    q: 'Is everything I write public?',
-    a: 'No. Notes, boards, to-do lists and your work journal are private by default. Only the pages you publish appear on your website, and you can unpublish them at any time.',
+    q: 'Is everything public?',
+    a: 'No. Your board, cards and updates are private by default. Only the posts you publish appear on your professional page, and you can unpublish them at any time.',
   },
   {
-    q: 'Do I have to write long articles?',
-    a: 'No. A post can be a short recap of what you finished this week. Notis starts it from your notes, so most of the writing is already done.',
+    q: 'Do I need to be an engineer?',
+    a: 'No. Notis started with software engineers, but a board of written updates works for anything you are working on: a project at work, a community event, or something you are learning.',
   },
   {
-    q: 'What is on my website?',
-    a: 'A home page with who you are, your projects and what you are up to now, a blog of everything you publish, and an About page. It lives at notis.swegrowth.id/@yourname.',
+    q: 'Why not Notion or Trello?',
+    a: 'Trello tracks where a card is, and Notion holds documents. In Notis every card keeps a running log of what you wrote as you worked, so when the work is done the story is already there to summarize and share.',
+  },
+  {
+    q: 'Why not LinkedIn or Medium?',
+    a: 'Those are places to post once something is written. Notis is where the writing starts: you add a few lines as you work, AI drafts the post, and it lives on a page you own next to your resume. You can still share the link anywhere.',
   },
   {
     q: 'What does uploading my resume do?',
-    a: 'It drafts your website from your resume: your headline, what you help with, your projects and your story. You review it before anything goes live.',
-  },
-  {
-    q: 'Can I use Notis just for notes?',
-    a: 'Yes. Boards, to-do lists and free writing work for any kind of work, and you never have to publish anything.',
+    a: 'It drafts your professional page from your resume: your headline, what you help with, your projects and your story. You review it before anything goes live.',
   },
 ];
 
-/** A real Notis website to point visitors at. */
+/** A real Notis profile to point visitors at. */
 const EXAMPLE_SITE = 'https://notis.swegrowth.id/@zikrul-ihsan-md';
 
-/** The app on sample data, to explore without an account. */
-const PLAYGROUND = '/playground';
+/** Boards for things other than code, each with a line or two of its log. */
+const USES: { label: string; title: string; log: { date: string; text: string }[] }[] = [
+  {
+    label: 'Work',
+    title: 'API performance',
+    log: [
+      { date: 'Mon, 6 Oct', text: 'p95 on /orders is 1.8s. Suspect the N+1 on order items.' },
+      { date: 'Wed, 8 Oct', text: 'Added the index and batched the query. p95 down to 320ms.' },
+    ],
+  },
+  {
+    label: 'Community',
+    title: 'Monthly meetup',
+    log: [
+      { date: 'Tue, 7 Oct', text: 'Venue confirmed for the 25th. 40 RSVPs so far.' },
+      { date: 'Fri, 10 Oct', text: 'Still need one talk on testing. Asked Rana.' },
+    ],
+  },
+  {
+    label: 'Learning',
+    title: 'Learning English',
+    log: [
+      {
+        date: 'Thu, 9 Oct',
+        text: 'Gave my standup update in English without notes. Past tense still slips.',
+      },
+    ],
+  },
+];
 
 /** What signed-out visitors see: what Notis is, and the way in. */
 export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeLandingProps) {
@@ -88,99 +114,73 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
 
       <main>
         <section className="home-hero">
-          <p className="eyebrow">YOUR NOTES, YOUR PUBLIC PRESENCE</p>
           <h1>
-            Write notes,
-            <br /> <mark>get noticed</mark>.
+            Write updates, track progress, and <mark>share your work</mark>.{' '}
+            <span className="home-hero-tail">All in one place.</span>
           </h1>
           <p className="home-lead">
-            A notes and writing app for professionals that turns everyday notes into a public
-            professional presence.
+            A board where every update is something you write: thoughts, findings, progress. Turn
+            them into posts and a professional page when you&apos;re ready.
           </p>
           <div className="home-signin">
             {start}
-            <a className="home-button" href={PLAYGROUND}>
-              Explore it first
+            <a className="home-button" href={EXAMPLE_SITE} target="_blank" rel="noreferrer">
+              See a real profile <ArrowRight size={18} />
             </a>
           </div>
-          <Equation
-            animate
-            label="Write notes, turn them into stories, show your work"
-            parts={[
-              { title: 'Write notes', caption: 'everyday, as you work', art: <NotesArt /> },
-              {
-                op: <ArrowRight size={30} />,
-                title: 'Turn into stories',
-                caption: 'with AI',
-                art: <PostArt />,
-              },
-              {
-                op: <ArrowRight size={30} />,
-                title: 'Show your work',
-                caption: 'on your own website',
-                art: <SiteArt />,
-                result: true,
-              },
-            ]}
-          />
+          <p className="home-micro">Free · Private by default</p>
+          <div className="home-hero-board">
+            <BoardSketch />
+          </div>
         </section>
 
-        <section className="home-beat" aria-labelledby="home-beat-notes">
+        <section className="home-beat" aria-labelledby="home-beat-write">
           <div className="home-beat-text">
-            <p className="eyebrow">1 · WRITE NOTES</p>
-            <h2 id="home-beat-notes">Just write it down.</h2>
+            <p className="eyebrow">1 · WRITE</p>
+            <h2 id="home-beat-write">Updates you write, not statuses you pick.</h2>
             <p>
-              Start an initiative and keep adding to it: what you tried, what went wrong, what you
-              figured out. A few lines at a time, each update with its date.
+              Every card keeps a running log. Add a few lines whenever something moves: what you
+              tried, what broke, what you learned.
             </p>
           </div>
           <NoteSketch />
         </section>
 
-        <section className="home-beat is-flipped" aria-labelledby="home-beat-stories">
+        <section className="home-beat is-flipped" aria-labelledby="home-beat-summarize">
           <div className="home-beat-text">
-            <p className="eyebrow">2 · TURN INTO STORIES</p>
-            <h2 id="home-beat-stories">
-              From notes to <mark>stories worth sharing</mark>, using AI.
+            <p className="eyebrow">2 · SUMMARIZE</p>
+            <h2 id="home-beat-summarize">
+              From scattered notes to <mark>a story worth sharing</mark>.
             </h2>
             <p>
-              The points you noted over a week or a project are already the bones of a story. AI
-              turns them into a draft, and you shape it into a lesson, an insight or a project
-              recap.
+              AI turns a week of updates into a draft: a recap, a lesson, or a project write-up. You
+              edit before anything goes out.
             </p>
-            <span className="home-ai">
-              <Sparkles size={15} /> Powered by AI: write it up from your notes in one click.
-            </span>
           </div>
           <StorySketch />
         </section>
 
-        <section className="home-beat is-wide" aria-labelledby="home-beat-site">
+        <section className="home-beat is-wide" aria-labelledby="home-beat-show">
           <div className="home-beat-text">
-            <p className="eyebrow">3 · SHOW YOUR WORK</p>
-            <h2 id="home-beat-site">
-              Every story is part of <mark>your professional journey</mark>.
+            <p className="eyebrow">3 · SHOW</p>
+            <h2 id="home-beat-show">
+              One link for <mark>your resume and your writing</mark>.
             </h2>
-            <p>It all lives on your own website on Notis, at /@yourname.</p>
-            <span className="home-ai">
-              <Sparkles size={15} /> Add your resume and AI sets up the rest in minutes.
-            </span>
+            <p>
+              Upload your resume and Notis builds your professional page, filled with the posts you
+              choose to publish.
+            </p>
           </div>
           <Equation
             animate
-            label="Stories plus resume equals your personal website"
+            label="Posts plus resume equals your professional page"
             parts={[
-              { title: 'Stories', caption: 'from your notes', art: <PostArt /> },
-              {
-                op: '+',
-                title: 'Resume',
-                caption: 'read by AI',
-                art: <ResumeArt />,
-              },
+              { title: 'Posts', caption: 'you choose to publish', art: <PostArt /> },
+              { op: '+', title: 'Resume', caption: 'uploaded once', art: <ResumeArt /> },
               {
                 op: '=',
-                title: 'Your website',
-                caption: 'on Notis',
+                title: 'Your page',
+                caption: 'one link to share',
                 art: <SiteArt />,
                 result: true,
               },
@@ -192,20 +192,27 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             target="_blank"
             rel="noreferrer"
           >
-            See a real one <ExternalLink size={16} />
+            See a real profile <ExternalLink size={16} />
           </a>
         </section>
 
-        <section className="home-beat" aria-labelledby="home-beat-boards">
-          <div className="home-beat-text">
-            <p className="eyebrow">AND EVERY DAY</p>
-            <h2 id="home-beat-boards">Track your work, journal your progress.</h2>
-            <p>
-              Move initiatives across your board to stay productive, and write updates on each one
-              as you go.
-            </p>
+        <section className="home-uses" aria-labelledby="home-uses">
+          <p className="eyebrow">NOT JUST CODE</p>
+          <h2 id="home-uses">For anything you&apos;re working on.</h2>
+          <div className="home-uses-list">
+            {USES.map((use) => (
+              <div key={use.title} className="home-paper">
+                <span className="home-sketch-label">Card · {use.label}</span>
+                <strong className="home-paper-title">{use.title}</strong>
+                {use.log.map((entry) => (
+                  <div key={entry.date} className="home-note-entry">
+                    <time>{entry.date}</time>
+                    <p>{entry.text}</p>
+                  </div>
+                ))}
+              </div>
+            ))}
           </div>
-          <BoardSketch />
         </section>
 
         <section className="home-faq" aria-labelledby="home-faq">
@@ -221,14 +228,8 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
         </section>
 
         <section className="home-start" id="start" aria-labelledby="home-start">
-          <h2 id="home-start">Start with one note.</h2>
-          <p>Sign in and your first board is ready.</p>
-          <div className="home-signin">
-            {start}
-            <a className="home-button" href={PLAYGROUND}>
-              Explore it first
-            </a>
-          </div>
+          <h2 id="home-start">Start with one update.</h2>
+          <div className="home-signin">{start}</div>
         </section>
       </main>
 
@@ -322,7 +323,13 @@ const INITIATIVE = [
   { date: 'Thu, 16 Oct', text: 'Checkouts back up 12%. Lesson: test the boring paths too.' },
 ];
 
-/** One initiative, updated over several days: each dated update appears in turn. */
+const REDESIGN = [
+  { date: 'Mon, 6 Oct', text: 'Mapped the old flow: five steps, two of them just confirmations.' },
+  { date: 'Wed, 8 Oct', text: 'One-page checkout prototype is up. Rana is testing it on mobile.' },
+  { date: 'Fri, 10 Oct', text: 'Shipped to 10% of users. Conversion up 6% so far.' },
+];
+
+/** One card, updated over several days: each dated update appears in turn. */
 function NoteSketch() {
   const { ref, step, animated } = useLoop(INITIATIVE.length + 1);
   return (
@@ -331,7 +338,7 @@ function NoteSketch() {
       className={`home-paper home-note${animated ? ' is-animated' : ''}`}
       aria-hidden="true"
     >
-      <span className="home-sketch-label">Initiative · Checkout</span>
+      <span className="home-sketch-label">Card · Checkout</span>
       <strong className="home-paper-title">Why carts were dropping</strong>
       {INITIATIVE.map((entry, index) => (
         <div key={entry.date} className={`home-note-entry${shownFrom(index, step)}`}>
@@ -417,7 +424,7 @@ function BoardSketch() {
               {card}
               {list.open && (
                 <span className="home-board-meta">
-                  <NotebookPen size={12} /> Journal · 3 updates
+                  <NotebookPen size={12} /> 3 updates
                 </span>
               )}
             </span>
@@ -431,9 +438,9 @@ function BoardSketch() {
         />
       )}
       <div className="home-board-panel">
-        <span className="home-sketch-label">Initiative · Doing</span>
+        <span className="home-sketch-label">Card · Doing</span>
         <strong className="home-paper-title">Checkout redesign</strong>
-        {INITIATIVE.map((entry, index) => (
+        {REDESIGN.map((entry, index) => (
           <div key={entry.date} className={`home-note-entry${shownFrom(index + 3, step)}`}>
             <time>{entry.date}</time>
             <p>{entry.text}</p>
@@ -493,14 +500,6 @@ function Equation({
     </div>
   );
 }
-
-const NotesArt = () =>
-  [0, 1, 2, 3, 4].map((line) => (
-    <span key={line} className="home-sketch-note">
-      <CircleCheck size={14} />
-      <span className={line % 2 ? 'home-sketch-bar is-short' : 'home-sketch-bar'} />
-    </span>
-  ));
 
 const ResumeArt = () => (
   <>
