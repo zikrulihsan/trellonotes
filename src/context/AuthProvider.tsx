@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState, type PropsWithChildren } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase/client';
+import {
+  finishGoogleSignIn,
+  googleClientId,
+  hasGoogleReturn,
+  startGoogleRedirect,
+} from '@/lib/supabase/google-direct';
 import { signInWithSsoToken, swegrowthSignInUrl, takeSsoToken } from '@/lib/supabase/swegrowth-sso';
 import { AuthContext, type AuthContextValue } from './auth-context';
 
@@ -13,9 +19,10 @@ export function AuthProvider({ children }: PropsWithChildren) {
     let active = true;
     const client = supabase;
     const ssoToken = takeSsoToken();
+    const tokenPending = Boolean(ssoToken) || hasGoogleReturn();
     const { data: authListener } = supabase.auth.onAuthStateChange((event, nextSession) => {
-      // While a swegrowth.id token is being exchanged, the empty initial session isn't final.
-      if (ssoToken && event === 'INITIAL_SESSION') return;
+      // While a swegrowth.id or Google token is being exchanged, the empty initial session isn't final.
+      if (tokenPending && event === 'INITIAL_SESSION') return;
       if (active) {
         setSession(nextSession);
         setLoading(false);
@@ -24,6 +31,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
     void (async () => {
       // Arriving from swegrowth.id: trade its one-time token for a session before deciding.
       if (ssoToken) await signInWithSsoToken(client, ssoToken);
+      // Back from Google's own sign-in: trade its ID token the same way.
+      await finishGoogleSignIn(client);
       const { data, error } = await client.auth.getSession();
       if (!active) return;
       setSession(error ? null : data.session);
@@ -43,6 +52,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
       user: session?.user ?? null,
       async signInWithGoogle() {
         if (!supabase) throw new Error('Supabase is not configured for this app.');
+        // Straight to Google when this site has its own client ID, so Google names this site.
+        if (googleClientId) return startGoogleRedirect(googleClientId);
         const { error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: { redirectTo: window.location.origin },
