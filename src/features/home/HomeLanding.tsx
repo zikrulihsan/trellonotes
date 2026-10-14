@@ -114,17 +114,17 @@ const USES: {
     post: 'Four loaves in: what sourdough taught me about patience',
   },
   {
-    label: 'Family',
-    title: "Raka's first year",
+    label: 'Home',
+    title: 'House to-dos',
     body: (
       <>
-        <p className="home-uses-prose">Little firsts we never want to forget.</p>
+        <p className="home-uses-prose">Before the rainy season starts.</p>
         <ul className="home-uses-checklist">
           {[
-            { text: 'First tooth', done: true },
-            { text: 'First taste of banana', done: true },
-            { text: 'Sleeps through the night', done: false },
-            { text: 'First steps', done: false },
+            { text: 'Service the AC', done: true },
+            { text: 'Clean the gutters', done: true },
+            { text: 'Fix the leaking roof tile', done: false },
+            { text: 'Call the plumber about the tap', done: false },
           ].map((item) => (
             <li key={item.text} className={item.done ? 'is-done' : undefined}>
               {item.done ? <CircleCheck size={16} /> : <Circle size={16} />}

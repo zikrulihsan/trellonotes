@@ -30,7 +30,7 @@ describe('signed-out home page', () => {
     expect(
       screen.getByRole('img', { name: 'A sourdough loaf on a wooden board' }),
     ).toBeInTheDocument();
-    expect(screen.getByText('First tooth')).toBeInTheDocument();
+    expect(screen.getByText('Service the AC')).toBeInTheDocument();
     expect(screen.getAllByText('Only you can see this')).toHaveLength(2);
     expect(screen.getAllByText('Public post')).toHaveLength(2);
     expect(screen.getByText('Why not Notion or Trello?')).toBeInTheDocument();
