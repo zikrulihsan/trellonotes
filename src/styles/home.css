@@ -71,7 +71,7 @@
 }
 
 .home-hero {
-  padding: clamp(40px, 8vw, 88px) 0 clamp(48px, 7vw, 72px);
+  padding: clamp(40px, 8vw, 88px) 0 clamp(4px, 2vw, 24px);
   text-align: center;
 }
 .home-hero h1 {
