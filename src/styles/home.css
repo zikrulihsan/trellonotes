@@ -86,6 +86,47 @@
   font-size: 14px;
   font-weight: 600;
 }
+/* The hero tag's rotating word: each drops in from above as the last falls away. */
+.home-rotate {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  color: var(--purple);
+}
+.home-rotate-room {
+  visibility: hidden;
+  white-space: nowrap;
+}
+.home-rotate-word {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+}
+.home-rotate-word.is-in {
+  animation: home-rotate-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.home-rotate-word.is-out {
+  animation: home-rotate-out 0.45s ease-in both;
+}
+@keyframes home-rotate-in {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+@keyframes home-rotate-out {
+  to {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-rotate-word {
+    animation: none !important;
+  }
+}
 .home-hero h1 {
   max-width: 14ch;
   margin: 0 auto;

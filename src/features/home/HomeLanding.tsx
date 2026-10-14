@@ -222,7 +222,8 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
       <main>
         <section className="home-hero">
           <p className="home-hero-tag">
-            The note-taking app that turns your notes into stories, with <AiMark>AI</AiMark>
+            <AiMark>AI</AiMark> note-taking app that turns notes into{' '}
+            <RotatingWords words={['stories', 'a personal blog', 'a work journal']} />
           </p>
           <h1>
             Notes that show <mark>your progress</mark>.
@@ -484,6 +485,46 @@ function useAutoSlide<T extends HTMLElement>() {
     };
   }, []);
   return ref;
+}
+
+/** How long each word of the hero's rotating line stays before the next drops in. */
+const WORD_MS = 2200;
+
+/**
+ * Shows one word at a time, each dropping in from above while the last one falls away.
+ * Screen readers get every word at once; without motion, only the first shows.
+ */
+function RotatingWords({ words }: { words: string[] }) {
+  const still = Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    if (still) return;
+    const timer = window.setInterval(
+      () => setIndex((current) => (current + 1) % words.length),
+      WORD_MS,
+    );
+    return () => window.clearInterval(timer);
+  }, [still, words.length]);
+  const previous = (index + words.length - 1) % words.length;
+  return (
+    <>
+      <span className="sr-only">{words.join(', ')}</span>
+      <span className="home-rotate" aria-hidden="true">
+        {/* Holds the longest word's width, so the line never shifts as the words change. */}
+        <span className="home-rotate-room">
+          {words.reduce((longest, word) => (word.length > longest.length ? word : longest))}
+        </span>
+        <span key={index} className="home-rotate-word is-in">
+          {words[index]}
+        </span>
+        {index !== previous && !still && (
+          <span key={`out-${previous}`} className="home-rotate-word is-out">
+            {words[previous]}
+          </span>
+        )}
+      </span>
+    </>
+  );
 }
 
 /** How long each step of an animated picture stays before the next one. */
