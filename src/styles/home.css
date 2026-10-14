@@ -1264,9 +1264,23 @@ a.home-logo {
   margin-top: 22px;
 }
 
-/* On phones every section reads from the left edge, like the side-by-side ones already do;
-   only the hero and the closing call stay centred. */
+/* On phones every section reads from the left edge, the hero too, like the side-by-side
+   ones already do; only the closing call, a box of its own, stays centred. */
 @media (max-width: 760px) {
+  .home-hero {
+    text-align: left;
+  }
+  .home-hero h1,
+  .home-lead {
+    margin-inline: 0;
+  }
+  .home-hero .home-signin {
+    align-items: flex-start;
+  }
+  .home-hero .home-button.is-quiet {
+    min-height: 40px;
+    padding-inline: 0;
+  }
   .home-beat.is-wide,
   .home-uses {
     justify-items: stretch;
