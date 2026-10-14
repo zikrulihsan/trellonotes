@@ -254,15 +254,15 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
 
       <main>
         <section className="home-hero">
-          <p className="home-hero-tag">
-            <AiMark>AI</AiMark> note-taking app that turns notes into{' '}
-            <RotatingWords words={['stories', 'a personal blog', 'a work journal']} />
-          </p>
           <h1>
-            Notes that show <mark>your progress</mark>.
+            <span className="home-hero-line">Write your thoughts.</span>{' '}
+            <span className="home-hero-line">
+              <mark>Track your work</mark>.
+            </span>
           </h1>
           <p className="home-lead">
-            Track your work. Write your thoughts. Share it as your professional journey.
+            <AiMark>AI</AiMark> note-taking app that turns notes into{' '}
+            <RotatingWords words={['stories', 'a personal blog', 'a work journal']} />
           </p>
           <div className="home-signin">
             {start}

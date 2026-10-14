@@ -10,7 +10,7 @@ describe('signed-out home page', () => {
       <HomeLanding redirecting={false} error="" onGoogle={onGoogle} onSwegrowth={onSwegrowth} />,
     );
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'Notes that show your progress.',
+      'Write your thoughts. Track your work.',
     );
     expect(screen.getByText('stories, a personal blog, a work journal')).toBeInTheDocument();
     expect(

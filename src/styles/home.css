@@ -74,19 +74,7 @@
   padding: clamp(32px, 6vw, 64px) 0 clamp(4px, 2vw, 24px);
   text-align: center;
 }
-/* What Notis is, in one line above the headline. */
-.home-hero-tag {
-  display: inline-block;
-  margin: 0 0 20px;
-  padding: 6px 8px 6px 14px;
-  border: 1px solid #e3dcf7;
-  border-radius: 999px;
-  color: var(--home-ink);
-  background: rgba(255, 255, 255, 0.7);
-  font-size: 14px;
-  font-weight: 600;
-}
-/* The hero tag's rotating word: each drops in from above as the last falls away. */
+/* The hero subtitle's rotating word: each drops in from above as the last falls away. */
 .home-rotate {
   position: relative;
   display: inline-block;
@@ -133,6 +121,10 @@
   text-wrap: balance;
   font-size: clamp(40px, 7vw, 68px);
   line-height: 1.08;
+}
+/* Each sentence of the headline starts its own line. */
+.home-hero-line {
+  display: block;
 }
 .home-lead {
   max-width: 34rem;
@@ -1378,8 +1370,8 @@ a.home-logo {
   margin-top: 22px;
 }
 
-/* On phones every section reads from the left edge, the hero too, like the side-by-side
-   ones already do; only the closing call, a box of its own, stays centred. */
+/* On phones every section reads from the left edge, like the side-by-side ones already do;
+   only the hero, which fills the first screen, and the closing call stay centred. */
 @media (max-width: 760px) {
   /* The hero alone fills the first screen below the nav, its text centred top to bottom,
      and the steps start only after scrolling. */
@@ -1389,14 +1381,14 @@ a.home-logo {
     min-height: calc(100vh - 76px);
     min-height: calc(100svh - 76px);
     padding: 16px 0 20px;
-    text-align: left;
+    text-align: center;
   }
   .home-hero > :first-child {
     margin-top: auto;
   }
   .home-hero-next {
     display: inline-flex;
-    align-self: flex-start;
+    align-self: center;
     align-items: center;
     gap: 6px;
     margin-top: auto;
@@ -1409,20 +1401,8 @@ a.home-logo {
   .home .home-hero + section {
     margin-top: 48px;
   }
-  .home-hero-tag {
-    display: block;
-    padding: 0;
-    border: 0;
-    background: none;
-    color: var(--home-muted);
-    font-size: 13px;
-  }
-  .home-hero h1,
-  .home-lead {
-    margin-inline: 0;
-  }
   .home-hero .home-signin {
-    align-items: flex-start;
+    align-items: center;
   }
   .home-hero .home-button.is-quiet {
     min-height: 40px;
