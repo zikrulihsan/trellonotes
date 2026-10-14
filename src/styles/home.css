@@ -442,6 +442,10 @@
   }
 }
 
+/* Phones only: a nudge to scroll on, at the foot of a hero that fills the first screen. */
+.home-hero-next {
+  display: none;
+}
 /* The first step follows the hero closely, so the page does not open on a gap. */
 .home .home-hero + section {
   margin-top: clamp(24px, 5vw, 56px);
@@ -1377,8 +1381,33 @@ a.home-logo {
 /* On phones every section reads from the left edge, the hero too, like the side-by-side
    ones already do; only the closing call, a box of its own, stays centred. */
 @media (max-width: 760px) {
+  /* The hero alone fills the first screen below the nav, its text centred top to bottom,
+     and the steps start only after scrolling. */
   .home-hero {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 76px);
+    min-height: calc(100svh - 76px);
+    padding: 16px 0 20px;
     text-align: left;
+  }
+  .home-hero > :first-child {
+    margin-top: auto;
+  }
+  .home-hero-next {
+    display: inline-flex;
+    align-self: flex-start;
+    align-items: center;
+    gap: 6px;
+    margin-top: auto;
+    padding-top: 24px;
+    color: var(--home-muted);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .home .home-hero + section {
+    margin-top: 48px;
   }
   .home-hero-tag {
     display: block;

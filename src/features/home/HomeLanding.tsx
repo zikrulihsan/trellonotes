@@ -276,9 +276,12 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               Software Engineer Growth Community
             </a>
           </p>
+          <a className="home-hero-next" href="#how">
+            See how it works <ArrowDown size={16} />
+          </a>
         </section>
 
-        <section className="home-beat is-board" aria-labelledby="home-beat-write">
+        <section id="how" className="home-beat is-board" aria-labelledby="home-beat-write">
           <div className="home-beat-text">
             <p className="eyebrow">1 · NOTIS BOARD</p>
             <h2 id="home-beat-write">Each task holds its own notes.</h2>
