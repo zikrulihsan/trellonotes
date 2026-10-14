@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { normalizeLanding, toLinkUrl, type Landing } from '@/lib/supabase/landing';
 import { RESUME_MAX_BYTES } from '@/lib/resume-prompt';
+import { aiHeaders } from '@/lib/gemini-key';
 
 /** What the writer hands over: a resume file, or its text pasted in. */
 export type ResumeInput = { file: File } | { text: string };
@@ -33,7 +34,7 @@ export async function readResume(client: SupabaseClient, input: ResumeInput): Pr
   if (!token) throw new Error('Sign in to import a resume.');
   const response = await fetch('/api/resume-import', {
     method: 'POST',
-    headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
+    headers: aiHeaders(token),
     body: JSON.stringify(body),
   });
   const result = (await response.json().catch(() => null)) as {

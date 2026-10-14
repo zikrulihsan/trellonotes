@@ -6,6 +6,7 @@ import {
   Feather,
   FileText,
   Globe,
+  KeyRound,
   LayoutGrid,
   ListChecks,
   NotebookPen,
@@ -291,6 +292,16 @@ export function Sidebar({
                 </span>
               )}
             </button>
+            {cloudEnabled && (
+              <button
+                className="side-link side-quick"
+                onClick={() => openDialog({ kind: 'gemini-key' })}
+                title="Your own Gemini API key, for AI past the free daily requests"
+              >
+                <KeyRound size={18} />
+                <span className="side-label">AI key</span>
+              </button>
+            )}
             <div className="side-section">
               <span>YOUR BOARDS</span>
               <button

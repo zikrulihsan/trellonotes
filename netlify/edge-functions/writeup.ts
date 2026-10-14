@@ -7,7 +7,7 @@ import {
   WRITEUP_SCHEMA,
   type WriteupKind,
 } from '../../src/lib/writeup-prompt.ts';
-import { askGemini, reply, signedIn } from '../shared/gemini.ts';
+import { askGemini, countGeminiUse, geminiAccess, reply } from '../shared/gemini.ts';
 
 interface WriteupRequest {
   kind?: unknown;
@@ -18,9 +18,8 @@ const isKind = (kind: unknown): kind is WriteupKind => kind === 'week' || kind =
 
 export default async function writeup(request: Request) {
   if (request.method !== 'POST') return reply(405, { error: 'Use POST.' });
-  const key = Netlify.env.get('GEMINI_API_KEY');
-  if (!key) return reply(503, { error: 'Writing with Gemini is not set up yet (GEMINI_API_KEY).' });
-  if (!(await signedIn(request))) return reply(401, { error: 'Sign in to write with Gemini.' });
+  const access = await geminiAccess(request, 'Sign in to write with Gemini.');
+  if (!access.ok) return access.response;
 
   let body: WriteupRequest;
   try {
@@ -32,7 +31,7 @@ export default async function writeup(request: Request) {
     return reply(400, { error: 'There are no notes to write from.' });
 
   const result = await askGemini(
-    key,
+    access.key,
     [
       { text: WRITEUP_PROMPTS[body.kind] },
       { text: `Notes:\n${body.notes.slice(0, WRITEUP_MAX_CHARS)}` },
@@ -44,9 +43,9 @@ export default async function writeup(request: Request) {
       slow: 'Gemini took too long. Try again, or pick fewer cards.',
     },
   );
-  return result.ok
-    ? reply(200, { draft: result.json })
-    : reply(result.status, { error: result.error });
+  if (!result.ok) return reply(result.status, { error: result.error });
+  await countGeminiUse(request, access);
+  return reply(200, { draft: result.json });
 }
 
 export const config = { path: '/api/writeup' };

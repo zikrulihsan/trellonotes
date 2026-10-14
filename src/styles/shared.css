@@ -203,6 +203,27 @@ button svg {
   gap: 10px;
   margin-top: 25px;
 }
+/* Your own Gemini key: where to get one, and that it stays in this browser. */
+.gemini-key a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--purple);
+  font-weight: 600;
+}
+.gemini-key input {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.gemini-key-note {
+  display: block;
+  margin-top: 8px;
+  color: #8b8596;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.gemini-key .gemini-key-remove {
+  margin-right: auto;
+}
 .destructive {
   background: #be4c5c;
   color: white;

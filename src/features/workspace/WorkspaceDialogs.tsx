@@ -6,6 +6,7 @@ import type { WorkspaceDialog } from '@/context/ui-context';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { boardPath, initiativePath } from '@/lib/app-paths';
+import { GeminiKeyDialog } from '@/features/ai/GeminiKeyDialog';
 import { LabelManager } from './LabelManager';
 import { BOARD_TEMPLATES, templateById } from './templates';
 
@@ -70,13 +71,17 @@ export function WorkspaceDialogs() {
   if (!dialog) return null;
   if (dialog.kind === 'manage-labels') return <LabelManager onClose={closeDialog} />;
   if (dialog.kind === 'create-board') return <CreateBoardDialog onClose={closeDialog} />;
+  if (dialog.kind === 'gemini-key') return <GeminiKeyDialog onClose={closeDialog} />;
   return <DialogForm key={JSON.stringify(dialog)} request={dialog} onClose={closeDialog} />;
 }
 function DialogForm({
   request,
   onClose,
 }: {
-  request: Exclude<WorkspaceDialog, { kind: 'manage-labels' } | { kind: 'create-board' }>;
+  request: Exclude<
+    WorkspaceDialog,
+    { kind: 'manage-labels' } | { kind: 'create-board' } | { kind: 'gemini-key' }
+  >;
   onClose: () => void;
 }) {
   const [value, setValue] = useState('title' in request ? request.title : '');
