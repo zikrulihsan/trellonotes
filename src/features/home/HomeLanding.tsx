@@ -245,13 +245,13 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           </p>
         </section>
 
-        <section className="home-beat is-wide" aria-labelledby="home-beat-write">
+        <section className="home-beat is-board" aria-labelledby="home-beat-write">
           <div className="home-beat-text">
             <p className="eyebrow">1 · NOTIS BOARD</p>
             <h2 id="home-beat-write">Each task holds its own notes.</h2>
             <p>
-              No more digging through chats and docs to remember what you did. Everything about a
-              task lives inside <NotisMark>Notis Board</NotisMark>.
+              No more digging through chats. Each task keeps its notes in{' '}
+              <NotisMark>Notis Board</NotisMark>.
             </p>
             <BeatLink href={PLAYGROUND}>Try the board</BeatLink>
           </div>
