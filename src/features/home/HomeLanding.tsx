@@ -7,10 +7,12 @@ import { rememberConsent } from '@/lib/consent';
 import { writerPath } from '@/lib/supabase/published-pages';
 import {
   ArrowRight,
+  ArrowUpRight,
   Circle,
   CircleCheck,
   Feather,
   LoaderCircle,
+  Lock,
   MousePointer2,
   NotebookPen,
   Sparkles,
@@ -55,39 +57,133 @@ const PLAYGROUND = '/playground';
 const EXAMPLE_SITE = `/playground${writerPath(PLAYGROUND_AUTHOR)}`;
 /** The same sample writer's Blog page. */
 const EXAMPLE_BLOG = `${EXAMPLE_SITE}?blog`;
+/** The sample workspace's landing page editor, with its live preview. */
+const EXAMPLE_LANDING_EDITOR = `${PLAYGROUND}/landing`;
+/** The sample workspace's Pages list. */
+const EXAMPLE_PAGES = `${PLAYGROUND}/pages`;
 
-/** Boards for things other than code, each with a line or two of its log. */
+/**
+ * Notes from different parts of life, each written its own way: a log, a paragraph, a
+ * photo, a checklist. Some stay private; for the others AI drafts a post the writer can
+ * choose to publish.
+ */
 const USES: {
   label: string;
   title: string;
-  log: { date: string; text: string }[];
-  post: string;
+  body: ReactNode;
+  /** The post AI drafted from the notes; none means the note stays private. */
+  post?: string;
 }[] = [
   {
     label: 'Work',
     title: 'API performance',
-    log: [
-      { date: 'Mon, 6 Oct', text: 'p95 on /orders is 1.8s. Suspect the N+1 on order items.' },
-      { date: 'Wed, 8 Oct', text: 'Added the index and batched the query. p95 down to 320ms.' },
-    ],
+    body: (
+      <>
+        <div className="home-note-entry">
+          <time>Mon, 6 Oct</time>
+          <p>p95 on /orders is 1.8s. Suspect the N+1 on order items.</p>
+        </div>
+        <div className="home-note-entry">
+          <time>Wed, 8 Oct</time>
+          <p>Added the index and batched the query. p95 down to 320ms.</p>
+        </div>
+      </>
+    ),
     post: 'How one index took our p95 from 1.8s to 320ms',
   },
   {
-    label: 'Community',
-    title: 'Monthly meetup',
-    log: [
-      { date: 'Tue, 7 Oct', text: 'Venue confirmed for the 25th. 40 RSVPs so far.' },
-      { date: 'Fri, 10 Oct', text: 'Still need one talk on testing. Asked Rana.' },
-    ],
-    post: 'Behind our October meetup: a venue, four talks and 40 RSVPs',
+    label: 'Journal',
+    title: 'A slower Tuesday',
+    body: (
+      <p className="home-uses-prose">
+        I walked before opening the laptop today, and the whole morning felt quieter. No rushing to
+        answer anything. I think I&apos;ll keep doing this, at least until the rain starts.
+      </p>
+    ),
   },
   {
-    label: 'Learning',
-    title: 'Learning Go',
-    log: [{ date: 'Thu, 9 Oct', text: 'Rewrote the CLI in Go. Goroutines finally clicked.' }],
-    post: 'What rewriting a CLI taught me about Go',
+    label: 'Hobby',
+    title: 'Sourdough',
+    body: (
+      <figure className="home-uses-photo">
+        <LoafArt />
+        <figcaption>Loaf #4. Better crumb this time. The crust is still too pale.</figcaption>
+      </figure>
+    ),
+    post: 'Four loaves in: what sourdough taught me about patience',
+  },
+  {
+    label: 'Home',
+    title: 'House to-dos',
+    body: (
+      <>
+        <p className="home-uses-prose">Before the rainy season starts.</p>
+        <ul className="home-uses-checklist">
+          {[
+            { text: 'Service the AC', done: true },
+            { text: 'Clean the gutters', done: true },
+            { text: 'Fix the leaking roof tile', done: false },
+            { text: 'Call the plumber about the tap', done: false },
+          ].map((item) => (
+            <li key={item.text} className={item.done ? 'is-done' : undefined}>
+              {item.done ? <CircleCheck size={16} /> : <Circle size={16} />}
+              {item.text}
+            </li>
+          ))}
+        </ul>
+      </>
+    ),
   },
 ];
+
+/** A drawn photo of a sourdough loaf on a board, for the hobby note. */
+function LoafArt() {
+  return (
+    <svg viewBox="0 0 240 120" role="img" aria-label="A sourdough loaf on a wooden board">
+      <rect width="240" height="120" fill="#f6ead8" />
+      <path
+        d="M58 22c2-8 8-8 10 0s8 8 10 0"
+        stroke="#d9c2a3"
+        strokeWidth="3"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <path
+        d="M150 18c2-8 8-8 10 0s8 8 10 0"
+        stroke="#d9c2a3"
+        strokeWidth="3"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <rect x="28" y="92" width="184" height="14" rx="7" fill="#b98552" />
+      <path d="M44 94c0-34 34-58 76-58s76 24 76 58z" fill="#c9874a" />
+      <path d="M52 92c4-26 32-46 68-46s64 20 68 46" fill="#d99a5b" />
+      <path
+        d="M82 60c14-10 32-14 52-10"
+        stroke="#f1d3a6"
+        strokeWidth="5"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <path
+        d="M96 76c12-7 28-9 44-6"
+        stroke="#f1d3a6"
+        strokeWidth="4"
+        fill="none"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+/** A step's way to see the real thing in the playground: a text link, not a button. */
+function BeatLink({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <a className="home-beat-link" href={href}>
+      {children} <ArrowUpRight size={16} />
+    </a>
+  );
+}
 
 /** What signed-out visitors see: what Notis is, and the way in. */
 export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeLandingProps) {
@@ -103,6 +199,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
     setAsked(open);
     if (!open) setDismissedError(error);
   };
+  const usesRef = useAutoSlide<HTMLDivElement>();
   const start = (
     <button className="home-button is-primary" type="button" onClick={() => setSigningIn(true)}>
       Start writing <ArrowRight size={18} />
@@ -124,6 +221,10 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
 
       <main>
         <section className="home-hero">
+          <p className="home-hero-tag">
+            You take notes. <AiMark>AI</AiMark> turns them into{' '}
+            <RotatingWords words={['stories', 'a personal blog', 'a work journal']} />
+          </p>
           <h1>
             Notes that show <mark>your progress</mark>.
           </h1>
@@ -132,8 +233,8 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           </p>
           <div className="home-signin">
             {start}
-            <a className="home-button" href={PLAYGROUND}>
-              Explore it first, no login <ArrowRight size={18} />
+            <a className="home-button is-quiet" href={PLAYGROUND}>
+              Try it first, no login <ArrowUpRight size={18} />
             </a>
           </div>
           <p className="home-micro">
@@ -152,6 +253,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               No more digging through chats and docs to remember what you did. Everything about a
               task lives inside <NotisMark>Notis Board</NotisMark>.
             </p>
+            <BeatLink href={PLAYGROUND}>Try the board</BeatLink>
           </div>
           <div className="home-hero-board">
             <BoardSketch />
@@ -169,7 +271,10 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               <AiMark>AI draft</AiMark> it from your notes on <NotisMark>Notis Pages</NotisMark>.
             </p>
           </div>
-          <WriteSketch />
+          <div className="home-beat-art">
+            <WriteSketch />
+            <BeatLink href={EXAMPLE_PAGES}>See sample pages</BeatLink>
+          </div>
         </section>
 
         <section className="home-beat is-flipped" aria-labelledby="home-beat-blog">
@@ -182,11 +287,11 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               Every post is a story of your work. <NotisMark>Notis Blog</NotisMark> shows them all
               on your own blog page, for anyone to read.
             </p>
-            <a className="home-button is-primary home-beat-link" href={EXAMPLE_BLOG}>
-              See an example blog <ArrowRight size={18} />
-            </a>
           </div>
-          <BlogSketch />
+          <div className="home-beat-art">
+            <BlogSketch />
+            <BeatLink href={EXAMPLE_BLOG}>See an example blog</BeatLink>
+          </div>
         </section>
 
         <section className="home-beat is-wide" aria-labelledby="home-beat-show">
@@ -216,31 +321,41 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               },
             ]}
           />
-          <a className="home-button is-primary" href={EXAMPLE_SITE}>
-            See an example page <ArrowRight size={18} />
-          </a>
+          <BeatLink href={EXAMPLE_LANDING_EDITOR}>Try the page editor</BeatLink>
         </section>
 
         <section className="home-uses" aria-labelledby="home-uses">
-          <p className="eyebrow">EXAMPLES</p>
-          <h2 id="home-uses">Track any kind of progress.</h2>
-          <div className="home-uses-list">
+          <p className="eyebrow">PRIVATE BY DEFAULT</p>
+          <h2 id="home-uses">You choose what you share.</h2>
+          <p className="home-uses-lead">
+            Write about anything. Your notes stay private. When something is worth sharing,{' '}
+            <AiMark>AI</AiMark> helps turn it into a post you can publish.
+          </p>
+          <div className="home-uses-list" ref={usesRef}>
             {USES.map((use) => (
               <div key={use.title} className="home-paper">
                 <span className="home-sketch-label">{use.label}</span>
                 <strong className="home-paper-title">{use.title}</strong>
-                {use.log.map((entry) => (
-                  <div key={entry.date} className="home-note-entry">
-                    <time>{entry.date}</time>
-                    <p>{entry.text}</p>
-                  </div>
-                ))}
-                <p className="home-uses-post">
-                  <Sparkles size={14} /> Post: {use.post}
-                </p>
+                {use.body}
+                {use.post ? (
+                  <p className="home-uses-post">
+                    <Sparkles size={14} />
+                    <span>
+                      <span className="home-uses-tag">Public post</span> {use.post}
+                    </span>
+                  </p>
+                ) : (
+                  <p className="home-uses-post is-private">
+                    <Lock size={14} />
+                    <span>
+                      <span className="home-uses-tag">Private</span> Only you can see this
+                    </span>
+                  </p>
+                )}
               </div>
             ))}
           </div>
+          <div className="home-signin">{start}</div>
         </section>
 
         <section className="home-faq" aria-labelledby="home-faq">
@@ -320,6 +435,96 @@ function AiMark({ children }: { children: ReactNode }) {
 /** A Notis feature named in the copy ("Notis Board"), highlighted and kept on one line. */
 function NotisMark({ children }: { children: ReactNode }) {
   return <span className="home-notis">{children}</span>;
+}
+
+/** How long each card of a sliding row stays before the next one slides in. */
+const SLIDE_MS = 2000;
+/** How long a sliding row waits after the visitor touches it before it moves on its own again. */
+const SLIDE_IDLE_MS = 4000;
+
+/**
+ * Moves a sideways-scrolling row on to its next card every few seconds while it is on
+ * screen, and back to the first after the last. It only moves when the row actually
+ * scrolls (on phones), never with reduced motion, and waits while the visitor uses it.
+ */
+function useAutoSlide<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  useEffect(() => {
+    const row = ref.current;
+    if (
+      !row ||
+      typeof IntersectionObserver === 'undefined' ||
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    )
+      return;
+    let visible = false,
+      touchedAt = 0;
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+    });
+    observer.observe(row);
+    const touched = () => {
+      touchedAt = Date.now();
+    };
+    const events = ['pointerdown', 'touchstart', 'wheel', 'focusin'] as const;
+    events.forEach((name) => row.addEventListener(name, touched, { passive: true }));
+    const timer = window.setInterval(() => {
+      const cards = Array.from(row.children) as HTMLElement[];
+      if (!visible || row.scrollWidth <= row.clientWidth + 1 || cards.length < 2) return;
+      if (Date.now() - touchedAt < SLIDE_IDLE_MS) return;
+      const inset = cards[0].offsetLeft;
+      const atEnd = row.scrollLeft + row.clientWidth >= row.scrollWidth - 2;
+      const next = cards.find((card) => card.offsetLeft - inset > row.scrollLeft + 2);
+      const left = atEnd || !next ? 0 : next.offsetLeft - inset;
+      row.scrollTo({ left, behavior: 'smooth' });
+    }, SLIDE_MS);
+    return () => {
+      window.clearInterval(timer);
+      observer.disconnect();
+      events.forEach((name) => row.removeEventListener(name, touched));
+    };
+  }, []);
+  return ref;
+}
+
+/** How long each word of the hero's rotating line stays before the next drops in. */
+const WORD_MS = 2200;
+
+/**
+ * Shows one word at a time, each dropping in from above while the last one falls away.
+ * Screen readers get every word at once; without motion, only the first shows.
+ */
+function RotatingWords({ words }: { words: string[] }) {
+  const still = Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    if (still) return;
+    const timer = window.setInterval(
+      () => setIndex((current) => (current + 1) % words.length),
+      WORD_MS,
+    );
+    return () => window.clearInterval(timer);
+  }, [still, words.length]);
+  const previous = (index + words.length - 1) % words.length;
+  return (
+    <>
+      <span className="sr-only">{words.join(', ')}</span>
+      <span className="home-rotate" aria-hidden="true">
+        {/* Holds the longest word's width, so the line never shifts as the words change. */}
+        <span className="home-rotate-room">
+          {words.reduce((longest, word) => (word.length > longest.length ? word : longest))}
+        </span>
+        <span key={index} className="home-rotate-word is-in">
+          {words[index]}
+        </span>
+        {index !== previous && !still && (
+          <span key={`out-${previous}`} className="home-rotate-word is-out">
+            {words[previous]}
+          </span>
+        )}
+      </span>
+    </>
+  );
 }
 
 /** How long each step of an animated picture stays before the next one. */

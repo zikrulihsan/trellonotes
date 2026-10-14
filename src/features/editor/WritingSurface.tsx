@@ -15,6 +15,7 @@ import { EditorToolbar } from './components/EditorToolbar';
 import { WritingBar } from './components/WritingBar';
 import { LinkDialog } from './components/LinkDialog';
 import { SlashMenu } from './components/SlashMenu';
+import { AiMenu } from './components/AiMenu';
 
 export interface WritingDoc {
   id: string;
@@ -183,6 +184,7 @@ export function WritingSurface({
         <EditorContent editor={editor} />
       </article>
       <SlashMenu editor={editor} keysRef={slashKeys} />
+      <AiMenu editor={editor} />
       {(images.uploading > 0 || images.error) && (
         <div className={`writing-upload ${images.error ? 'is-error' : ''}`} role="status">
           {images.uploading > 0 ? 'Uploading image…' : images.error}

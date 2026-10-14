@@ -12,6 +12,7 @@ describe('signed-out home page', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
       'Notes that show your progress.',
     );
+    expect(screen.getByText('stories, a personal blog, a work journal')).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: 'Software Engineer Growth Community' }),
     ).toHaveAttribute('href', 'https://swegrowth.id');
@@ -25,21 +26,40 @@ describe('signed-out home page', () => {
       screen.getByRole('heading', { name: /Publish your writing as a blog page/ }),
     ).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /your professional profile/ })).toBeInTheDocument();
-    expect(screen.getByText('Learning Go')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'You choose what you share.' })).toBeInTheDocument();
+    expect(screen.getByText(/I walked before opening the laptop/)).toBeInTheDocument();
+    expect(
+      screen.getByRole('img', { name: 'A sourdough loaf on a wooden board' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Service the AC')).toBeInTheDocument();
+    expect(screen.getAllByText('Only you can see this')).toHaveLength(2);
+    expect(screen.getAllByText('Public post')).toHaveLength(2);
     expect(screen.getByText('Why not Notion or Trello?')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Explore it first, no login/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Try it first, no login/ })).toHaveAttribute(
       'href',
       '/playground',
     );
-    expect(screen.getByRole('link', { name: /See an example page/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Try the board/ })).toHaveAttribute(
       'href',
-      '/playground/@alya',
+      '/playground',
+    );
+    expect(screen.getByRole('link', { name: /See sample pages/ })).toHaveAttribute(
+      'href',
+      '/playground/pages',
+    );
+    expect(screen.getByRole('link', { name: /See an example blog/ })).toHaveAttribute(
+      'href',
+      '/playground/@alya?blog',
+    );
+    expect(screen.getByRole('link', { name: /Try the page editor/ })).toHaveAttribute(
+      'href',
+      '/playground/landing',
     );
     expect(screen.getByRole('heading', { name: 'Start your first board.' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy');
     expect(screen.queryByRole('button', { name: 'Continue with Google' })).toBeNull();
     const starts = screen.getAllByRole('button', { name: /Start writing/ });
-    expect(starts).toHaveLength(2);
+    expect(starts).toHaveLength(3);
     fireEvent.click(starts[0]);
     expect(screen.getByRole('dialog', { name: 'Start writing in Notis' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Continue with Google' })).toBeDisabled();

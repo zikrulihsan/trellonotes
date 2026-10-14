@@ -71,8 +71,61 @@
 }
 
 .home-hero {
-  padding: clamp(40px, 8vw, 88px) 0 clamp(48px, 7vw, 72px);
+  padding: clamp(40px, 8vw, 88px) 0 clamp(4px, 2vw, 24px);
   text-align: center;
+}
+/* What Notis is, in one line above the headline. */
+.home-hero-tag {
+  display: inline-block;
+  margin: 0 0 20px;
+  padding: 6px 8px 6px 14px;
+  border: 1px solid #e3dcf7;
+  border-radius: 999px;
+  color: var(--home-ink);
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  font-weight: 600;
+}
+/* The hero tag's rotating word: each drops in from above as the last falls away. */
+.home-rotate {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  color: var(--purple);
+}
+.home-rotate-room {
+  visibility: hidden;
+  white-space: nowrap;
+}
+.home-rotate-word {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+}
+.home-rotate-word.is-in {
+  animation: home-rotate-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.home-rotate-word.is-out {
+  animation: home-rotate-out 0.45s ease-in both;
+}
+@keyframes home-rotate-in {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+@keyframes home-rotate-out {
+  to {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-rotate-word {
+    animation: none !important;
+  }
 }
 .home-hero h1 {
   max-width: 14ch;
@@ -486,9 +539,6 @@
 .home-beat.is-wide .home-beat-text > p:not(.eyebrow) {
   margin-inline: auto;
 }
-.home-beat.is-wide .home-button {
-  margin-top: 32px;
-}
 .home-paper {
   display: flex;
   flex-direction: column;
@@ -658,16 +708,49 @@
   margin: 0 0 12px;
   color: var(--purple);
 }
+.home-uses-lead {
+  max-width: 34rem;
+  text-wrap: balance;
+  margin: 14px auto 0;
+  color: var(--home-muted);
+  font-size: 18px;
+  line-height: 1.6;
+}
 .home-uses-list {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
   margin-top: 32px;
   text-align: left;
 }
+@media (max-width: 980px) {
+  .home-uses-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+/* On phones the boards slide sideways, the next one peeking in, instead of stacking four deep. */
 @media (max-width: 760px) {
   .home-uses-list {
-    grid-template-columns: minmax(0, 1fr);
+    position: relative;
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: min(82%, 320px);
+    gap: 12px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 16px;
+    scrollbar-width: none;
+    /* Bleed to the screen edges, with room below for the cards' shadows. */
+    margin-inline: -16px;
+    padding: 4px 16px 32px;
+    margin-bottom: -20px;
+  }
+  .home-uses-list::-webkit-scrollbar {
+    display: none;
+  }
+  .home-uses-list > .home-paper {
+    scroll-snap-align: start;
   }
 }
 .home-faq-list {
@@ -976,6 +1059,82 @@ a.home-logo {
   flex: none;
   color: var(--purple);
 }
+/* The example notes are written different ways: a paragraph, a photo, a checklist. */
+.home-paper p.home-uses-prose {
+  margin: 0;
+  color: var(--home-ink);
+  font-family: 'Literata', Georgia, serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+.home-uses-photo {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+.home-uses-photo svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+.home-uses-photo figcaption {
+  color: var(--home-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.home-uses-checklist {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+}
+.home-uses-checklist li {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--home-ink);
+}
+.home-uses-checklist svg {
+  flex: none;
+  color: #c9c4d2;
+}
+.home-uses-checklist li.is-done {
+  color: var(--home-muted);
+  text-decoration: line-through;
+  text-decoration-color: #c9c4d2;
+}
+.home-uses-checklist li.is-done svg {
+  color: var(--purple);
+}
+
+/* Whether the board's writing goes out, as a small tag before the post or the note. */
+.home-uses-tag {
+  display: inline-block;
+  margin-right: 4px;
+  padding: 0 6px;
+  border-radius: 999px;
+  color: var(--purple);
+  background: #f0eaff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  vertical-align: 0.1em;
+}
+.home-paper p.home-uses-post.is-private {
+  color: var(--home-muted);
+  font-weight: 500;
+}
+.home-uses-post.is-private svg {
+  color: var(--home-muted);
+}
+.home-uses-post.is-private .home-uses-tag {
+  color: var(--home-ink);
+  background: #ecebf0;
+}
 
 /* The Write picture takes turns between a post written by hand and one drafted by AI. */
 .home-write-tabs {
@@ -1101,7 +1260,109 @@ a.home-logo {
   white-space: nowrap;
 }
 
-/* A step's way to see the real thing, under its description. */
+/* The hero's second way in: lighter than Start writing, so the two don't read as twins. */
+.home-button.is-quiet {
+  border-color: transparent;
+  background: transparent;
+  color: var(--home-muted);
+}
+.home-button.is-quiet:hover {
+  border-color: #dedde5;
+  background: #fff;
+  color: var(--home-ink);
+}
+
+/* A step's way to see the real thing: a link, not a button. Under the text, or under the picture. */
 .home-beat-link {
-  margin-top: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 18px;
+  color: var(--purple);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+.home-beat-link:hover {
+  text-decoration-thickness: 2px;
+}
+.home-beat-link svg {
+  transition: transform 0.15s ease;
+}
+.home-beat-link:hover svg {
+  transform: translate(2px, -2px);
+}
+.home-beat-link:focus-visible {
+  outline: 2px solid var(--purple);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.home-beat.is-wide .home-beat-text .home-beat-link {
+  margin-bottom: 8px;
+}
+.home-beat.is-wide > .home-beat-link {
+  margin-top: 28px;
+}
+.home-beat-art {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+.home-beat-art > .home-paper {
+  align-self: stretch;
+}
+.home-beat-art .home-beat-link {
+  margin-top: 22px;
+}
+
+/* On phones every section reads from the left edge, the hero too, like the side-by-side
+   ones already do; only the closing call, a box of its own, stays centred. */
+@media (max-width: 760px) {
+  .home-hero {
+    text-align: left;
+  }
+  .home-hero-tag {
+    display: block;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--home-muted);
+    font-size: 13px;
+  }
+  .home-hero h1,
+  .home-lead {
+    margin-inline: 0;
+  }
+  .home-hero .home-signin {
+    align-items: flex-start;
+  }
+  .home-hero .home-button.is-quiet {
+    min-height: 40px;
+    padding-inline: 0;
+  }
+  .home-beat.is-wide,
+  .home-uses {
+    justify-items: stretch;
+    text-align: left;
+  }
+  .home .home-beat.is-wide h2,
+  .home .home-uses h2,
+  .home .home-faq h2 {
+    text-align: left;
+  }
+  .home-beat.is-wide .home-beat-text > p:not(.eyebrow),
+  .home-uses-lead {
+    margin-inline: 0;
+  }
+  .home-beat.is-wide > .home-beat-link {
+    justify-self: start;
+  }
+  .home-beat.is-wide .home-sketch {
+    text-align: center;
+  }
+  .home-uses-lead {
+    text-wrap: pretty;
+  }
 }
