@@ -435,9 +435,9 @@ function NotisMark({ children }: { children: ReactNode }) {
 }
 
 /** How long each card of a sliding row stays before the next one slides in. */
-const SLIDE_MS = 3500;
+const SLIDE_MS = 2000;
 /** How long a sliding row waits after the visitor touches it before it moves on its own again. */
-const SLIDE_IDLE_MS = 6000;
+const SLIDE_IDLE_MS = 4000;
 
 /**
  * Moves a sideways-scrolling row on to its next card every few seconds while it is on
