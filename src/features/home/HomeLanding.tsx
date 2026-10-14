@@ -262,7 +262,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           </h1>
           <p className="home-lead">
             <AiMark>AI</AiMark> note-taking app that turns notes into{' '}
-            <RotatingWords words={['stories', 'a personal blog', 'a work journal']} />
+            <RotatingWords words={['stories', 'a personal blog', 'a professional page']} />
           </p>
           <div className="home-signin">
             {start}

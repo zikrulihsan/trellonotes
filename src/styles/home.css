@@ -127,7 +127,7 @@
   display: block;
 }
 .home-lead {
-  max-width: 34rem;
+  max-width: 38rem;
   text-wrap: balance;
   margin: 20px auto 0;
   color: var(--home-muted);
