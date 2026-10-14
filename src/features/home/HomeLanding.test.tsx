@@ -34,7 +34,7 @@ describe('signed-out home page', () => {
     expect(screen.getAllByText('Only you can see this')).toHaveLength(2);
     expect(screen.getAllByText('Public post')).toHaveLength(2);
     expect(screen.getByText('Why not Notion or Trello?')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Explore it first, no login/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Try it first, no login/ })).toHaveAttribute(
       'href',
       '/playground',
     );

@@ -231,7 +231,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           <div className="home-signin">
             {start}
             <a className="home-button is-quiet" href={PLAYGROUND}>
-              <Compass size={18} /> Explore it first, no login
+              <Compass size={18} /> Try it first, no login
             </a>
           </div>
           <p className="home-micro">
