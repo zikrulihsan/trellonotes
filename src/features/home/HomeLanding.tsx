@@ -261,7 +261,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             </span>
           </h1>
           <p className="home-lead">
-            <AiMark>AI</AiMark> note-taking app that boosts your career.
+            <AiMark>AI</AiMark> note-taking app for your career journey.
           </p>
           <div className="home-signin">
             {start}
