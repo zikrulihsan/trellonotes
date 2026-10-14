@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Modal } from '@/components/ui/Modal';
 import { ConsentCheckbox } from '@/features/legal/ConsentCheckbox';
 import { LegalFooter } from '@/features/legal/LegalPage';
@@ -261,11 +261,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             </span>
           </h1>
           <p className="home-lead">
-            <AiMark>AI</AiMark> note-taking app that turns{' '}
-            <span className="home-rotate-line">
-              notes into{' '}
-              <RotatingWords words={['stories', 'a personal blog', 'a professional page']} />
-            </span>
+            <AiMark>AI</AiMark> note-taking app that boosts your career.
           </p>
           <div className="home-signin">
             {start}
@@ -559,53 +555,6 @@ function useAutoSlide<T extends HTMLElement>() {
     };
   }, []);
   return ref;
-}
-
-/** How long each word of the hero's rotating line stays before the next drops in. */
-const WORD_MS = 2200;
-
-/**
- * Shows one word at a time, each dropping in from above while the last one falls away.
- * The space it takes eases to fit each word, so a centred line stays centred.
- * Screen readers get every word at once; without motion, only the first shows.
- */
-function RotatingWords({ words }: { words: string[] }) {
-  const still = Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
-  const [index, setIndex] = useState(0);
-  const [width, setWidth] = useState<number>();
-  const current = useRef<HTMLSpanElement>(null);
-  useEffect(() => {
-    if (still) return;
-    const timer = window.setInterval(
-      () => setIndex((value) => (value + 1) % words.length),
-      WORD_MS,
-    );
-    return () => window.clearInterval(timer);
-  }, [still, words.length]);
-  useLayoutEffect(() => {
-    const measure = () => setWidth(current.current?.offsetWidth || undefined);
-    measure();
-    // The web font can land after the first measure and change the word's width.
-    document.fonts?.ready.then(measure);
-  }, [index]);
-  const previous = (index + words.length - 1) % words.length;
-  return (
-    <>
-      <span className="sr-only">{words.join(', ')}</span>
-      <span className="home-rotate" aria-hidden="true" style={{ width }}>
-        {/* Gives the line its height; the width follows the word that is showing. */}
-        <span className="home-rotate-room">{words[index]}</span>
-        <span key={index} ref={current} className="home-rotate-word is-in">
-          {words[index]}
-        </span>
-        {index !== previous && !still && (
-          <span key={`out-${previous}`} className="home-rotate-word is-out">
-            {words[previous]}
-          </span>
-        )}
-      </span>
-    </>
-  );
 }
 
 /** How long each step of an animated picture stays before the next one. */
