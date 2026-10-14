@@ -734,42 +734,81 @@
   font-size: 18px;
   line-height: 1.6;
 }
+/* The examples slide sideways: four in view on wide screens, two on tablets, one and a peek on
+   phones. */
 .home-uses-list {
+  position: relative;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-flow: column;
+  grid-auto-columns: calc((100% - 3 * 16px) / 4);
   gap: 16px;
-  margin-top: 32px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  /* Room around the cards for their shadows. */
+  margin: 12px -12px -20px;
+  padding: 4px 12px 32px;
+  scroll-padding-inline: 12px;
   text-align: left;
+}
+.home-uses-list::-webkit-scrollbar {
+  display: none;
+}
+.home-uses-list > .home-paper {
+  scroll-snap-align: start;
+}
+.home-uses-nav {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+}
+.home-uses-arrow {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid #dedde5;
+  border-radius: 999px;
+  color: var(--home-ink);
+  background: #fff;
+  cursor: pointer;
+}
+.home-uses-arrow:hover {
+  border-color: #c9c4d2;
+}
+.home-uses-arrow:focus-visible {
+  outline: 2px solid var(--purple);
+  outline-offset: 2px;
 }
 @media (max-width: 980px) {
   .home-uses-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-columns: calc((100% - 16px) / 2);
   }
 }
-/* On phones the boards slide sideways, the next one peeking in, instead of stacking four deep. */
 @media (max-width: 760px) {
-  .home-uses-list {
-    position: relative;
-    grid-template-columns: none;
-    grid-auto-flow: column;
-    grid-auto-columns: min(82%, 320px);
-    gap: 12px;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: 16px;
-    scrollbar-width: none;
-    /* Bleed to the screen edges, with room below for the cards' shadows. */
-    margin-inline: -16px;
-    padding: 4px 16px 32px;
-    margin-bottom: -20px;
-  }
-  .home-uses-list::-webkit-scrollbar {
+  .home-uses-nav {
     display: none;
   }
-  .home-uses-list > .home-paper {
-    scroll-snap-align: start;
+  .home-uses-list {
+    grid-auto-columns: min(82%, 320px);
+    gap: 12px;
+    /* Bleed to the screen edges. */
+    margin: 24px -16px -20px;
+    padding: 4px 16px 32px;
+    scroll-padding-inline: 16px;
   }
+}
+.home-uses-quote {
+  margin: 0;
+  padding-left: 12px;
+  border-left: 3px solid var(--home-marker);
+  color: var(--home-ink);
+  font-family: 'Literata', Georgia, serif;
+  font-size: 15px;
+  font-style: italic;
+  line-height: 1.55;
 }
 .home-faq-list {
   max-width: 44rem;
