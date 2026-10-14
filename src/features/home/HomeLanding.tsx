@@ -9,7 +9,6 @@ import {
   ArrowRight,
   ArrowUpRight,
   Circle,
-  Compass,
   CircleCheck,
   Feather,
   LoaderCircle,
@@ -231,7 +230,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           <div className="home-signin">
             {start}
             <a className="home-button is-quiet" href={PLAYGROUND}>
-              <Compass size={18} /> Try it first, no login
+              Try it first, no login <ArrowUpRight size={18} />
             </a>
           </div>
           <p className="home-micro">
