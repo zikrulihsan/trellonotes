@@ -32,8 +32,10 @@ describe('signed-out home page', () => {
       screen.getByRole('img', { name: 'A sourdough loaf on a wooden board' }),
     ).toBeInTheDocument();
     expect(screen.getByText('Service the AC')).toBeInTheDocument();
-    expect(screen.getAllByText('Only you can see this')).toHaveLength(2);
-    expect(screen.getAllByText('Public post')).toHaveLength(2);
+    expect(screen.getAllByText('Only you can see this')).toHaveLength(3);
+    expect(screen.getAllByText('Public post')).toHaveLength(3);
+    expect(screen.getByText('Learning Go')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Next examples' })).toBeInTheDocument();
     expect(screen.getByText('Why not Notion or Trello?')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Try it first, no login/ })).toHaveAttribute(
       'href',

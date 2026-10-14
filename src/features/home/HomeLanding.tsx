@@ -8,6 +8,8 @@ import { writerPath } from '@/lib/supabase/published-pages';
 import {
   ArrowRight,
   ArrowUpRight,
+  ChevronLeft,
+  ChevronRight,
   Circle,
   CircleCheck,
   Feather,
@@ -111,6 +113,37 @@ const USES: {
       </figure>
     ),
     post: 'Four loaves in: what sourdough taught me about patience',
+  },
+  {
+    label: 'Learning',
+    title: 'Learning Go',
+    body: (
+      <>
+        <div className="home-note-entry">
+          <time>Sat, 4 Oct</time>
+          <p>Goroutines finally clicked: a channel is just a queue with manners.</p>
+        </div>
+        <div className="home-note-entry">
+          <time>Sun, 12 Oct</time>
+          <p>Rewrote the CSV importer with a worker pool. 40s down to 6s.</p>
+        </div>
+      </>
+    ),
+    post: 'Rewriting a slow importer in Go, as a beginner',
+  },
+  {
+    label: 'Reading',
+    title: 'Notes on Deep Work',
+    body: (
+      <>
+        <blockquote className="home-uses-quote">
+          Clarity about what matters provides clarity about what does not.
+        </blockquote>
+        <p className="home-uses-prose">
+          Try two mornings a week with no meetings and no chat. See if the hard tickets move.
+        </p>
+      </>
+    ),
   },
   {
     label: 'Home',
@@ -260,7 +293,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           </div>
         </section>
 
-        <section className="home-beat" aria-labelledby="home-beat-summarize">
+        <section className="home-beat is-flipped" aria-labelledby="home-beat-summarize">
           <div className="home-beat-text">
             <p className="eyebrow">2 · NOTIS PAGES</p>
             <h2 id="home-beat-summarize">
@@ -277,7 +310,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           </div>
         </section>
 
-        <section className="home-beat is-flipped" aria-labelledby="home-beat-blog">
+        <section className="home-beat" aria-labelledby="home-beat-blog">
           <div className="home-beat-text">
             <p className="eyebrow">3 · NOTIS BLOG</p>
             <h2 id="home-beat-blog">
@@ -331,6 +364,24 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             Write about anything. Your notes stay private. When something is worth sharing,{' '}
             <AiMark>AI</AiMark> helps turn it into a post you can publish.
           </p>
+          <div className="home-uses-nav">
+            <button
+              type="button"
+              className="home-uses-arrow"
+              aria-label="Previous examples"
+              onClick={() => slideBy(usesRef.current, -1)}
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <button
+              type="button"
+              className="home-uses-arrow"
+              aria-label="Next examples"
+              onClick={() => slideBy(usesRef.current, 1)}
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
           <div className="home-uses-list" ref={usesRef}>
             {USES.map((use) => (
               <div key={use.title} className="home-paper">
@@ -435,6 +486,23 @@ function AiMark({ children }: { children: ReactNode }) {
 /** A Notis feature named in the copy ("Notis Board"), highlighted and kept on one line. */
 function NotisMark({ children }: { children: ReactNode }) {
   return <span className="home-notis">{children}</span>;
+}
+
+/** Scrolls a sliding row one card to the left (-1) or right (1), wrapping at the ends. */
+function slideBy(row: HTMLElement | null, direction: -1 | 1) {
+  const first = row?.firstElementChild as HTMLElement | null;
+  if (!row || !first) return;
+  const step = first.offsetWidth + parseFloat(getComputedStyle(row).columnGap || '0');
+  const max = row.scrollWidth - row.clientWidth;
+  const atStart = row.scrollLeft <= 2,
+    atEnd = row.scrollLeft >= max - 2;
+  const left =
+    direction > 0 && atEnd
+      ? 0
+      : direction < 0 && atStart
+        ? max
+        : Math.round(row.scrollLeft / step + direction) * step;
+  row.scrollTo({ left, behavior: 'smooth' });
 }
 
 /** How long each card of a sliding row stays before the next one slides in. */
