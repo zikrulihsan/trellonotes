@@ -678,6 +678,7 @@
 /* On phones the boards slide sideways, the next one peeking in, instead of stacking four deep. */
 @media (max-width: 760px) {
   .home-uses-list {
+    position: relative;
     grid-template-columns: none;
     grid-auto-flow: column;
     grid-auto-columns: min(82%, 320px);
@@ -1005,6 +1006,57 @@ a.home-logo {
   flex: none;
   color: var(--purple);
 }
+/* The example notes are written different ways: a paragraph, a photo, a checklist. */
+.home-paper p.home-uses-prose {
+  margin: 0;
+  color: var(--home-ink);
+  font-family: 'Literata', Georgia, serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+.home-uses-photo {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+.home-uses-photo svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+.home-uses-photo figcaption {
+  color: var(--home-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.home-uses-checklist {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+}
+.home-uses-checklist li {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--home-ink);
+}
+.home-uses-checklist svg {
+  flex: none;
+  color: #c9c4d2;
+}
+.home-uses-checklist li.is-done {
+  color: var(--home-muted);
+  text-decoration: line-through;
+  text-decoration-color: #c9c4d2;
+}
+.home-uses-checklist li.is-done svg {
+  color: var(--purple);
+}
+
 /* Whether the board's writing goes out, as a small tag before the post or the note. */
 .home-uses-tag {
   display: inline-block;

@@ -64,51 +64,118 @@ const EXAMPLE_LANDING_EDITOR = `${PLAYGROUND}/landing`;
 const EXAMPLE_PAGES = `${PLAYGROUND}/pages`;
 
 /**
- * Boards from different parts of life, each with a line or two of its log. Some stay
- * private; for the others AI drafts a post the writer can choose to publish.
+ * Notes from different parts of life, each written its own way: a log, a paragraph, a
+ * photo, a checklist. Some stay private; for the others AI drafts a post the writer can
+ * choose to publish.
  */
 const USES: {
   label: string;
   title: string;
-  log: { date: string; text: string }[];
-  /** The post AI drafted from the notes; none means the board stays private. */
+  body: ReactNode;
+  /** The post AI drafted from the notes; none means the note stays private. */
   post?: string;
 }[] = [
   {
     label: 'Work',
     title: 'API performance',
-    log: [
-      { date: 'Mon, 6 Oct', text: 'p95 on /orders is 1.8s. Suspect the N+1 on order items.' },
-      { date: 'Wed, 8 Oct', text: 'Added the index and batched the query. p95 down to 320ms.' },
-    ],
+    body: (
+      <>
+        <div className="home-note-entry">
+          <time>Mon, 6 Oct</time>
+          <p>p95 on /orders is 1.8s. Suspect the N+1 on order items.</p>
+        </div>
+        <div className="home-note-entry">
+          <time>Wed, 8 Oct</time>
+          <p>Added the index and batched the query. p95 down to 320ms.</p>
+        </div>
+      </>
+    ),
     post: 'How one index took our p95 from 1.8s to 320ms',
   },
   {
     label: 'Journal',
-    title: 'Daily journal',
-    log: [
-      { date: 'Mon, 6 Oct', text: 'Walked before opening the laptop. Calmer all morning.' },
-      { date: 'Thu, 9 Oct', text: 'Skipped the walk. Scattered by noon. Noted.' },
-    ],
+    title: 'A slower Tuesday',
+    body: (
+      <p className="home-uses-prose">
+        I walked before opening the laptop today, and the whole morning felt quieter. No rushing to
+        answer anything. I think I&apos;ll keep doing this, at least until the rain starts.
+      </p>
+    ),
   },
   {
     label: 'Hobby',
     title: 'Sourdough',
-    log: [
-      { date: 'Tue, 7 Oct', text: 'Starter doubled in six hours. Finally alive.' },
-      { date: 'Sun, 12 Oct', text: 'Loaf #4: better crumb, crust still too pale.' },
-    ],
+    body: (
+      <figure className="home-uses-photo">
+        <LoafArt />
+        <figcaption>Loaf #4. Better crumb this time. The crust is still too pale.</figcaption>
+      </figure>
+    ),
     post: 'Four loaves in: what sourdough taught me about patience',
   },
   {
     label: 'Family',
     title: "Raka's first year",
-    log: [
-      { date: 'Sun, 5 Oct', text: 'First tooth! He will not stop chewing the spoon.' },
-      { date: 'Sat, 11 Oct', text: 'Tried solids: loves banana, refuses spinach.' },
-    ],
+    body: (
+      <>
+        <p className="home-uses-prose">Little firsts we never want to forget.</p>
+        <ul className="home-uses-checklist">
+          {[
+            { text: 'First tooth', done: true },
+            { text: 'First taste of banana', done: true },
+            { text: 'Sleeps through the night', done: false },
+            { text: 'First steps', done: false },
+          ].map((item) => (
+            <li key={item.text} className={item.done ? 'is-done' : undefined}>
+              {item.done ? <CircleCheck size={16} /> : <Circle size={16} />}
+              {item.text}
+            </li>
+          ))}
+        </ul>
+      </>
+    ),
   },
 ];
+
+/** A drawn photo of a sourdough loaf on a board, for the hobby note. */
+function LoafArt() {
+  return (
+    <svg viewBox="0 0 240 120" role="img" aria-label="A sourdough loaf on a wooden board">
+      <rect width="240" height="120" fill="#f6ead8" />
+      <path
+        d="M58 22c2-8 8-8 10 0s8 8 10 0"
+        stroke="#d9c2a3"
+        strokeWidth="3"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <path
+        d="M150 18c2-8 8-8 10 0s8 8 10 0"
+        stroke="#d9c2a3"
+        strokeWidth="3"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <rect x="28" y="92" width="184" height="14" rx="7" fill="#b98552" />
+      <path d="M44 94c0-34 34-58 76-58s76 24 76 58z" fill="#c9874a" />
+      <path d="M52 92c4-26 32-46 68-46s64 20 68 46" fill="#d99a5b" />
+      <path
+        d="M82 60c14-10 32-14 52-10"
+        stroke="#f1d3a6"
+        strokeWidth="5"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <path
+        d="M96 76c12-7 28-9 44-6"
+        stroke="#f1d3a6"
+        strokeWidth="4"
+        fill="none"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
 
 /** A step's way to see the real thing in the playground: a text link, not a button. */
 function BeatLink({ href, children }: { href: string; children: ReactNode }) {
@@ -133,6 +200,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
     setAsked(open);
     if (!open) setDismissedError(error);
   };
+  const usesRef = useAutoSlide<HTMLDivElement>();
   const start = (
     <button className="home-button is-primary" type="button" onClick={() => setSigningIn(true)}>
       Start writing <ArrowRight size={18} />
@@ -260,17 +328,12 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             Write about anything. Your notes stay private. When something is worth sharing,{' '}
             <AiMark>AI</AiMark> helps turn it into a post you can publish.
           </p>
-          <div className="home-uses-list">
+          <div className="home-uses-list" ref={usesRef}>
             {USES.map((use) => (
               <div key={use.title} className="home-paper">
                 <span className="home-sketch-label">{use.label}</span>
                 <strong className="home-paper-title">{use.title}</strong>
-                {use.log.map((entry) => (
-                  <div key={entry.date} className="home-note-entry">
-                    <time>{entry.date}</time>
-                    <p>{entry.text}</p>
-                  </div>
-                ))}
+                {use.body}
                 {use.post ? (
                   <p className="home-uses-post">
                     <Sparkles size={14} />
@@ -369,6 +432,56 @@ function AiMark({ children }: { children: ReactNode }) {
 /** A Notis feature named in the copy ("Notis Board"), highlighted and kept on one line. */
 function NotisMark({ children }: { children: ReactNode }) {
   return <span className="home-notis">{children}</span>;
+}
+
+/** How long each card of a sliding row stays before the next one slides in. */
+const SLIDE_MS = 3500;
+/** How long a sliding row waits after the visitor touches it before it moves on its own again. */
+const SLIDE_IDLE_MS = 6000;
+
+/**
+ * Moves a sideways-scrolling row on to its next card every few seconds while it is on
+ * screen, and back to the first after the last. It only moves when the row actually
+ * scrolls (on phones), never with reduced motion, and waits while the visitor uses it.
+ */
+function useAutoSlide<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  useEffect(() => {
+    const row = ref.current;
+    if (
+      !row ||
+      typeof IntersectionObserver === 'undefined' ||
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    )
+      return;
+    let visible = false,
+      touchedAt = 0;
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+    });
+    observer.observe(row);
+    const touched = () => {
+      touchedAt = Date.now();
+    };
+    const events = ['pointerdown', 'touchstart', 'wheel', 'focusin'] as const;
+    events.forEach((name) => row.addEventListener(name, touched, { passive: true }));
+    const timer = window.setInterval(() => {
+      const cards = Array.from(row.children) as HTMLElement[];
+      if (!visible || row.scrollWidth <= row.clientWidth + 1 || cards.length < 2) return;
+      if (Date.now() - touchedAt < SLIDE_IDLE_MS) return;
+      const inset = cards[0].offsetLeft;
+      const atEnd = row.scrollLeft + row.clientWidth >= row.scrollWidth - 2;
+      const next = cards.find((card) => card.offsetLeft - inset > row.scrollLeft + 2);
+      const left = atEnd || !next ? 0 : next.offsetLeft - inset;
+      row.scrollTo({ left, behavior: 'smooth' });
+    }, SLIDE_MS);
+    return () => {
+      window.clearInterval(timer);
+      observer.disconnect();
+      events.forEach((name) => row.removeEventListener(name, touched));
+    };
+  }, []);
+  return ref;
 }
 
 /** How long each step of an animated picture stays before the next one. */
