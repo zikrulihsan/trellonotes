@@ -71,7 +71,7 @@
 }
 
 .home-hero {
-  padding: clamp(40px, 8vw, 88px) 0 clamp(4px, 2vw, 24px);
+  padding: clamp(32px, 6vw, 64px) 0 clamp(4px, 2vw, 24px);
   text-align: center;
 }
 /* What Notis is, in one line above the headline. */
@@ -427,6 +427,24 @@
   font-size: clamp(28px, 4vw, 38px);
   line-height: 1.2;
   text-align: center;
+}
+/* The board step puts its picture beside the text on wide screens, so the sample board
+   shows on the first screen without scrolling. */
+.home-beat.is-board {
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+}
+.home-beat.is-board .home-hero-board {
+  margin: 0;
+}
+@media (max-width: 760px) {
+  .home-beat.is-board {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* The first step follows the hero closely, so the page does not open on a gap. */
+.home .home-hero + section {
+  margin-top: clamp(24px, 5vw, 56px);
 }
 .home-section-lead {
   max-width: 36rem;
