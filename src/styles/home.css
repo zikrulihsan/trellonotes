@@ -1263,3 +1263,31 @@ a.home-logo {
 .home-beat-art .home-beat-link {
   margin-top: 22px;
 }
+
+/* On phones every section reads from the left edge, like the side-by-side ones already do;
+   only the hero and the closing call stay centred. */
+@media (max-width: 760px) {
+  .home-beat.is-wide,
+  .home-uses {
+    justify-items: stretch;
+    text-align: left;
+  }
+  .home .home-beat.is-wide h2,
+  .home .home-uses h2,
+  .home .home-faq h2 {
+    text-align: left;
+  }
+  .home-beat.is-wide .home-beat-text > p:not(.eyebrow),
+  .home-uses-lead {
+    margin-inline: 0;
+  }
+  .home-beat.is-wide > .home-beat-link {
+    justify-self: start;
+  }
+  .home-beat.is-wide .home-sketch {
+    text-align: center;
+  }
+  .home-uses-lead {
+    text-wrap: pretty;
+  }
+}
