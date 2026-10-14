@@ -221,6 +221,9 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
 
       <main>
         <section className="home-hero">
+          <p className="home-hero-tag">
+            The note-taking app that turns your notes into stories, with <AiMark>AI</AiMark>
+          </p>
           <h1>
             Notes that show <mark>your progress</mark>.
           </h1>

@@ -13,6 +13,9 @@ describe('signed-out home page', () => {
       'Notes that show your progress.',
     );
     expect(
+      screen.getByText(/The note-taking app that turns your notes into stories/),
+    ).toBeInTheDocument();
+    expect(
       screen.getByRole('link', { name: 'Software Engineer Growth Community' }),
     ).toHaveAttribute('href', 'https://swegrowth.id');
     expect(

@@ -74,6 +74,18 @@
   padding: clamp(40px, 8vw, 88px) 0 clamp(4px, 2vw, 24px);
   text-align: center;
 }
+/* What Notis is, in one line above the headline. */
+.home-hero-tag {
+  display: inline-block;
+  margin: 0 0 20px;
+  padding: 6px 8px 6px 14px;
+  border: 1px solid #e3dcf7;
+  border-radius: 999px;
+  color: var(--home-ink);
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  font-weight: 600;
+}
 .home-hero h1 {
   max-width: 14ch;
   margin: 0 auto;
@@ -1269,6 +1281,14 @@ a.home-logo {
 @media (max-width: 760px) {
   .home-hero {
     text-align: left;
+  }
+  .home-hero-tag {
+    display: block;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--home-muted);
+    font-size: 13px;
   }
   .home-hero h1,
   .home-lead {
