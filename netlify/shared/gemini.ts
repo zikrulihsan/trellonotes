@@ -1,6 +1,6 @@
-// What the app's Gemini edge functions share: the JSON reply, the signed-in check and one
-// structured call to Gemini. Needs GEMINI_API_KEY in Netlify's environment; GEMINI_MODEL is
-// optional.
+// What the app's Gemini edge functions share: the JSON reply, the signed-in check, the
+// free daily allowance on the app's key, and one structured call to Gemini. Needs
+// GEMINI_API_KEY in Netlify's environment; GEMINI_MODEL and AI_DAILY_LIMIT are optional.
 
 // Public values, the same ones the app is built with (netlify.toml).
 const SUPABASE_URL =
@@ -24,6 +24,76 @@ export async function signedIn(request: Request) {
     signal: AbortSignal.timeout(5000),
   }).catch(() => null);
   return Boolean(response?.ok);
+}
+
+/** Free Gemini requests per writer per day on the app's key, unless AI_DAILY_LIMIT says otherwise. */
+const DEFAULT_DAILY_LIMIT = 10;
+/** The header a writer's own Gemini key comes in, from their browser. It is never stored here. */
+const OWN_KEY_HEADER = 'x-gemini-key';
+
+const dailyLimit = () => {
+  const limit = Number(Netlify.env.get('AI_DAILY_LIMIT'));
+  return Number.isFinite(limit) && limit >= 0 ? Math.floor(limit) : DEFAULT_DAILY_LIMIT;
+};
+
+/** Calls one of the AI usage functions in the database as the signed-in writer. */
+async function usage(request: Request, name: string): Promise<number | null> {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
+    method: 'POST',
+    headers: {
+      apikey: SUPABASE_KEY,
+      authorization: request.headers.get('authorization') ?? '',
+      'content-type': 'application/json',
+    },
+    body: '{}',
+    signal: AbortSignal.timeout(5000),
+  }).catch(() => null);
+  if (!response?.ok) {
+    console.error('AI usage call failed', name, response?.status);
+    return null;
+  }
+  const count = (await response.json().catch(() => null)) as unknown;
+  return typeof count === 'number' ? count : null;
+}
+
+export type GeminiAccess =
+  { ok: true; key: string; own: boolean } | { ok: false; response: Response };
+
+/**
+ * Which Gemini key a request may use: the writer's own key when they sent one, or else the
+ * app's key while they have free requests left today. Signed-in writers only, either way.
+ */
+export async function geminiAccess(request: Request, signInFirst: string): Promise<GeminiAccess> {
+  if (!(await signedIn(request)))
+    return { ok: false, response: reply(401, { error: signInFirst }) };
+  const own = request.headers.get(OWN_KEY_HEADER)?.trim();
+  if (own) return { ok: true, key: own, own: true };
+  const key = Netlify.env.get('GEMINI_API_KEY');
+  if (!key)
+    return {
+      ok: false,
+      response: reply(503, {
+        error: 'AI is not set up on this site yet. Add your own Gemini API key to use it.',
+        code: 'ai-key-needed',
+      }),
+    };
+  const limit = dailyLimit();
+  // Without the usage table (not migrated yet) the allowance cannot be checked; let it through.
+  const used = await usage(request, 'trellonotes_ai_used_today');
+  if (used !== null && used >= limit)
+    return {
+      ok: false,
+      response: reply(429, {
+        error: `You have used today's ${limit} free AI requests. Add your own Gemini API key to keep going, or come back tomorrow.`,
+        code: 'ai-quota',
+      }),
+    };
+  return { ok: true, key, own: false };
+}
+
+/** Counts a finished request against the writer's free allowance when it used the app's key. */
+export async function countGeminiUse(request: Request, access: { own: boolean }) {
+  if (!access.own) await usage(request, 'trellonotes_count_ai_use');
 }
 
 export type GeminiResult =

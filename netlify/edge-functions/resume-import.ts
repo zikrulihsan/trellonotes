@@ -6,7 +6,7 @@ import {
   RESUME_PROMPT,
   RESUME_SCHEMA,
 } from '../../src/lib/resume-prompt.ts';
-import { askGemini, reply, signedIn } from '../shared/gemini.ts';
+import { askGemini, countGeminiUse, geminiAccess, reply } from '../shared/gemini.ts';
 
 /** File types Gemini reads directly. Word files are pasted as text instead. */
 const FILE_TYPES = new Set(['application/pdf', 'text/plain', 'image/png', 'image/jpeg']);
@@ -18,9 +18,8 @@ interface ResumeRequest {
 
 export default async function resumeImport(request: Request) {
   if (request.method !== 'POST') return reply(405, { error: 'Use POST.' });
-  const key = Netlify.env.get('GEMINI_API_KEY');
-  if (!key) return reply(503, { error: 'Resume import is not set up yet (GEMINI_API_KEY).' });
-  if (!(await signedIn(request))) return reply(401, { error: 'Sign in to import a resume.' });
+  const access = await geminiAccess(request, 'Sign in to import a resume.');
+  if (!access.ok) return access.response;
 
   let body: ResumeRequest;
   try {
@@ -43,14 +42,14 @@ export default async function resumeImport(request: Request) {
     return reply(400, { error: 'Attach a PDF or image of your resume, or paste its text.' });
   }
 
-  const result = await askGemini(key, parts, RESUME_SCHEMA, {
+  const result = await askGemini(access.key, parts, RESUME_SCHEMA, {
     what: 'read the resume',
     temperature: 0.3,
     slow: 'Gemini took too long. Try a shorter resume, or paste its text.',
   });
-  return result.ok
-    ? reply(200, { resume: result.json })
-    : reply(result.status, { error: result.error });
+  if (!result.ok) return reply(result.status, { error: result.error });
+  await countGeminiUse(request, access);
+  return reply(200, { resume: result.json });
 }
 
 export const config = { path: '/api/resume-import' };

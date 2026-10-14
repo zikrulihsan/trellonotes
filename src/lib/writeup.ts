@@ -3,6 +3,7 @@ import type { Note, Workspace } from '@/features/workspace/types';
 import { isDoneList, type JournalWeek } from '@/features/journal/journal';
 import { markdownToHtml } from '@/features/editor/markdown';
 import { WRITEUP_MAX_CHARS, type WriteupKind } from '@/lib/writeup-prompt';
+import { aiHeaders } from '@/lib/gemini-key';
 
 const BLOCKS = new Set(['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'BLOCKQUOTE', 'PRE']);
 
@@ -129,7 +130,7 @@ export async function writeUp(
   if (!token) throw new Error('Sign in to write with Gemini.');
   const response = await fetch('/api/writeup', {
     method: 'POST',
-    headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
+    headers: aiHeaders(token),
     body: JSON.stringify({ kind, notes: notes.slice(0, WRITEUP_MAX_CHARS) }),
   });
   const result = (await response.json().catch(() => null)) as {
