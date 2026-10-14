@@ -75,12 +75,19 @@
   text-align: center;
 }
 /* The hero subtitle's rotating word: each drops in from above as the last falls away. */
+/* "notes into" stays with the rotating word, so a narrow screen breaks the line before it
+   and only the last line moves as the word changes. */
+.home-rotate-line {
+  white-space: nowrap;
+}
 .home-rotate {
   position: relative;
   display: inline-block;
   overflow: hidden;
   vertical-align: bottom;
   color: var(--purple);
+  white-space: nowrap;
+  transition: width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .home-rotate-room {
   visibility: hidden;
@@ -111,6 +118,9 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .home-rotate {
+    transition: none;
+  }
   .home-rotate-word {
     animation: none !important;
   }
