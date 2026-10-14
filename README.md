@@ -28,6 +28,8 @@ For cloud sync, copy `.env.example` to `.env.local` and add the SweGrowth projec
 
 To enable Google sign-in, create a Google OAuth client of type **Web application**. Add `http://localhost:5173` and `http://127.0.0.1:5173` as authorized JavaScript origins, and add `https://vqtzmhfnyaujkbczibwu.supabase.co/auth/v1/callback` as its authorized redirect URI. Enter that client ID and secret in the SweGrowth project's **Authentication → Sign In / Providers → Google** settings. In **Authentication → URL Configuration**, allow `http://localhost:5173/**` and `http://127.0.0.1:5173/**`; add the deployed app origin before publishing.
 
+To make Google's sign-in screen name this site instead of `vqtzmhfnyaujkbczibwu.supabase.co`, add `https://notis.swegrowth.id/auth/google` and `http://localhost:5173/auth/google` to that same OAuth client's authorized redirect URIs, then set its client ID as `VITE_GOOGLE_CLIENT_ID` (Netlify environment and `.env.local`). Sign-in then goes straight to Google and hands the ID token to Supabase (`signInWithIdToken`), so accounts and sessions stay in Supabase. Without the variable, sign-in uses Supabase's redirect as before.
+
 ```sh
 npm run dev
 ```

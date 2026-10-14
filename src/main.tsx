@@ -4,12 +4,17 @@ import { App } from './app/App';
 import { AppProviders } from './app/AppProviders';
 import { Playground } from './features/playground/Playground';
 import { isPlaygroundPath } from './lib/app-paths';
+import { takeGoogleReturn } from './lib/supabase/google-direct';
 import './styles/index.css';
 
 // Links from before clean URLs carried the route in the hash, e.g. /#/board/x.
 // Supabase sign-in callbacks also use the hash (#access_token=…) and are left alone.
 if (window.location.hash.startsWith('#/'))
   window.history.replaceState(null, '', window.location.hash.slice(1));
+
+// Back from Google's own sign-in (/auth/google#id_token=…): keep the token for AuthProvider
+// and return the address to where sign-in started, before the router reads it.
+takeGoogleReturn();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
