@@ -578,3 +578,109 @@
   line-height: 1;
   cursor: pointer;
 }
+
+/* Edit with AI: a button over selected text, its actions, and the suggestion to accept. */
+.ai-menu {
+  z-index: 30;
+}
+.ai-menu button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+}
+.ai-menu-open {
+  padding: 7px 12px;
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(135deg, #7c5cff, #c056e0);
+  box-shadow: 0 6px 18px rgba(92, 61, 180, 0.28);
+  font-size: 13px;
+  font-weight: 600;
+}
+.ai-menu-panel {
+  display: grid;
+  width: min(360px, calc(100vw - 32px));
+  padding: 6px;
+  border: 1px solid #e3e1ea;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 14px 40px rgba(42, 33, 59, 0.16);
+}
+.ai-menu-panel > button {
+  padding: 9px 10px;
+  border-radius: 8px;
+  color: #27282e;
+  background: none;
+  font-size: 14px;
+  text-align: left;
+}
+.ai-menu-panel > button:hover,
+.ai-menu-panel > button:focus-visible {
+  background: #f4f0ff;
+}
+.ai-menu-panel > .ai-menu-dismiss {
+  color: #8b8596;
+}
+.ai-menu-status,
+.ai-menu-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 10px;
+  color: #6f6e7a;
+  font-size: 14px;
+}
+.ai-menu-error {
+  color: #b23b4f;
+}
+.ai-menu-spinner {
+  animation: auth-spin 0.9s linear infinite;
+}
+.ai-menu-suggestion {
+  max-height: 260px;
+  overflow: auto;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #27282e;
+  background: #f8f6fd;
+  font-size: 15px;
+  line-height: 1.6;
+}
+.ai-menu-suggestion > :first-child {
+  margin-top: 0;
+}
+.ai-menu-suggestion > :last-child {
+  margin-bottom: 0;
+}
+.ai-menu-suggestion a {
+  pointer-events: none;
+}
+.ai-menu-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 4px 2px;
+}
+.ai-menu-actions button {
+  padding: 7px 11px;
+  border: 1px solid #e3e1ea;
+  border-radius: 8px;
+  color: #27282e;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+}
+.ai-menu-actions button.is-primary {
+  border-color: var(--purple);
+  color: #fff;
+  background: var(--purple);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ai-menu-spinner {
+    animation: none;
+  }
+}
