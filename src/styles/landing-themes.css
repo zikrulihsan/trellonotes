@@ -326,14 +326,46 @@
     display: inline-flex;
   }
 }
+.landing-preview-back {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4b4556;
+  text-align: left;
+}
+/* Tablets and phones: the preview covers the whole screen, like opening another page. */
 .landing-preview-pane.is-overlay {
   position: fixed;
-  inset: 12px;
+  inset: 0;
   z-index: 100;
   display: flex;
   height: auto;
+  min-height: 0;
   margin: 0;
-  box-shadow: 0 20px 60px rgba(20, 15, 30, 0.35);
+  border: 0;
+  border-radius: 0;
+  overscroll-behavior: contain;
+}
+.landing-preview-pane.is-overlay .landing-preview-bar {
+  padding-top: max(8px, env(safe-area-inset-top));
+}
+.landing-preview-pane.is-overlay .landing-preview-note {
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+/* On a phone the page shows at the phone's own width, edge to edge. */
+@media (max-width: 760px) {
+  .landing-preview-pane.is-overlay .landing-preview-stage {
+    padding: 0;
+  }
+  .landing-preview-pane.is-overlay .landing-preview-device {
+    border-radius: 0;
+    box-shadow: none;
+  }
 }
 
 /* Type scale. Sketchbook's hand faces run small and narrow, and the sizes above are set

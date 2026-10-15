@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Monitor, Smartphone, Tablet, X } from 'lucide-react';
+import { ArrowLeft, Monitor, Smartphone, Tablet } from 'lucide-react';
 import type { Landing } from '@/lib/supabase/landing';
 import type { PublicAuthor, PublishedPage } from '@/lib/supabase/published-pages';
 import type { Section } from '@/features/reader/PublicReader';
@@ -11,11 +11,18 @@ const DEVICES = [
 ] as const;
 type Device = (typeof DEVICES)[number]['id'];
 
+/** The size that matches the screen the writer is on, which the overlay starts on. */
+function screenDevice(): Device {
+  if (window.innerWidth <= 760) return 'mobile';
+  return window.innerWidth <= 1180 ? 'tablet' : 'desktop';
+}
+
 /**
  * The Me, Blog or About page as visitors will see it, drawn live from the unsaved draft in a
  * frame at a real device width and scaled down to fit. `focus` names the section the writer
  * just moved or restyled, which the frame brings into view each time `focusKey` changes.
- * `onClose` is set when it shows as an overlay.
+ * `onClose` is set when it shows as an overlay: on tablets and phones it takes the whole
+ * screen until the writer goes back to editing.
  */
 export function LandingPreviewPane({
   landing,
@@ -35,22 +42,53 @@ export function LandingPreviewPane({
   focusKey?: number;
   onClose?: () => void;
 }) {
-  const [device, setDevice] = useState<Device>('desktop');
+  const overlay = Boolean(onClose);
+  // The overlay starts at the size of the screen it opens on.
+  const [device, setDevice] = useState<Device>(() => (overlay ? screenDevice() : 'desktop'));
+  const close = useRef(onClose);
+  useLayoutEffect(() => {
+    close.current = onClose;
+  });
   const frame = useRef<HTMLIFrameElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
   const [box, setBox] = useState({ width: 0, height: 0 });
-  const width = DEVICES.find((item) => item.id === device)!.width;
+  // On a phone, the mobile view is drawn at the phone's own width, unscaled.
+  const width =
+    overlay && device === 'mobile' && box.width && box.width <= 760
+      ? box.width
+      : DEVICES.find((item) => item.id === device)!.width;
 
   useLayoutEffect(() => {
     const element = stage.current;
     if (!element) return;
-    const measure = () => setBox({ width: element.clientWidth, height: element.clientHeight });
+    const measure = () => {
+      // The frame fits inside the stage's padding, so a device as wide as the screen is never cut off.
+      const { paddingLeft, paddingRight, paddingTop, paddingBottom } = getComputedStyle(element);
+      setBox({
+        width: Math.max(
+          0,
+          element.clientWidth - parseFloat(paddingLeft) - parseFloat(paddingRight),
+        ),
+        height: Math.max(
+          0,
+          element.clientHeight - parseFloat(paddingTop) - parseFloat(paddingBottom),
+        ),
+      });
+    };
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(element);
     return () => observer.disconnect();
   }, []);
+
+  // While it covers the screen, Escape goes back to editing too.
+  useEffect(() => {
+    if (!overlay) return;
+    const leave = (event: KeyboardEvent) => event.key === 'Escape' && close.current?.();
+    document.addEventListener('keydown', leave);
+    return () => document.removeEventListener('keydown', leave);
+  }, [overlay]);
 
   useEffect(() => {
     const listen = (event: MessageEvent) => {
@@ -72,9 +110,20 @@ export function LandingPreviewPane({
 
   const scale = box.width ? Math.min(1, box.width / width) : 1;
   return (
-    <aside className={`landing-preview-pane ${onClose ? 'is-overlay' : ''}`} aria-label="Preview">
+    <aside
+      className={`landing-preview-pane ${overlay ? 'is-overlay' : ''}`}
+      aria-label="Preview"
+      role={overlay ? 'dialog' : undefined}
+      aria-modal={overlay || undefined}
+    >
       <div className="landing-preview-bar">
-        <span className="landing-preview-title">Preview</span>
+        {onClose ? (
+          <button type="button" className="landing-preview-back" onClick={onClose}>
+            <ArrowLeft size={17} /> Back to editing
+          </button>
+        ) : (
+          <span className="landing-preview-title">Preview</span>
+        )}
         <div className="landing-preview-devices" role="radiogroup" aria-label="Screen size">
           {DEVICES.map(({ id, label, icon: Icon }) => (
             <button
@@ -91,16 +140,6 @@ export function LandingPreviewPane({
             </button>
           ))}
         </div>
-        {onClose && (
-          <button
-            type="button"
-            className="icon-button"
-            aria-label="Close preview"
-            onClick={onClose}
-          >
-            <X size={18} />
-          </button>
-        )}
       </div>
       <div className="landing-preview-stage" ref={stage}>
         <div

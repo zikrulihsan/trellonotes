@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ArrowDown, ArrowUp, Eye, ExternalLink, Plus, Trash2 } from 'lucide-react';
 import { useWorkspace } from '@/hooks/useWorkspace';
 import { useAuth } from '@/context/auth-context';
@@ -62,7 +63,23 @@ export function LandingSettingsPage() {
   const [saved, setSaved] = useState(() => (playground ? JSON.stringify(playground.landing) : ''));
   const [loadError, setLoadError] = useState('');
   const [status, setStatus] = useState<{ busy?: boolean; error?: string; done?: boolean }>({});
-  const [previewOpen, setPreviewOpen] = useState(false);
+  // On narrower screens the preview opens over the form as its own step in history, so the
+  // browser's back button or swipe closes it like leaving any page.
+  const location = useLocation(),
+    navigate = useNavigate();
+  const previewOpen = Boolean((location.state as { preview?: boolean } | null)?.preview);
+  const pushedPreview = useRef(false);
+  const here = { pathname: location.pathname, search: location.search, hash: location.hash };
+  const openPreview = () => {
+    pushedPreview.current = true;
+    navigate(here, { state: { preview: true } });
+  };
+  const closePreview = () => {
+    if (pushedPreview.current) {
+      pushedPreview.current = false;
+      navigate(-1);
+    } else navigate(here, { replace: true, state: null });
+  };
   const [tab, setTab] = useState<Section>('me');
   // The section last moved or restyled, which the preview scrolls to; `key` counts changes.
   const [focus, setFocus] = useState<{ id: string; key: number }>();
@@ -209,17 +226,14 @@ export function LandingSettingsPage() {
   }
 
   const working = nowTitles(workspace);
-  const preview = (
-    <LandingPreviewPane
-      landing={previewLanding!}
-      author={previewAuthor}
-      pages={playground ? playgroundPosts(workspace) : undefined}
-      view={tab}
-      focus={focus?.id}
-      focusKey={focus?.key}
-      onClose={previewOpen ? () => setPreviewOpen(false) : undefined}
-    />
-  );
+  const previewProps = {
+    landing: previewLanding!,
+    author: previewAuthor,
+    pages: playground ? playgroundPosts(workspace) : undefined,
+    view: tab,
+    focus: focus?.id,
+    focusKey: focus?.key,
+  };
   const pageTitle = (project: LandingProject) =>
     workspace.pages?.find((page) => page.id === project.pageId)?.title;
 
@@ -241,7 +255,7 @@ export function LandingSettingsPage() {
             View page <ExternalLink size={14} />
           </a>
         )}
-        <button type="button" className="landing-preview-open" onClick={() => setPreviewOpen(true)}>
+        <button type="button" className="landing-preview-open" onClick={openPreview}>
           <Eye size={15} /> Preview
         </button>
       </Header>
@@ -1036,8 +1050,14 @@ export function LandingSettingsPage() {
             </div>
           </form>
         </div>
-        {preview}
+        <LandingPreviewPane {...previewProps} />
       </div>
+      {/* Drawn on the page itself, not inside the scrolling form, so it always covers the screen. */}
+      {previewOpen &&
+        createPortal(
+          <LandingPreviewPane {...previewProps} onClose={closePreview} />,
+          document.body,
+        )}
     </div>
   );
 }
