@@ -471,6 +471,19 @@
   margin: 0.1em 0;
 }
 
+/* What Notis is, in one line above the headline. */
+.home-hero-tag {
+  display: inline-block;
+  margin: 0 0 20px;
+  padding: 6px 14px 6px 8px;
+  border: 1px solid #e3dcf7;
+  border-radius: 999px;
+  color: var(--home-ink);
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  font-weight: 600;
+}
+
 /* The three steps from the hero, one section each. */
 .home-beat {
   display: grid;
@@ -1264,15 +1277,6 @@ a.home-logo {
 }
 
 /* A Notis feature named in a description ("Notis Board"), tinted like the step tags above it. */
-.home-notis {
-  padding: 1px 4px;
-  border-radius: 6px;
-  color: var(--purple);
-  background: #f0eaff;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
 /* The hero's second way in: lighter than Start writing, so the two don't read as twins. */
 .home-button.is-quiet {
   border-color: transparent;
@@ -1317,6 +1321,38 @@ a.home-logo {
 .home-beat.is-wide > .home-beat-link {
   margin-top: 28px;
 }
+/* Notis Pages: the post being written, then the same post on top of the blog. Side by side
+   on wide screens, one above the other on phones. */
+.home-publish {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  margin-top: 36px;
+  text-align: left;
+}
+.home-publish > .home-paper {
+  align-self: stretch;
+  margin: 0;
+}
+.home-publish-step {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--purple);
+  font-size: 13px;
+  font-weight: 700;
+}
+@media (max-width: 760px) {
+  .home-publish {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .home-publish-step svg {
+    transform: rotate(90deg);
+  }
+}
 .home-beat-art {
   display: flex;
   flex-direction: column;
@@ -1345,6 +1381,10 @@ a.home-logo {
   }
   .home-hero > :first-child {
     margin-top: auto;
+  }
+  .home-hero-tag {
+    align-self: center;
+    font-size: 13px;
   }
   .home-hero-next {
     display: inline-flex;

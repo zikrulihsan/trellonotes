@@ -61,8 +61,6 @@ const EXAMPLE_SITE = `/playground${writerPath(PLAYGROUND_AUTHOR)}`;
 const EXAMPLE_BLOG = `${EXAMPLE_SITE}?blog`;
 /** The sample workspace's landing page editor, with its live preview. */
 const EXAMPLE_LANDING_EDITOR = `${PLAYGROUND}/landing`;
-/** The sample workspace's Pages list. */
-const EXAMPLE_PAGES = `${PLAYGROUND}/pages`;
 
 /**
  * Notes from different parts of life, each written its own way: a log, a paragraph, a
@@ -254,15 +252,13 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
 
       <main>
         <section className="home-hero">
-          <h1>
-            <span className="home-hero-line">Write your thoughts.</span>{' '}
-            <span className="home-hero-line">
-              <mark>Track your work</mark>.
-            </span>
-          </h1>
-          <p className="home-lead">
-            <AiMark>AI</AiMark> note-taking app for your career journey.
+          <p className="home-hero-tag">
+            <AiMark>AI</AiMark> note-taking with a progress board
           </p>
+          <h1>
+            Notes that <mark>show your progress.</mark>
+          </h1>
+          <p className="home-lead">Write your thoughts. Track your goals. Share your story.</p>
           <div className="home-signin">
             {start}
             <a className="home-button is-quiet" href={PLAYGROUND}>
@@ -283,10 +279,11 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
         <section id="how" className="home-beat is-board" aria-labelledby="home-beat-write">
           <div className="home-beat-text">
             <p className="eyebrow">1 · NOTIS BOARD</p>
-            <h2 id="home-beat-write">Each task holds its own notes.</h2>
+            <h2 id="home-beat-write">
+              Write it down. <mark>See how far you&apos;ve come.</mark>
+            </h2>
             <p>
-              No more digging through chats. Each task keeps its notes in{' '}
-              <NotisMark>Notis Board</NotisMark>.
+              Each task holds its own notes. No more switching between a task board and a notes app.
             </p>
             <BeatLink href={PLAYGROUND}>Try the board</BeatLink>
           </div>
@@ -295,68 +292,55 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           </div>
         </section>
 
-        <section className="home-beat is-flipped" aria-labelledby="home-beat-summarize">
+        <section className="home-beat is-wide" aria-labelledby="home-beat-summarize">
           <div className="home-beat-text">
             <p className="eyebrow">2 · NOTIS PAGES</p>
             <h2 id="home-beat-summarize">
-              Write stories, <mark>like blog posts</mark>.
+              You did the work. <mark>Now tell the story.</mark>
             </h2>
             <p>
-              Turn what you worked on into something people read. Write it yourself, or let{' '}
-              <AiMark>AI draft</AiMark> it from your notes on <NotisMark>Notis Pages</NotisMark>.
+              Write a post yourself or let <AiMark>AI draft</AiMark> it from your notes. Every post
+              you publish shows up on your own blog.
             </p>
           </div>
-          <div className="home-beat-art">
+          <div className="home-publish">
             <WriteSketch />
-            <BeatLink href={EXAMPLE_PAGES}>See sample pages</BeatLink>
-          </div>
-        </section>
-
-        <section className="home-beat" aria-labelledby="home-beat-blog">
-          <div className="home-beat-text">
-            <p className="eyebrow">3 · NOTIS BLOG</p>
-            <h2 id="home-beat-blog">
-              Publish your writing as <mark>a blog page</mark>.
-            </h2>
-            <p>
-              Every post is a story of your work. <NotisMark>Notis Blog</NotisMark> shows them all
-              on your own blog page, for anyone to read.
-            </p>
-          </div>
-          <div className="home-beat-art">
+            <span className="home-publish-step" aria-hidden="true">
+              <ArrowRight size={18} />
+              Published
+            </span>
             <BlogSketch />
-            <BeatLink href={EXAMPLE_BLOG}>See an example blog</BeatLink>
           </div>
+          <BeatLink href={EXAMPLE_BLOG}>See an example blog</BeatLink>
         </section>
 
         <section className="home-beat is-wide" aria-labelledby="home-beat-show">
           <div className="home-beat-text">
-            <p className="eyebrow">4 · NOTIS PORTFOLIO</p>
+            <p className="eyebrow">3 · NOTIS PORTFOLIO</p>
             <h2 id="home-beat-show">
-              Show it with <mark>your professional profile</mark>.
+              Share how you think. <mark>Show what you did.</mark>
             </h2>
             <p>
-              Your posts show how you think. Your resume shows what you&apos;ve done. Put them
-              together with the <AiMark>AI-powered</AiMark> <NotisMark>Notis Portfolio</NotisMark>{' '}
-              generator.
+              Pair your posts with your resume, and <AiMark>AI</AiMark> builds a portfolio you can
+              share with one link.
             </p>
           </div>
           <Equation
             animate
-            label="Posts plus resume equals your professional page"
+            label="Posts plus resume equals your portfolio"
             parts={[
               { title: 'Posts', caption: 'you choose to publish', art: <PostArt /> },
               { op: '+', title: 'Resume', caption: 'uploaded once', art: <ResumeArt /> },
               {
                 op: '=',
-                title: 'Your page',
+                title: 'Your portfolio',
                 caption: 'one link to share',
                 art: <SiteArt />,
                 result: true,
               },
             ]}
           />
-          <BeatLink href={EXAMPLE_LANDING_EDITOR}>Try the page editor</BeatLink>
+          <BeatLink href={EXAMPLE_LANDING_EDITOR}>Try the portfolio editor</BeatLink>
         </section>
 
         <section className="home-uses" aria-labelledby="home-uses">
@@ -483,11 +467,6 @@ function AiMark({ children }: { children: ReactNode }) {
       {children}
     </span>
   );
-}
-
-/** A Notis feature named in the copy ("Notis Board"), highlighted and kept on one line. */
-function NotisMark({ children }: { children: ReactNode }) {
-  return <span className="home-notis">{children}</span>;
 }
 
 /** Scrolls a sliding row one card to the left (-1) or right (1), wrapping at the ends. */
