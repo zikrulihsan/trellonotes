@@ -12,7 +12,9 @@ describe('signed-out home page', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
       'Notes that show your progress.',
     );
-    expect(screen.getByText(/note-taking with a progress board/)).toBeInTheDocument();
+    expect(screen.getByText(/Track your goals with/)).toHaveTextContent(
+      'Track your goals with Board. Write your thoughts with Notes and Pages. Share your story with Blog.',
+    );
     expect(
       screen.getByRole('link', { name: 'Software Engineer Growth Community' }),
     ).toHaveAttribute('href', 'https://swegrowth.id');
@@ -43,18 +45,26 @@ describe('signed-out home page', () => {
       'href',
       '/playground',
     );
-    expect(screen.getByRole('link', { name: /Try the board/ })).toHaveAttribute(
+    for (const link of screen.getAllByRole('link', { name: /Try the board/ })) {
+      expect(link).toHaveAttribute('href', '/playground');
+    }
+    expect(screen.queryByRole('link', { name: /See sample pages/ })).not.toBeInTheDocument();
+    for (const link of screen.getAllByRole('link', { name: /Try writing a post/ })) {
+      expect(link).toHaveAttribute(
+        'href',
+        '/playground/page/the-boring-bug-that-cost-us-sales-storyche',
+      );
+    }
+    for (const link of screen.getAllByRole('link', { name: /Try the portfolio editor/ })) {
+      expect(link).toHaveAttribute('href', '/playground/landing');
+    }
+    expect(screen.getByRole('link', { name: 'See an example blog' })).toHaveAttribute(
+      'href',
+      '/playground/@alya?blog',
+    );
+    expect(screen.getByRole('link', { name: 'Try Notis, no login' })).toHaveAttribute(
       'href',
       '/playground',
-    );
-    expect(screen.queryByRole('link', { name: /See sample pages/ })).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Try writing a post/ })).toHaveAttribute(
-      'href',
-      '/playground/page/the-boring-bug-that-cost-us-sales-storyche',
-    );
-    expect(screen.getByRole('link', { name: /Try the portfolio editor/ })).toHaveAttribute(
-      'href',
-      '/playground/landing',
     );
     expect(screen.getByRole('heading', { name: 'Start your first board.' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy');
