@@ -250,13 +250,14 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
 
       <main>
         <section className="home-hero">
-          <p className="home-hero-tag">
-            <AiMark>AI</AiMark> note-taking with a progress board
-          </p>
           <h1>
             Notes that <mark>show your progress.</mark>
           </h1>
-          <p className="home-lead">Write your thoughts. Track your goals. Share your story.</p>
+          <p className="home-lead">
+            Track your goals with <b className="home-feature">Board</b>. Write your thoughts with{' '}
+            <b className="home-feature">Notes</b> and <b className="home-feature">Pages</b>. Share
+            your story with <b className="home-feature">Blog</b>.
+          </p>
           <div className="home-signin">
             {start}
             <a className="home-button is-quiet" href={PLAYGROUND}>

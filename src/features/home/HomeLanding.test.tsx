@@ -12,7 +12,9 @@ describe('signed-out home page', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
       'Notes that show your progress.',
     );
-    expect(screen.getByText(/note-taking with a progress board/)).toBeInTheDocument();
+    expect(screen.getByText(/Track your goals with/)).toHaveTextContent(
+      'Track your goals with Board. Write your thoughts with Notes and Pages. Share your story with Blog.',
+    );
     expect(
       screen.getByRole('link', { name: 'Software Engineer Growth Community' }),
     ).toHaveAttribute('href', 'https://swegrowth.id');

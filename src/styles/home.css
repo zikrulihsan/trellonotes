@@ -94,6 +94,11 @@
   font-size: clamp(17px, 2vw, 19px);
   line-height: 1.6;
 }
+/* The feature names in the hero subtitle, in the logo's purple. */
+.home-lead .home-feature {
+  color: var(--purple);
+  font-weight: 600;
+}
 .home-micro {
   margin: 14px 0 0;
   color: var(--home-muted);
@@ -469,26 +474,6 @@
   width: 0.8em;
   height: 0.8em;
   margin: 0.1em 0;
-}
-
-/* What Notis is, in one line above the headline. */
-.home-hero-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0 0 20px;
-  padding: 6px 14px 6px 8px;
-  border: 1px solid #e3dcf7;
-  border-radius: 999px;
-  color: var(--home-ink);
-  background: rgba(255, 255, 255, 0.7);
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.4;
-}
-/* In the tag the badge is centred by the flex row, not nudged like it is inside a sentence. */
-.home-hero-tag .home-ai {
-  vertical-align: baseline;
 }
 
 /* The three steps from the hero, one section each. */
@@ -1419,10 +1404,6 @@ a.home-logo {
   }
   .home-hero > :first-child {
     margin-top: auto;
-  }
-  .home-hero-tag {
-    align-self: center;
-    font-size: 13px;
   }
   .home-hero-next {
     display: inline-flex;
