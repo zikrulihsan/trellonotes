@@ -14,8 +14,8 @@
   --landing-card: #ffffff;
   --landing-marker: #e6dcff;
   --landing-nav-bg: rgb(255 255 255 / 0.9);
-  --landing-hand: 'DM Sans', system-ui, sans-serif;
-  --landing-display: 'DM Sans', system-ui, sans-serif;
+  --landing-hand: 'DM Sans', 'DM Sans Fallback', system-ui, sans-serif;
+  --landing-display: 'DM Sans', 'DM Sans Fallback', system-ui, sans-serif;
   --landing-wobble: 12px;
   --landing-wobble-alt: 12px;
   --landing-blob: 50%;
@@ -36,9 +36,9 @@
   --landing-stripe-a: #efe6d8;
   --landing-stripe-b: #e6dac8;
   --landing-nav-bg: rgb(247 241 230 / 0.92);
-  --landing-sans: 'Literata', Georgia, serif;
-  --landing-hand: 'Literata', Georgia, serif;
-  --landing-display: 'Literata', Georgia, serif;
+  --landing-sans: 'Literata', 'Literata Fallback', Georgia, serif;
+  --landing-hand: 'Literata', 'Literata Fallback', Georgia, serif;
+  --landing-display: 'Literata', 'Literata Fallback', Georgia, serif;
   --landing-wobble: 3px;
   --landing-wobble-alt: 3px;
   --landing-blob: 2px;
@@ -60,8 +60,8 @@
   --landing-stripe-a: #26242e;
   --landing-stripe-b: #2e2c37;
   --landing-nav-bg: rgb(22 21 27 / 0.9);
-  --landing-hand: 'DM Sans', system-ui, sans-serif;
-  --landing-display: 'DM Sans', system-ui, sans-serif;
+  --landing-hand: 'DM Sans', 'DM Sans Fallback', system-ui, sans-serif;
+  --landing-display: 'DM Sans', 'DM Sans Fallback', system-ui, sans-serif;
   --landing-wobble: 14px;
   --landing-wobble-alt: 14px;
   --landing-blob: 50%;

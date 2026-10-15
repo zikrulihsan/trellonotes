@@ -16,7 +16,7 @@
   --landing-stripe-a: #f3f2f5;
   --landing-stripe-b: #e6e4ea;
   --landing-nav-bg: rgb(255 253 248 / 0.88);
-  --landing-sans: 'DM Sans', system-ui, sans-serif;
+  --landing-sans: 'DM Sans', 'DM Sans Fallback', system-ui, sans-serif;
   --landing-hand: 'Patrick Hand', 'Segoe Print', 'Comic Sans MS', cursive;
   --landing-display: 'Kalam', 'Patrick Hand', 'Segoe Print', cursive;
   --landing-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;

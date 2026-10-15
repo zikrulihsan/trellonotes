@@ -44,7 +44,7 @@
 }
 .journal-stats strong {
   margin-right: 4px;
-  font-family: 'Literata', Georgia, serif;
+  font-family: 'Literata', 'Literata Fallback', Georgia, serif;
   font-size: 22px;
   font-weight: 500;
   color: #2d2737;

@@ -99,7 +99,7 @@
   padding: 72px 32px 40vh;
 }
 .note-title {
-  font-family: 'Literata', Georgia, serif;
+  font-family: 'Literata', 'Literata Fallback', Georgia, serif;
   font-size: 40px;
   letter-spacing: -1.2px;
   font-weight: 500;
@@ -121,7 +121,7 @@
   outline: none;
 }
 .writing-content {
-  font-family: 'Literata', Georgia, serif;
+  font-family: 'Literata', 'Literata Fallback', Georgia, serif;
   font-size: 19px;
   line-height: 1.85;
   color: #3f3848;

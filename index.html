@@ -9,10 +9,23 @@
       content="Notis is a writing app with a progress board. Write updates as you work, turn them into posts, and show them on a portfolio next to your resume."
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <!-- Opens connections early: data comes from Supabase, public pages use Google Fonts. -->
+    <!-- Opens the Supabase connection early, since all data comes from there. -->
     <link rel="preconnect" href="https://vqtzmhfnyaujkbczibwu.supabase.co" crossorigin />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Starts the two main fonts with the page instead of after the CSS, so text paints in them from the start. -->
+    <link
+      rel="preload"
+      href="/fonts/dm-sans-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/literata-latin-opsz-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <title>Notis — Notes that show your progress</title>
   </head>
   <body>
