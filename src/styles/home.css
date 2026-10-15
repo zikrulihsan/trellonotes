@@ -1388,36 +1388,10 @@ a.home-logo {
 /* On phones every section reads from the left edge, like the side-by-side ones already do;
    only the hero, which fills the first screen, and the closing call stay centred. */
 @media (max-width: 760px) {
-  /* The hero stays short so the board below it already shows on the first screen. */
+  /* The hero is only as tall as its words, so the app showcase peeks in on the first screen. */
   .home-hero {
     padding: 16px 0 0;
     text-align: center;
-  }
-  .home .home-hero + section {
-    margin-top: 32px;
-  }
-  /* The first step shows its board straight under the hero; its words follow below and
-     ease in as they scroll into view. */
-  .home-beat.is-board .home-hero-board {
-    order: -1;
-  }
-  .home-reveal {
-    opacity: var(--reveal, 1);
-    transform: translateY(calc((1 - var(--reveal, 1)) * 24px));
-  }
-  /* Every step reads picture first, then its words centred under it like a caption. */
-  .home-beat .home-beat-text {
-    text-align: center;
-  }
-  .home-beat .home-beat-text > p:not(.eyebrow) {
-    margin-inline: auto;
-  }
-  .home-beat.is-wide .home-beat-text {
-    order: 1;
-    margin-top: 28px;
-  }
-  .home-beat.is-wide > .home-beat-link {
-    order: 2;
   }
   .home-hero .home-signin {
     align-items: center;
@@ -1426,22 +1400,22 @@ a.home-logo {
     min-height: 40px;
     padding-inline: 0;
   }
-  .home-beat.is-wide {
-    justify-items: stretch;
-  }
+  .home-beat.is-wide,
   .home-uses {
     justify-items: stretch;
     text-align: left;
   }
+  .home .home-beat.is-wide h2,
   .home .home-uses h2,
   .home .home-faq h2 {
     text-align: left;
   }
+  .home-beat.is-wide .home-beat-text > p:not(.eyebrow),
   .home-uses-lead {
     margin-inline: 0;
   }
   .home-beat.is-wide > .home-beat-link {
-    justify-self: center;
+    justify-self: start;
   }
   .home-beat.is-wide .home-sketch {
     text-align: center;
@@ -1477,9 +1451,252 @@ a.home-logo {
     transform: none;
   }
 }
-@media (max-width: 760px) and (prefers-reduced-motion: reduce) {
-  .home-reveal {
-    opacity: 1;
-    transform: none;
+
+/* Under the hero: a window onto the whole app, like a screenshot that plays. */
+.home-showcase {
+  position: relative;
+  max-width: 940px;
+  margin: clamp(40px, 6vw, 64px) auto 0;
+  padding: 0 clamp(0px, 4vw, 40px);
+}
+.home .home-showcase + section {
+  margin-top: clamp(56px, 9vw, 104px);
+}
+.home-app {
+  position: relative;
+  border: 1px solid #e3e1ea;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 30px 80px rgba(42, 33, 59, 0.14);
+  text-align: left;
+}
+.home-app-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #efedf3;
+  font-size: 12px;
+}
+.home-app-dots {
+  display: inline-flex;
+  gap: 5px;
+}
+.home-app-dots i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #e3e1ea;
+}
+.home-app-path {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--home-muted);
+  white-space: nowrap;
+}
+.home-app-path b {
+  overflow: hidden;
+  color: var(--home-ink);
+  font-weight: 550;
+  text-overflow: ellipsis;
+}
+.home-app-share {
+  margin-left: auto;
+  padding: 4px 10px;
+  border-radius: 6px;
+  color: #fff;
+  background: var(--purple);
+  font-weight: 600;
+}
+.home-app-body {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  height: clamp(280px, 30vw, 320px);
+}
+.home-app-side {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 10px;
+  border-right: 1px solid #efedf3;
+  border-bottom-left-radius: 16px;
+  background: #faf9fc;
+  font-size: 13px;
+}
+.home-app-brand {
+  margin: 0 6px 10px;
+  font-family: 'Literata', Georgia, serif;
+  font-size: 17px;
+  font-weight: 600;
+}
+.home-app-brand span {
+  color: var(--purple);
+}
+.home-app-group {
+  margin: 10px 6px 2px;
+  color: #9d9ba8;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+.home-app-nav {
+  padding: 6px;
+  border-radius: 6px;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
+}
+.home-app-nav.is-active {
+  color: var(--purple);
+  background: #f0eaff;
+  font-weight: 600;
+}
+.home-app-main {
+  position: relative;
+  overflow: hidden;
+}
+.home-app-scene {
+  position: absolute;
+  inset: 0;
+  padding: clamp(16px, 3vw, 28px);
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+}
+.home-app-scene.is-current {
+  opacity: 1;
+  transform: none;
+}
+.home-app-scene:first-child {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 12px;
+}
+.home-app-page {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 34rem;
+}
+.home-app-page p {
+  margin: 0;
+  color: #4a4953;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.home-app-page .home-story-ai {
+  align-self: flex-start;
+  margin: 0;
+}
+.home-app-post {
+  display: grid;
+  gap: 2px;
+  padding: 6px 0 6px 12px;
+  border-left: 2px solid #e3dcf7;
+}
+.home-app-post time {
+  color: var(--purple);
+  font-size: 12px;
+}
+.home-app-post strong {
+  font-family: 'Literata', Georgia, serif;
+  font-size: 16px;
+  font-weight: 500;
+}
+/* Little cards that float beside the window, each naming what the current scene shows. */
+.home-app-float {
+  position: absolute;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 14px;
+  border: 1px solid #e3e1ea;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 14px 34px rgba(42, 33, 59, 0.14);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.home-app-float svg {
+  color: var(--purple);
+}
+.home-app-float.is-board {
+  bottom: 14%;
+  right: -36px;
+}
+.home-app-float.is-card {
+  bottom: 18%;
+  left: -40px;
+}
+.home-app-float.is-post {
+  top: 34%;
+  left: -48px;
+}
+.home-app-float.is-blog {
+  top: 30%;
+  right: -36px;
+}
+.home-app.is-animated .home-app-float {
+  opacity: 0;
+  transform: translateY(12px) scale(0.96);
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s ease;
+}
+.home-app.is-animated .home-app-float.is-shown {
+  opacity: 1;
+  transform: none;
+  animation: home-float 2.6s ease-in-out infinite alternate;
+}
+@keyframes home-float {
+  to {
+    translate: 0 -6px;
+  }
+}
+/* Without motion, the window rests on the board and only its own card floats beside it. */
+.home-app:not(.is-animated) .home-app-float:not(.is-board) {
+  display: none;
+}
+@media (max-width: 760px) {
+  .home-showcase {
+    margin-top: 32px;
+  }
+  .home-app-body {
+    grid-template-columns: minmax(0, 1fr);
+    height: 300px;
+  }
+  .home-app-side {
+    display: none;
+  }
+  .home-app-scene:first-child {
+    gap: 8px;
+  }
+  .home-app-scene .home-board-card {
+    padding: 8px;
+    font-size: 12px;
+  }
+  .home-app-float {
+    padding: 8px 11px;
+    font-size: 12px;
+  }
+  .home-app-float.is-board,
+  .home-app-float.is-blog {
+    right: -6px;
+    bottom: -18px;
+    top: auto;
+  }
+  .home-app-float.is-card,
+  .home-app-float.is-post {
+    left: -6px;
+    bottom: -18px;
+    top: auto;
   }
 }
