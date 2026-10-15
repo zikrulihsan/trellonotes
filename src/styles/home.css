@@ -473,7 +473,9 @@
 
 /* What Notis is, in one line above the headline. */
 .home-hero-tag {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   margin: 0 0 20px;
   padding: 6px 14px 6px 8px;
   border: 1px solid #e3dcf7;
@@ -482,6 +484,11 @@
   background: rgba(255, 255, 255, 0.7);
   font-size: 14px;
   font-weight: 600;
+  line-height: 1.4;
+}
+/* In the tag the badge is centred by the flex row, not nudged like it is inside a sentence. */
+.home-hero-tag .home-ai {
+  vertical-align: baseline;
 }
 
 /* The three steps from the hero, one section each. */
