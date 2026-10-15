@@ -1401,6 +1401,10 @@ a.home-logo {
   .home .home-hero + section {
     margin-top: 48px;
   }
+  /* Where "See how it works" stops: the step's tag with a little room above it. */
+  #how {
+    scroll-margin-top: 24px;
+  }
   .home-hero .home-signin {
     align-items: center;
   }

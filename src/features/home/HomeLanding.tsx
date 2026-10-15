@@ -1,10 +1,10 @@
-import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 import { Modal } from '@/components/ui/Modal';
 import { ConsentCheckbox } from '@/features/legal/ConsentCheckbox';
 import { LegalFooter } from '@/features/legal/LegalPage';
-import { PLAYGROUND_AUTHOR } from '@/features/playground/sample';
+import { PLAYGROUND_IDS } from '@/features/playground/sample';
+import { pagePath } from '@/lib/app-paths';
 import { rememberConsent } from '@/lib/consent';
-import { writerPath } from '@/lib/supabase/published-pages';
 import {
   ArrowRight,
   ArrowUpRight,
@@ -55,10 +55,11 @@ const FAQ: { q: string; a: string }[] = [
 
 /** The playground: the app on a sample workspace, to try without signing in. */
 const PLAYGROUND = '/playground';
-/** The sample professional page in the playground, to point visitors at. */
-const EXAMPLE_SITE = `/playground${writerPath(PLAYGROUND_AUTHOR)}`;
-/** The same sample writer's Blog page. */
-const EXAMPLE_BLOG = `${EXAMPLE_SITE}?blog`;
+/** The sample post from the Notis Pages mockup, open in the playground's editor. */
+const EXAMPLE_WRITING = `${PLAYGROUND}${pagePath({
+  id: PLAYGROUND_IDS.story,
+  title: 'The boring bug that cost us sales',
+})}`;
 /** The sample workspace's landing page editor, with its live preview. */
 const EXAMPLE_LANDING_EDITOR = `${PLAYGROUND}/landing`;
 
@@ -271,7 +272,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               Software Engineer Growth Community
             </a>
           </p>
-          <a className="home-hero-next" href="#how">
+          <a className="home-hero-next" href="#how" onClick={scrollToSteps}>
             See how it works <ArrowDown size={16} />
           </a>
         </section>
@@ -311,7 +312,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             </span>
             <BlogSketch />
           </div>
-          <BeatLink href={EXAMPLE_BLOG}>See an example blog</BeatLink>
+          <BeatLink href={EXAMPLE_WRITING}>Try writing a post</BeatLink>
         </section>
 
         <section className="home-beat is-wide" aria-labelledby="home-beat-show">
@@ -467,6 +468,15 @@ function AiMark({ children }: { children: ReactNode }) {
       {children}
     </span>
   );
+}
+
+/** Glides down to the first step instead of jumping, unless the visitor asked for less motion. */
+function scrollToSteps(event: MouseEvent<HTMLAnchorElement>) {
+  const steps = document.getElementById('how');
+  if (!steps) return;
+  event.preventDefault();
+  const still = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  steps.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
 }
 
 /** Scrolls a sliding row one card to the left (-1) or right (1), wrapping at the ends. */
