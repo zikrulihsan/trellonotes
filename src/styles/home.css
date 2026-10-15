@@ -579,8 +579,14 @@
   font-size: 12.5px;
   overflow-wrap: anywhere;
 }
+/* The page sketches use the editor's writing type, so they look like the real pages. */
+p.home-block,
+.home-block.is-heading,
+.home-block.is-checks {
+  font-family: 'Literata', Georgia, serif;
+}
 .home-block.is-heading {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
 }
 .home-block.is-checks {
@@ -1086,6 +1092,14 @@ a.home-logo {
   font-family: 'Literata', Georgia, serif;
   font-size: 15px;
   line-height: 1.6;
+}
+/* A date heading as the editor shows what /date writes: bold, in the writing's own type. */
+.home-paper .home-uses-date {
+  margin-top: 4px;
+  color: var(--home-ink);
+  font-family: 'Literata', Georgia, serif;
+  font-size: 16px;
+  font-weight: 700;
 }
 .home-uses-photo {
   display: grid;

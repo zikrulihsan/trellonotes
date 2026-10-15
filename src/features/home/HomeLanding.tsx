@@ -78,14 +78,10 @@ const USES: {
     title: 'API performance',
     body: (
       <>
-        <div className="home-note-entry">
-          <time>Tuesday, 6 October 2026</time>
-          <p>p95 on /orders is 1.8s. Suspect the N+1 on order items.</p>
-        </div>
-        <div className="home-note-entry">
-          <time>Thursday, 8 October 2026</time>
-          <p>Added the index and batched the query. p95 down to 320ms.</p>
-        </div>
+        <strong className="home-uses-date">Tuesday 6 October 2026</strong>
+        <p className="home-uses-prose">p95 on /orders is 1.8s. Suspect the N+1 on order items.</p>
+        <strong className="home-uses-date">Thursday 8 October 2026</strong>
+        <p className="home-uses-prose">Added the index and batched the query. p95 down to 320ms.</p>
       </>
     ),
     post: 'How one index took our p95 from 1.8s to 320ms',
@@ -116,14 +112,14 @@ const USES: {
     title: 'Learning Go',
     body: (
       <>
-        <div className="home-note-entry">
-          <time>Sunday, 4 October 2026</time>
-          <p>Goroutines finally clicked: a channel is just a queue with manners.</p>
-        </div>
-        <div className="home-note-entry">
-          <time>Monday, 12 October 2026</time>
-          <p>Rewrote the CSV importer with a worker pool. 40s down to 6s.</p>
-        </div>
+        <strong className="home-uses-date">Sunday 4 October 2026</strong>
+        <p className="home-uses-prose">
+          Goroutines finally clicked: a channel is just a queue with manners.
+        </p>
+        <strong className="home-uses-date">Monday 12 October 2026</strong>
+        <p className="home-uses-prose">
+          Rewrote the CSV importer with a worker pool. 40s down to 6s.
+        </p>
       </>
     ),
     post: 'Rewriting a slow importer in Go, as a beginner',
