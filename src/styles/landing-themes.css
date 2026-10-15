@@ -102,6 +102,7 @@
   gap: 12px;
 }
 .theme-option {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -123,7 +124,12 @@
   outline-offset: 2px;
 }
 .theme-option input {
+  /* Hidden but focusable. Kept tiny and inside its card: the global input width (100%) would
+     otherwise size it from the whole window and push the page sideways. */
   position: absolute;
+  inset: 0 auto auto 0;
+  width: 1px;
+  height: 1px;
   opacity: 0;
   pointer-events: none;
 }
