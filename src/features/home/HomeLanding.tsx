@@ -1,13 +1,15 @@
-import { Fragment, useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
+import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Modal } from '@/components/ui/Modal';
 import { ConsentCheckbox } from '@/features/legal/ConsentCheckbox';
 import { LegalFooter } from '@/features/legal/LegalPage';
-import { PLAYGROUND_IDS } from '@/features/playground/sample';
+import { PLAYGROUND_AUTHOR, PLAYGROUND_IDS } from '@/features/playground/sample';
+import { writerPath } from '@/lib/supabase/published-pages';
 import { pagePath } from '@/lib/app-paths';
 import { rememberConsent } from '@/lib/consent';
 import {
   ArrowRight,
   ArrowUpRight,
+  Check,
   ChevronLeft,
   ChevronRight,
   Feather,
@@ -53,6 +55,8 @@ const FAQ: { q: string; a: string }[] = [
 
 /** The playground: the app on a sample workspace, to try without signing in. */
 const PLAYGROUND = '/playground';
+/** The sample writer's blog, which the Notis Pages mockup ends on. */
+const EXAMPLE_BLOG = `${PLAYGROUND}${writerPath(PLAYGROUND_AUTHOR)}?blog`;
 /** The sample post from the Notis Pages mockup, open in the playground's editor. */
 const EXAMPLE_WRITING = `${PLAYGROUND}${pagePath({
   id: PLAYGROUND_IDS.story,
@@ -247,13 +251,14 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
 
       <main>
         <section className="home-hero">
-          <p className="home-hero-tag">
-            <AiMark>AI</AiMark> note-taking with a progress board
-          </p>
           <h1>
             Notes that <mark>show your progress.</mark>
           </h1>
-          <p className="home-lead">Write your thoughts. Track your goals. Share your story.</p>
+          <p className="home-lead">
+            Track your goals with <b className="home-feature">Board</b>. Write your thoughts with{' '}
+            <b className="home-feature">Notes</b> and <b className="home-feature">Pages</b>. Share
+            your story with <b className="home-feature">Blog</b>.
+          </p>
           <div className="home-signin">
             {start}
             <a className="home-button is-quiet" href={PLAYGROUND}>
@@ -266,14 +271,13 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               Software Engineer Growth Community
             </a>
           </p>
-          <a className="home-hero-next" href="#how" onClick={scrollToSteps}>
-            See how it works <ArrowDown size={16} />
-          </a>
         </section>
+
+        <HeroShowcase />
 
         <section id="how" className="home-beat is-board" aria-labelledby="home-beat-write">
           <div className="home-beat-text">
-            <p className="eyebrow">1 · NOTIS BOARD</p>
+            <p className="eyebrow">NOTIS BOARD</p>
             <h2 id="home-beat-write">
               Write it down. <mark>See how far you&apos;ve come.</mark>
             </h2>
@@ -282,14 +286,18 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             </p>
             <BeatLink href={PLAYGROUND}>Try the board</BeatLink>
           </div>
-          <div className="home-hero-board">
+          <a
+            className="home-hero-board home-visual-link"
+            href={PLAYGROUND}
+            aria-label="Try the board"
+          >
             <BoardSketch />
-          </div>
+          </a>
         </section>
 
         <section className="home-beat is-wide" aria-labelledby="home-beat-summarize">
           <div className="home-beat-text">
-            <p className="eyebrow">2 · NOTIS PAGES</p>
+            <p className="eyebrow">NOTIS PAGES</p>
             <h2 id="home-beat-summarize">
               You did the work. <mark>Now tell the story.</mark>
             </h2>
@@ -299,19 +307,23 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             </p>
           </div>
           <div className="home-publish">
-            <WriteSketch />
+            <a className="home-visual-link" href={EXAMPLE_WRITING} aria-label="Try writing a post">
+              <WriteSketch />
+            </a>
             <span className="home-publish-step" aria-hidden="true">
               <ArrowRight size={18} />
               Published
             </span>
-            <BlogSketch />
+            <a className="home-visual-link" href={EXAMPLE_BLOG} aria-label="See an example blog">
+              <BlogSketch />
+            </a>
           </div>
           <BeatLink href={EXAMPLE_WRITING}>Try writing a post</BeatLink>
         </section>
 
         <section className="home-beat is-wide" aria-labelledby="home-beat-show">
           <div className="home-beat-text">
-            <p className="eyebrow">3 · NOTIS PORTFOLIO</p>
+            <p className="eyebrow">NOTIS PORTFOLIO</p>
             <h2 id="home-beat-show">
               Share how you think. <mark>Show what you did.</mark>
             </h2>
@@ -320,21 +332,27 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               share with one link.
             </p>
           </div>
-          <Equation
-            animate
-            label="Posts plus resume equals your portfolio"
-            parts={[
-              { title: 'Posts', caption: 'you choose to publish', art: <PostArt /> },
-              { op: '+', title: 'Resume', caption: 'uploaded once', art: <ResumeArt /> },
-              {
-                op: '=',
-                title: 'Your portfolio',
-                caption: 'one link to share',
-                art: <SiteArt />,
-                result: true,
-              },
-            ]}
-          />
+          <a
+            className="home-visual-link is-sketch"
+            href={EXAMPLE_LANDING_EDITOR}
+            aria-label="Try the portfolio editor"
+          >
+            <Equation
+              animate
+              label="Posts plus resume equals your portfolio"
+              parts={[
+                { title: 'Posts', caption: 'you choose to publish', art: <PostArt /> },
+                { op: '+', title: 'Resume', caption: 'uploaded once', art: <ResumeArt /> },
+                {
+                  op: '=',
+                  title: 'Your portfolio',
+                  caption: 'one link to share',
+                  art: <SiteArt />,
+                  result: true,
+                },
+              ]}
+            />
+          </a>
           <BeatLink href={EXAMPLE_LANDING_EDITOR}>Try the portfolio editor</BeatLink>
         </section>
 
@@ -464,15 +482,6 @@ function AiMark({ children }: { children: ReactNode }) {
   );
 }
 
-/** Glides down to the first step instead of jumping, unless the visitor asked for less motion. */
-function scrollToSteps(event: MouseEvent<HTMLAnchorElement>) {
-  const steps = document.getElementById('how');
-  if (!steps) return;
-  event.preventDefault();
-  const still = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-  steps.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
-}
-
 /** Scrolls a sliding row one card to the left (-1) or right (1), wrapping at the ends. */
 function slideBy(row: HTMLElement | null, direction: -1 | 1) {
   const first = row?.firstElementChild as HTMLElement | null;
@@ -548,7 +557,7 @@ const STEP_MS = 700;
  * starts from its first frame each time it scrolls into view. Without motion (or without
  * IntersectionObserver), it rests on the last frame, where everything is shown.
  */
-function useLoop(length: number) {
+function useLoop(length: number, stepMs = STEP_MS) {
   const ref = useRef<HTMLDivElement>(null);
   const still =
     typeof IntersectionObserver === 'undefined' ||
@@ -567,9 +576,9 @@ function useLoop(length: number) {
   }, [still]);
   useEffect(() => {
     if (still || !visible) return;
-    const timer = window.setInterval(() => setStep((current) => (current + 1) % length), STEP_MS);
+    const timer = window.setInterval(() => setStep((current) => (current + 1) % length), stepMs);
     return () => window.clearInterval(timer);
-  }, [length, still, visible]);
+  }, [length, stepMs, still, visible]);
   return { ref, step: still ? length - 1 : step, animated: !still };
 }
 
@@ -857,6 +866,138 @@ function BoardSketch() {
         ))}
       </div>
     </div>
+  );
+}
+
+/** The app's sidebar sections the showcase walks through, named as the app names them. */
+const SHOWCASE_NAV = [
+  { group: 'NOTE', label: 'My boards' },
+  { group: 'WRITE', label: 'Pages' },
+  { group: 'SHOW', label: 'Public page' },
+];
+// Scenes: the board, a card opened to its notes, a post drafted from them, the public blog.
+const SHOWCASE_SCENES = ['board', 'card', 'post', 'blog'] as const;
+const SHOWCASE_NAV_OF = [0, 0, 1, 2];
+const SHOWCASE_PATH = [
+  ['My boards', 'Launch checkout'],
+  ['Launch checkout', 'Checkout redesign'],
+  ['Pages', 'The boring bug that cost us sales'],
+  ['Public page', 'Blog'],
+];
+const SHOWCASE_MS = 2600;
+const SHOWCASE_BOARD = [
+  { title: 'To do', cards: ['Interview Dimas', 'Pricing page copy'] },
+  { title: 'Doing', cards: ['Checkout redesign'] },
+  { title: 'Done', cards: ['Fix cart drop', 'Launch waitlist'] },
+];
+
+/**
+ * The whole app at a glance under the hero, like a window onto it: the sidebar moves from the
+ * board to a card's notes, to a post written from them, to the blog readers see. Small cards
+ * float around the window to name what just happened. Without motion it rests on the board.
+ */
+function HeroShowcase() {
+  const { ref, step, animated } = useLoop(SHOWCASE_SCENES.length, SHOWCASE_MS);
+  const scene = animated ? step : 0;
+  const [parent, here] = SHOWCASE_PATH[scene];
+  const showing = (index: number) => `home-app-scene${scene === index ? ' is-current' : ''}`;
+  const floating = (index: number) =>
+    `home-app-float is-${SHOWCASE_SCENES[index]}${!animated || scene === index ? ' is-shown' : ''}`;
+  return (
+    <a
+      className="home-showcase home-visual-link"
+      href={PLAYGROUND}
+      aria-label="Try Notis, no login"
+    >
+      <div ref={ref} className={`home-app${animated ? ' is-animated' : ''}`} aria-hidden="true">
+        <div className="home-app-bar">
+          <span className="home-app-dots">
+            <i />
+            <i />
+            <i />
+          </span>
+          <span className="home-app-path">
+            {parent} <ChevronRight size={12} /> <b>{here}</b>
+          </span>
+          <span className="home-app-share">Share</span>
+        </div>
+        <div className="home-app-body">
+          <div className="home-app-side">
+            <span className="home-app-brand">
+              notis<span>.</span>
+            </span>
+            {SHOWCASE_NAV.map((item, index) => (
+              <Fragment key={item.label}>
+                <span className="home-app-group">{item.group}</span>
+                <span
+                  className={`home-app-nav${SHOWCASE_NAV_OF[scene] === index ? ' is-active' : ''}`}
+                >
+                  {item.label}
+                </span>
+              </Fragment>
+            ))}
+          </div>
+          <div className="home-app-main">
+            <div className={showing(0)}>
+              {SHOWCASE_BOARD.map(({ title, cards }) => (
+                <div key={title} className="home-board-list">
+                  <span className="home-sketch-label">{title}</span>
+                  {cards.map((card) => (
+                    <span key={card} className="home-board-card">
+                      {card}
+                      {card === 'Checkout redesign' && (
+                        <span className="home-board-meta">
+                          <NotebookPen size={12} /> 3 updates
+                        </span>
+                      )}
+                    </span>
+                  ))}
+                </div>
+              ))}
+            </div>
+            <div className={`${showing(1)} home-app-page`}>
+              <span className="home-sketch-label">Doing</span>
+              <strong className="home-paper-title">Checkout redesign</strong>
+              {REDESIGN.map((block, index) => (
+                <PageBlock key={index} block={block} className=" is-shown" />
+              ))}
+            </div>
+            <div className={`${showing(2)} home-app-page`}>
+              <span className="home-story-ai is-shown">
+                <Sparkles size={14} /> Drafted from 3 updates
+              </span>
+              <strong className="home-paper-title">The boring bug that cost us sales</strong>
+              {BLOG.map((block, index) => (
+                <PageBlock key={index} block={block} className=" is-shown" />
+              ))}
+            </div>
+            <div className={`${showing(3)} home-app-page`}>
+              <strong className="home-paper-title">
+                <mark>Blog</mark>
+              </strong>
+              {BLOG_POSTS.map((post) => (
+                <div key={post.title} className="home-app-post">
+                  <time>{post.date}</time>
+                  <strong>{post.title}</strong>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <span className={floating(0)}>
+          <Check size={14} /> Fix cart drop moved to Done
+        </span>
+        <span className={floating(1)}>
+          <NotebookPen size={14} /> 3 updates on this card
+        </span>
+        <span className={floating(2)}>
+          <Sparkles size={14} /> AI draft ready
+        </span>
+        <span className={floating(3)}>
+          <Send size={14} /> Published to your blog
+        </span>
+      </div>
+    </a>
   );
 }
 

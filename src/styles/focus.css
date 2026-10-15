@@ -72,7 +72,7 @@
   inset: 0;
   display: grid;
   place-items: center;
-  font-family: 'Literata', Georgia, serif;
+  font-family: 'Literata', 'Literata Fallback', Georgia, serif;
   font-size: 40px;
   letter-spacing: -1px;
   font-variant-numeric: tabular-nums;
