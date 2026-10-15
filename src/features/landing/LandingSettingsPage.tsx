@@ -35,7 +35,6 @@ import { visibility } from '@/features/pages/publish-state';
 import { PublicAddress } from '@/features/pages/PublicAddress';
 import { applyResume } from '@/lib/resume-import';
 import { nowTitles } from '@/features/journal/journal';
-import { useLandingFont } from '@/features/reader/useLandingFont';
 import { ResumeImport } from './ResumeImport';
 import { LandingPreviewPane } from './LandingPreviewPane';
 import type { Section } from '@/features/reader/PublicReader';
@@ -85,7 +84,6 @@ export function LandingSettingsPage() {
   const [focus, setFocus] = useState<{ id: string; key: number }>();
   const touch = (id: string) => setFocus((last) => ({ id, key: (last?.key ?? 0) + 1 }));
   // The theme samples show each look in its own faces.
-  useLandingFont();
 
   useEffect(() => {
     if (!supabase || !userId) return;

@@ -274,7 +274,7 @@
   align-items: center;
   gap: 8px;
   padding-right: 36px;
-  font-family: 'Literata', Georgia, serif;
+  font-family: 'Literata', 'Literata Fallback', Georgia, serif;
   font-size: 19px;
   color: #2d2737;
 }
@@ -401,7 +401,7 @@
   margin-bottom: 36px;
 }
 .reader-header h1 {
-  font-family: 'Literata', Georgia, serif;
+  font-family: 'Literata', 'Literata Fallback', Georgia, serif;
   font-size: 40px;
   font-weight: 500;
   letter-spacing: -1.2px;
@@ -448,7 +448,7 @@
   color: #a39dab;
 }
 .reader-list h2 {
-  font-family: 'Literata', Georgia, serif;
+  font-family: 'Literata', 'Literata Fallback', Georgia, serif;
   font-size: 24px;
   font-weight: 500;
   margin: 6px 0 8px;

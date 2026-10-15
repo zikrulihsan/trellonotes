@@ -217,7 +217,7 @@ a.side-link {
   color: #676773;
 }
 .sidebar-note p {
-  font-family: 'Literata', serif;
+  font-family: 'Literata', 'Literata Fallback', serif;
   font-size: 16px;
   line-height: 1.65;
   color: #96969f;

@@ -57,7 +57,6 @@ import {
 import { getProfile } from '@/lib/supabase/profiles';
 import { readCached, writeCached } from '@/lib/public-cache';
 import { writingExtensions } from '@/features/editor/extensions';
-import { useLandingFont } from './useLandingFont';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const longDate = (iso: string) =>
@@ -227,7 +226,6 @@ function AuthorPage({ author }: { author: Author }) {
     document.title =
       view === 'me' || blogOnly ? who : `${view === 'blog' ? 'Blog' : 'About'} · ${who}`;
   }, [name, author.handle, view, blogOnly]);
-  useLandingFont();
   useReaderTheme(result.status === 'ready' ? (result.data[1]?.theme ?? 'sketch') : undefined);
   if (result.status !== 'ready') return <Status result={result} kind="page" />;
   const [pages, landing] = result.data;
@@ -609,7 +607,6 @@ export function PublicNav({
   active?: Section;
   showAbout: boolean;
 }) {
-  useLandingFont();
   const current = (section: Section) => (active === section ? 'page' : undefined);
   return (
     <nav className="landing-nav" aria-label="Sections">
@@ -976,7 +973,6 @@ export function SampleSite({
   const slug = address && 'slug' in address ? address.slug : undefined;
   const page = slug ? pages.find((listed) => listed.slug === slug) : undefined;
   const view: Section = params.has('about') ? 'about' : params.has('blog') ? 'blog' : 'me';
-  useLandingFont();
   useEffect(() => {
     const who = author.name ?? 'Writing';
     if (!slug)
@@ -1064,7 +1060,6 @@ function Status({ result, kind }: { result: Load<unknown>; kind: 'page' | 'artic
 
 /** A sketch of the page that is on its way, in place of a bare "Loading…". */
 function Skeleton({ kind }: { kind: 'page' | 'article' }) {
-  useLandingFont();
   return (
     <div className="landing-skeleton" role="status" aria-busy="true">
       <span className="sr-only">Loading…</span>
@@ -1131,7 +1126,6 @@ export interface PreviewMessage {
 export function LandingPreview() {
   const [draft, setDraft] = useState<PreviewMessage | null>(null);
   const [fetched, setPages] = useState<PublishedPage[]>([]);
-  useLandingFont();
   useEffect(() => {
     const receive = (event: MessageEvent) => {
       if (event.origin !== window.location.origin || event.source !== window.parent) return;
