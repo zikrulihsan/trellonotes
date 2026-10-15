@@ -229,7 +229,9 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
     if (!open) setDismissedError(error);
   };
   const usesRef = useAutoSlide<HTMLDivElement>();
-  const [boardTextRef, boardTextShown] = useRevealed<HTMLDivElement>();
+  const boardTextRef = useScrollReveal<HTMLDivElement>(),
+    pagesTextRef = useScrollReveal<HTMLDivElement>(),
+    portfolioTextRef = useScrollReveal<HTMLDivElement>();
   const start = (
     <button className="home-button is-primary" type="button" onClick={() => setSigningIn(true)}>
       Start writing <ArrowRight size={18} />
@@ -274,10 +276,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
         </section>
 
         <section id="how" className="home-beat is-board" aria-labelledby="home-beat-write">
-          <div
-            ref={boardTextRef}
-            className={`home-beat-text home-reveal${boardTextShown ? ' is-shown' : ''}`}
-          >
+          <div ref={boardTextRef} className="home-beat-text home-reveal">
             <p className="eyebrow">1 · NOTIS BOARD</p>
             <h2 id="home-beat-write">
               Write it down. <mark>See how far you&apos;ve come.</mark>
@@ -297,7 +296,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
         </section>
 
         <section className="home-beat is-wide" aria-labelledby="home-beat-summarize">
-          <div className="home-beat-text">
+          <div ref={pagesTextRef} className="home-beat-text home-reveal">
             <p className="eyebrow">2 · NOTIS PAGES</p>
             <h2 id="home-beat-summarize">
               You did the work. <mark>Now tell the story.</mark>
@@ -323,7 +322,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
         </section>
 
         <section className="home-beat is-wide" aria-labelledby="home-beat-show">
-          <div className="home-beat-text">
+          <div ref={portfolioTextRef} className="home-beat-text home-reveal">
             <p className="eyebrow">3 · NOTIS PORTFOLIO</p>
             <h2 id="home-beat-show">
               Share how you think. <mark>Show what you did.</mark>
@@ -484,25 +483,36 @@ function AiMark({ children }: { children: ReactNode }) {
 }
 
 /**
- * Whether the element has scrolled into view yet; once it has, it stays shown. Without
- * IntersectionObserver it counts as shown from the start.
+ * Sets `--reveal` on the element, from 0 as its top enters the bottom of the screen to 1 once
+ * it is a third of the way up, so its words can fade in with the scroll. Skipped without
+ * motion; the CSS treats a missing value as fully shown and only uses it on phones.
  */
-function useRevealed<T extends HTMLElement>() {
+function useScrollReveal<T extends HTMLElement>() {
   const ref = useRef<T>(null);
-  const [shown, setShown] = useState(() => typeof IntersectionObserver === 'undefined');
   useEffect(() => {
     const node = ref.current;
-    if (shown || !node) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setShown(true);
-      },
-      { rootMargin: '0px 0px -15% 0px' },
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [shown]);
-  return [ref, shown] as const;
+    if (!node || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const height = window.innerHeight;
+      const top = node.getBoundingClientRect().top;
+      const progress = Math.min(1, Math.max(0, (height - top) / (height / 3)));
+      node.style.setProperty('--reveal', progress.toFixed(3));
+    };
+    const schedule = () => {
+      if (!frame) frame = window.requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    return () => {
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, []);
+  return ref;
 }
 
 /** Scrolls a sliding row one card to the left (-1) or right (1), wrapping at the ends. */

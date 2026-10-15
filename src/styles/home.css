@@ -1402,15 +1402,22 @@ a.home-logo {
     order: -1;
   }
   .home-reveal {
-    opacity: 0;
-    transform: translateY(24px);
-    transition:
-      opacity 0.6s ease,
-      transform 0.6s ease;
+    opacity: var(--reveal, 1);
+    transform: translateY(calc((1 - var(--reveal, 1)) * 24px));
   }
-  .home-reveal.is-shown {
-    opacity: 1;
-    transform: none;
+  /* Every step reads picture first, then its words centred under it like a caption. */
+  .home-beat .home-beat-text {
+    text-align: center;
+  }
+  .home-beat .home-beat-text > p:not(.eyebrow) {
+    margin-inline: auto;
+  }
+  .home-beat.is-wide .home-beat-text {
+    order: 1;
+    margin-top: 28px;
+  }
+  .home-beat.is-wide > .home-beat-link {
+    order: 2;
   }
   .home-hero .home-signin {
     align-items: center;
@@ -1419,22 +1426,22 @@ a.home-logo {
     min-height: 40px;
     padding-inline: 0;
   }
-  .home-beat.is-wide,
+  .home-beat.is-wide {
+    justify-items: stretch;
+  }
   .home-uses {
     justify-items: stretch;
     text-align: left;
   }
-  .home .home-beat.is-wide h2,
   .home .home-uses h2,
   .home .home-faq h2 {
     text-align: left;
   }
-  .home-beat.is-wide .home-beat-text > p:not(.eyebrow),
   .home-uses-lead {
     margin-inline: 0;
   }
   .home-beat.is-wide > .home-beat-link {
-    justify-self: start;
+    justify-self: center;
   }
   .home-beat.is-wide .home-sketch {
     text-align: center;
@@ -1474,6 +1481,5 @@ a.home-logo {
   .home-reveal {
     opacity: 1;
     transform: none;
-    transition: none;
   }
 }
