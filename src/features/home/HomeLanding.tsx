@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
+import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Modal } from '@/components/ui/Modal';
 import { ConsentCheckbox } from '@/features/legal/ConsentCheckbox';
 import { LegalFooter } from '@/features/legal/LegalPage';
@@ -229,6 +229,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
     if (!open) setDismissedError(error);
   };
   const usesRef = useAutoSlide<HTMLDivElement>();
+  const [boardTextRef, boardTextShown] = useRevealed<HTMLDivElement>();
   const start = (
     <button className="home-button is-primary" type="button" onClick={() => setSigningIn(true)}>
       Start writing <ArrowRight size={18} />
@@ -270,13 +271,13 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               Software Engineer Growth Community
             </a>
           </p>
-          <a className="home-hero-next" href="#how" onClick={scrollToSteps}>
-            See how it works <ArrowDown size={16} />
-          </a>
         </section>
 
         <section id="how" className="home-beat is-board" aria-labelledby="home-beat-write">
-          <div className="home-beat-text">
+          <div
+            ref={boardTextRef}
+            className={`home-beat-text home-reveal${boardTextShown ? ' is-shown' : ''}`}
+          >
             <p className="eyebrow">1 · NOTIS BOARD</p>
             <h2 id="home-beat-write">
               Write it down. <mark>See how far you&apos;ve come.</mark>
@@ -482,13 +483,26 @@ function AiMark({ children }: { children: ReactNode }) {
   );
 }
 
-/** Glides down to the first step instead of jumping, unless the visitor asked for less motion. */
-function scrollToSteps(event: MouseEvent<HTMLAnchorElement>) {
-  const steps = document.getElementById('how');
-  if (!steps) return;
-  event.preventDefault();
-  const still = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-  steps.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
+/**
+ * Whether the element has scrolled into view yet; once it has, it stays shown. Without
+ * IntersectionObserver it counts as shown from the start.
+ */
+function useRevealed<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  const [shown, setShown] = useState(() => typeof IntersectionObserver === 'undefined');
+  useEffect(() => {
+    const node = ref.current;
+    if (shown || !node) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setShown(true);
+      },
+      { rootMargin: '0px 0px -15% 0px' },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [shown]);
+  return [ref, shown] as const;
 }
 
 /** Scrolls a sliding row one card to the left (-1) or right (1), wrapping at the ends. */
