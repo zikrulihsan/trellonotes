@@ -1,17 +1,15 @@
-import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 import { Modal } from '@/components/ui/Modal';
 import { ConsentCheckbox } from '@/features/legal/ConsentCheckbox';
 import { LegalFooter } from '@/features/legal/LegalPage';
-import { PLAYGROUND_AUTHOR } from '@/features/playground/sample';
+import { PLAYGROUND_IDS } from '@/features/playground/sample';
+import { pagePath } from '@/lib/app-paths';
 import { rememberConsent } from '@/lib/consent';
-import { writerPath } from '@/lib/supabase/published-pages';
 import {
   ArrowRight,
   ArrowUpRight,
   ChevronLeft,
   ChevronRight,
-  Circle,
-  CircleCheck,
   Feather,
   LoaderCircle,
   Lock,
@@ -55,10 +53,11 @@ const FAQ: { q: string; a: string }[] = [
 
 /** The playground: the app on a sample workspace, to try without signing in. */
 const PLAYGROUND = '/playground';
-/** The sample professional page in the playground, to point visitors at. */
-const EXAMPLE_SITE = `/playground${writerPath(PLAYGROUND_AUTHOR)}`;
-/** The same sample writer's Blog page. */
-const EXAMPLE_BLOG = `${EXAMPLE_SITE}?blog`;
+/** The sample post from the Notis Pages mockup, open in the playground's editor. */
+const EXAMPLE_WRITING = `${PLAYGROUND}${pagePath({
+  id: PLAYGROUND_IDS.story,
+  title: 'The boring bug that cost us sales',
+})}`;
 /** The sample workspace's landing page editor, with its live preview. */
 const EXAMPLE_LANDING_EDITOR = `${PLAYGROUND}/landing`;
 
@@ -79,14 +78,10 @@ const USES: {
     title: 'API performance',
     body: (
       <>
-        <div className="home-note-entry">
-          <time>Mon, 6 Oct</time>
-          <p>p95 on /orders is 1.8s. Suspect the N+1 on order items.</p>
-        </div>
-        <div className="home-note-entry">
-          <time>Wed, 8 Oct</time>
-          <p>Added the index and batched the query. p95 down to 320ms.</p>
-        </div>
+        <strong className="home-uses-date">Tuesday 6 October 2026</strong>
+        <p className="home-uses-prose">p95 on /orders is 1.8s. Suspect the N+1 on order items.</p>
+        <strong className="home-uses-date">Thursday 8 October 2026</strong>
+        <p className="home-uses-prose">Added the index and batched the query. p95 down to 320ms.</p>
       </>
     ),
     post: 'How one index took our p95 from 1.8s to 320ms',
@@ -117,14 +112,14 @@ const USES: {
     title: 'Learning Go',
     body: (
       <>
-        <div className="home-note-entry">
-          <time>Sat, 4 Oct</time>
-          <p>Goroutines finally clicked: a channel is just a queue with manners.</p>
-        </div>
-        <div className="home-note-entry">
-          <time>Sun, 12 Oct</time>
-          <p>Rewrote the CSV importer with a worker pool. 40s down to 6s.</p>
-        </div>
+        <strong className="home-uses-date">Sunday 4 October 2026</strong>
+        <p className="home-uses-prose">
+          Goroutines finally clicked: a channel is just a queue with manners.
+        </p>
+        <strong className="home-uses-date">Monday 12 October 2026</strong>
+        <p className="home-uses-prose">
+          Rewrote the CSV importer with a worker pool. 40s down to 6s.
+        </p>
       </>
     ),
     post: 'Rewriting a slow importer in Go, as a beginner',
@@ -157,7 +152,7 @@ const USES: {
             { text: 'Call the plumber about the tap', done: false },
           ].map((item) => (
             <li key={item.text} className={item.done ? 'is-done' : undefined}>
-              {item.done ? <CircleCheck size={16} /> : <Circle size={16} />}
+              <CheckBox done={item.done} />
               {item.text}
             </li>
           ))}
@@ -271,7 +266,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               Software Engineer Growth Community
             </a>
           </p>
-          <a className="home-hero-next" href="#how">
+          <a className="home-hero-next" href="#how" onClick={scrollToSteps}>
             See how it works <ArrowDown size={16} />
           </a>
         </section>
@@ -311,7 +306,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             </span>
             <BlogSketch />
           </div>
-          <BeatLink href={EXAMPLE_BLOG}>See an example blog</BeatLink>
+          <BeatLink href={EXAMPLE_WRITING}>Try writing a post</BeatLink>
         </section>
 
         <section className="home-beat is-wide" aria-labelledby="home-beat-show">
@@ -469,6 +464,15 @@ function AiMark({ children }: { children: ReactNode }) {
   );
 }
 
+/** Glides down to the first step instead of jumping, unless the visitor asked for less motion. */
+function scrollToSteps(event: MouseEvent<HTMLAnchorElement>) {
+  const steps = document.getElementById('how');
+  if (!steps) return;
+  event.preventDefault();
+  const still = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  steps.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' });
+}
+
 /** Scrolls a sliding row one card to the left (-1) or right (1), wrapping at the ends. */
 function slideBy(row: HTMLElement | null, direction: -1 | 1) {
   const first = row?.firstElementChild as HTMLElement | null;
@@ -579,6 +583,11 @@ type Block =
   | { kind: 'heading'; text: string }
   | { kind: 'checks'; items: [done: boolean, text: string][] };
 
+/** A checklist box drawn like the editor's: a rounded square, filled purple with a tick when done. */
+function CheckBox({ done }: { done: boolean }) {
+  return <span className={`home-check${done ? ' is-checked' : ''}`} aria-hidden="true" />;
+}
+
 function PageBlock({ block, className }: { block: Block; className: string }) {
   const name = `home-block is-${block.kind}${className}`;
   switch (block.kind) {
@@ -600,7 +609,7 @@ function PageBlock({ block, className }: { block: Block; className: string }) {
         <ul className={name}>
           {block.items.map(([done, text]) => (
             <li key={text} className={done ? 'is-done' : ''}>
-              {done ? <CircleCheck size={14} /> : <Circle size={14} />}
+              <CheckBox done={done} />
               {text}
             </li>
           ))}
