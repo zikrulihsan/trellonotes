@@ -43,18 +43,22 @@ describe('signed-out home page', () => {
       'href',
       '/playground',
     );
-    expect(screen.getByRole('link', { name: /Try the board/ })).toHaveAttribute(
-      'href',
-      '/playground',
-    );
+    for (const link of screen.getAllByRole('link', { name: /Try the board/ })) {
+      expect(link).toHaveAttribute('href', '/playground');
+    }
     expect(screen.queryByRole('link', { name: /See sample pages/ })).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Try writing a post/ })).toHaveAttribute(
+    for (const link of screen.getAllByRole('link', { name: /Try writing a post/ })) {
+      expect(link).toHaveAttribute(
+        'href',
+        '/playground/page/the-boring-bug-that-cost-us-sales-storyche',
+      );
+    }
+    for (const link of screen.getAllByRole('link', { name: /Try the portfolio editor/ })) {
+      expect(link).toHaveAttribute('href', '/playground/landing');
+    }
+    expect(screen.getByRole('link', { name: 'See an example blog' })).toHaveAttribute(
       'href',
-      '/playground/page/the-boring-bug-that-cost-us-sales-storyche',
-    );
-    expect(screen.getByRole('link', { name: /Try the portfolio editor/ })).toHaveAttribute(
-      'href',
-      '/playground/landing',
+      '/playground/@alya?blog',
     );
     expect(screen.getByRole('heading', { name: 'Start your first board.' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy');

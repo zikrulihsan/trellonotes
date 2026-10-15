@@ -2,7 +2,8 @@ import { Fragment, useEffect, useRef, useState, type MouseEvent, type ReactNode 
 import { Modal } from '@/components/ui/Modal';
 import { ConsentCheckbox } from '@/features/legal/ConsentCheckbox';
 import { LegalFooter } from '@/features/legal/LegalPage';
-import { PLAYGROUND_IDS } from '@/features/playground/sample';
+import { PLAYGROUND_AUTHOR, PLAYGROUND_IDS } from '@/features/playground/sample';
+import { writerPath } from '@/lib/supabase/published-pages';
 import { pagePath } from '@/lib/app-paths';
 import { rememberConsent } from '@/lib/consent';
 import {
@@ -53,6 +54,8 @@ const FAQ: { q: string; a: string }[] = [
 
 /** The playground: the app on a sample workspace, to try without signing in. */
 const PLAYGROUND = '/playground';
+/** The sample writer's blog, which the Notis Pages mockup ends on. */
+const EXAMPLE_BLOG = `${PLAYGROUND}${writerPath(PLAYGROUND_AUTHOR)}?blog`;
 /** The sample post from the Notis Pages mockup, open in the playground's editor. */
 const EXAMPLE_WRITING = `${PLAYGROUND}${pagePath({
   id: PLAYGROUND_IDS.story,
@@ -282,9 +285,13 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             </p>
             <BeatLink href={PLAYGROUND}>Try the board</BeatLink>
           </div>
-          <div className="home-hero-board">
+          <a
+            className="home-hero-board home-visual-link"
+            href={PLAYGROUND}
+            aria-label="Try the board"
+          >
             <BoardSketch />
-          </div>
+          </a>
         </section>
 
         <section className="home-beat is-wide" aria-labelledby="home-beat-summarize">
@@ -299,12 +306,16 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             </p>
           </div>
           <div className="home-publish">
-            <WriteSketch />
+            <a className="home-visual-link" href={EXAMPLE_WRITING} aria-label="Try writing a post">
+              <WriteSketch />
+            </a>
             <span className="home-publish-step" aria-hidden="true">
               <ArrowRight size={18} />
               Published
             </span>
-            <BlogSketch />
+            <a className="home-visual-link" href={EXAMPLE_BLOG} aria-label="See an example blog">
+              <BlogSketch />
+            </a>
           </div>
           <BeatLink href={EXAMPLE_WRITING}>Try writing a post</BeatLink>
         </section>
@@ -320,21 +331,27 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               share with one link.
             </p>
           </div>
-          <Equation
-            animate
-            label="Posts plus resume equals your portfolio"
-            parts={[
-              { title: 'Posts', caption: 'you choose to publish', art: <PostArt /> },
-              { op: '+', title: 'Resume', caption: 'uploaded once', art: <ResumeArt /> },
-              {
-                op: '=',
-                title: 'Your portfolio',
-                caption: 'one link to share',
-                art: <SiteArt />,
-                result: true,
-              },
-            ]}
-          />
+          <a
+            className="home-visual-link is-sketch"
+            href={EXAMPLE_LANDING_EDITOR}
+            aria-label="Try the portfolio editor"
+          >
+            <Equation
+              animate
+              label="Posts plus resume equals your portfolio"
+              parts={[
+                { title: 'Posts', caption: 'you choose to publish', art: <PostArt /> },
+                { op: '+', title: 'Resume', caption: 'uploaded once', art: <ResumeArt /> },
+                {
+                  op: '=',
+                  title: 'Your portfolio',
+                  caption: 'one link to share',
+                  art: <SiteArt />,
+                  result: true,
+                },
+              ]}
+            />
+          </a>
           <BeatLink href={EXAMPLE_LANDING_EDITOR}>Try the portfolio editor</BeatLink>
         </section>
 
