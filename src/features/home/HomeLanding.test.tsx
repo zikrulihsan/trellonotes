@@ -48,9 +48,9 @@ describe('signed-out home page', () => {
       '/playground',
     );
     expect(screen.queryByRole('link', { name: /See sample pages/ })).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /See an example blog/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Try writing a post/ })).toHaveAttribute(
       'href',
-      '/playground/@alya?blog',
+      '/playground/page/the-boring-bug-that-cost-us-sales-storyche',
     );
     expect(screen.getByRole('link', { name: /Try the portfolio editor/ })).toHaveAttribute(
       'href',
