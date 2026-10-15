@@ -12,20 +12,22 @@ describe('signed-out home page', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
       'Notes that show your progress.',
     );
-    expect(screen.getByText('stories, a personal blog, a work journal')).toBeInTheDocument();
+    expect(screen.getByText(/note-taking with a progress board/)).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: 'Software Engineer Growth Community' }),
     ).toHaveAttribute('href', 'https://swegrowth.id');
     expect(
-      screen.getByRole('img', { name: 'Posts plus resume equals your professional page' }),
+      screen.getByRole('img', { name: 'Posts plus resume equals your portfolio' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: 'Each task holds its own notes.' }),
+      screen.getByRole('heading', { name: "Write it down. See how far you've come." }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: /Publish your writing as a blog page/ }),
+      screen.getByRole('heading', { name: 'You did the work. Now tell the story.' }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /your professional profile/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Share how you think. Show what you did.' }),
+    ).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'You choose what you share.' })).toBeInTheDocument();
     expect(screen.getByText(/I walked before opening the laptop/)).toBeInTheDocument();
     expect(
@@ -45,15 +47,12 @@ describe('signed-out home page', () => {
       'href',
       '/playground',
     );
-    expect(screen.getByRole('link', { name: /See sample pages/ })).toHaveAttribute(
-      'href',
-      '/playground/pages',
-    );
+    expect(screen.queryByRole('link', { name: /See sample pages/ })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: /See an example blog/ })).toHaveAttribute(
       'href',
       '/playground/@alya?blog',
     );
-    expect(screen.getByRole('link', { name: /Try the page editor/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Try the portfolio editor/ })).toHaveAttribute(
       'href',
       '/playground/landing',
     );
