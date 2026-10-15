@@ -597,16 +597,10 @@
   align-items: center;
   gap: 8px;
 }
-.home-block.is-checks svg {
-  flex: none;
-  color: #b5b0c4;
-}
 .home-block.is-checks .is-done {
-  color: #8a8896;
+  color: #a59cb0;
   text-decoration: line-through;
-}
-.home-block.is-checks .is-done svg {
-  color: var(--purple);
+  text-decoration-color: #cbc2d6;
 }
 .home-note-entry time {
   color: var(--purple);
@@ -1123,17 +1117,33 @@ a.home-logo {
   align-items: center;
   color: var(--home-ink);
 }
-.home-uses-checklist svg {
-  flex: none;
-  color: #c9c4d2;
-}
 .home-uses-checklist li.is-done {
-  color: var(--home-muted);
+  color: #a59cb0;
   text-decoration: line-through;
-  text-decoration-color: #c9c4d2;
+  text-decoration-color: #cbc2d6;
 }
-.home-uses-checklist li.is-done svg {
-  color: var(--purple);
+/* A checklist box as the editor draws it (see editor.css): grey outline, or purple with a tick. */
+.home-check {
+  flex: none;
+  display: grid;
+  place-content: center;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid #b9aecb;
+  border-radius: 5px;
+  background: #fff;
+}
+.home-check.is-checked {
+  border-color: #8962c8;
+  background: #8962c8;
+}
+.home-check.is-checked::after {
+  content: '';
+  width: 4px;
+  height: 8px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: translateY(-1px) rotate(45deg);
 }
 
 /* Whether the board's writing goes out, as a small tag before the post or the note. */

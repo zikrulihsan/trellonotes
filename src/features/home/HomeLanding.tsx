@@ -10,8 +10,6 @@ import {
   ArrowUpRight,
   ChevronLeft,
   ChevronRight,
-  Circle,
-  CircleCheck,
   Feather,
   LoaderCircle,
   Lock,
@@ -81,11 +79,11 @@ const USES: {
     body: (
       <>
         <div className="home-note-entry">
-          <time>Mon, 6 Oct</time>
+          <time>Tuesday, 6 October 2026</time>
           <p>p95 on /orders is 1.8s. Suspect the N+1 on order items.</p>
         </div>
         <div className="home-note-entry">
-          <time>Wed, 8 Oct</time>
+          <time>Thursday, 8 October 2026</time>
           <p>Added the index and batched the query. p95 down to 320ms.</p>
         </div>
       </>
@@ -119,11 +117,11 @@ const USES: {
     body: (
       <>
         <div className="home-note-entry">
-          <time>Sat, 4 Oct</time>
+          <time>Sunday, 4 October 2026</time>
           <p>Goroutines finally clicked: a channel is just a queue with manners.</p>
         </div>
         <div className="home-note-entry">
-          <time>Sun, 12 Oct</time>
+          <time>Monday, 12 October 2026</time>
           <p>Rewrote the CSV importer with a worker pool. 40s down to 6s.</p>
         </div>
       </>
@@ -158,7 +156,7 @@ const USES: {
             { text: 'Call the plumber about the tap', done: false },
           ].map((item) => (
             <li key={item.text} className={item.done ? 'is-done' : undefined}>
-              {item.done ? <CircleCheck size={16} /> : <Circle size={16} />}
+              <CheckBox done={item.done} />
               {item.text}
             </li>
           ))}
@@ -589,6 +587,11 @@ type Block =
   | { kind: 'heading'; text: string }
   | { kind: 'checks'; items: [done: boolean, text: string][] };
 
+/** A checklist box drawn like the editor's: a rounded square, filled purple with a tick when done. */
+function CheckBox({ done }: { done: boolean }) {
+  return <span className={`home-check${done ? ' is-checked' : ''}`} aria-hidden="true" />;
+}
+
 function PageBlock({ block, className }: { block: Block; className: string }) {
   const name = `home-block is-${block.kind}${className}`;
   switch (block.kind) {
@@ -610,7 +613,7 @@ function PageBlock({ block, className }: { block: Block; className: string }) {
         <ul className={name}>
           {block.items.map(([done, text]) => (
             <li key={text} className={done ? 'is-done' : ''}>
-              {done ? <CircleCheck size={14} /> : <Circle size={14} />}
+              <CheckBox done={done} />
               {text}
             </li>
           ))}
