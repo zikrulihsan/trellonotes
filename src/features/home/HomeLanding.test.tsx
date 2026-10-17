@@ -41,6 +41,18 @@ describe('signed-out home page', () => {
     expect(screen.getByText('Learning Go')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Next examples' })).toBeInTheDocument();
     expect(screen.getByText('Why not Notion or Trello?')).toBeInTheDocument();
+    expect(screen.getByText('Open source')).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /Notion \+ Trello alternative for personal notes/ }),
+    ).toHaveAttribute('href', 'https://github.com/zikrulihsan/trellonotes');
+    expect(
+      screen.getByRole('heading', { name: 'Built in the open. Come build it with us.' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /How to contribute/ })).toHaveAttribute(
+      'href',
+      'https://github.com/zikrulihsan/trellonotes/blob/main/CONTRIBUTING.md',
+    );
+    expect(screen.getByText('Is Notis open source?')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Try it first, no login/ })).toHaveAttribute(
       'href',
       '/playground',

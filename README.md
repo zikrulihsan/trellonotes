@@ -4,6 +4,8 @@
 
 Notis is a board whose cards open into full-page free-writing notes. Soft gray scrollable lists, white cards, purple accents, and a charcoal sidebar frame the board; Tiptap powers the spacious writing editor.
 
+Notis is open source under the [MIT License](LICENSE). Contributions are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Stack
 
 - **Vite + TypeScript** — development server, bundling, and strict type checking.
