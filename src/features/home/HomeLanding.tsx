@@ -13,6 +13,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Feather,
+  Github,
+  GitPullRequest,
   LoaderCircle,
   Lock,
   MousePointer2,
@@ -44,6 +46,10 @@ const FAQ: { q: string; a: string }[] = [
     a: 'Those are where you post. Notis is where the writing starts, and you can still share your link there.',
   },
   {
+    q: 'Is Notis open source?',
+    a: 'Yes. The code is on GitHub under the MIT license. Read it, run it yourself, or send a pull request.',
+  },
+  {
     q: 'What does uploading my resume do?',
     a: 'It drafts your professional page: headline, projects and story. You review it before anything goes live.',
   },
@@ -52,6 +58,9 @@ const FAQ: { q: string; a: string }[] = [
     a: 'We do not sell it or show ads. You can ask for a copy, or delete your account and everything in it, at any time.',
   },
 ];
+
+/** Where the code lives, for anyone who wants to read it or contribute. */
+const REPO = 'https://github.com/zikrulihsan/trellonotes';
 
 /** The playground: the app on a sample workspace, to try without signing in. */
 const PLAYGROUND = '/playground';
@@ -244,13 +253,23 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           </span>
           Notis
         </span>
-        <button className="home-nav-link" type="button" onClick={() => setSigningIn(true)}>
-          Sign in
-        </button>
+        <div className="home-nav-actions">
+          <a className="home-nav-link is-icon" href={REPO} target="_blank" rel="noreferrer">
+            <Github size={16} aria-hidden="true" />
+            <span>GitHub</span>
+          </a>
+          <button className="home-nav-link" type="button" onClick={() => setSigningIn(true)}>
+            Sign in
+          </button>
+        </div>
       </header>
 
       <main>
         <section className="home-hero">
+          <a className="home-tag" href={REPO} target="_blank" rel="noreferrer">
+            <span className="home-tag-badge">Open source</span>
+            Notion + Trello alternative for personal notes and progress
+          </a>
           <h1>
             Notes that <mark>show your progress.</mark>
           </h1>
@@ -406,6 +425,30 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             ))}
           </div>
           <div className="home-signin">{start}</div>
+        </section>
+
+        <section className="home-open" aria-labelledby="home-open">
+          <p className="eyebrow">OPEN SOURCE</p>
+          <h2 id="home-open">
+            Built in the open. <mark>Come build it with us.</mark>
+          </h2>
+          <p className="home-open-lead">
+            All of Notis is on GitHub under the MIT license. Read the code, run your own copy,
+            report a bug, or pick an issue and send a pull request.
+          </p>
+          <div className="home-signin">
+            <a className="home-button is-primary" href={REPO} target="_blank" rel="noreferrer">
+              <Github size={18} aria-hidden="true" /> View on GitHub
+            </a>
+            <a
+              className="home-button"
+              href={`${REPO}/blob/main/CONTRIBUTING.md`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <GitPullRequest size={18} aria-hidden="true" /> How to contribute
+            </a>
+          </div>
         </section>
 
         <section className="home-faq" aria-labelledby="home-faq">
