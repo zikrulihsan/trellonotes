@@ -55,6 +55,7 @@ const FAQ: { q: string; a: string }[] = [
 
 /** The playground: the app on a sample workspace, to try without signing in. */
 const PLAYGROUND = '/playground';
+const GITHUB = 'https://github.com/zikrulihsan/trellonotes';
 /** The sample writer's blog, which the Notis Pages mockup ends on. */
 const EXAMPLE_BLOG = `${PLAYGROUND}${writerPath(PLAYGROUND_AUTHOR)}?blog`;
 /** The sample post from the Notis Pages mockup, open in the playground's editor. */
@@ -252,12 +253,18 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
       <main>
         <section className="home-hero">
           <h1>
-            Notes that <mark>show your progress.</mark>
+            <span className="home-hero-line">Write your thoughts.</span>{' '}
+            <span className="home-hero-line">
+              <mark>Track your progress.</mark>
+            </span>
           </h1>
           <p className="home-lead">
-            Track your goals with <b className="home-feature">Board</b>. Write your thoughts with{' '}
-            <b className="home-feature">Notes</b> and <b className="home-feature">Pages</b>. Share
-            your story with <b className="home-feature">Blog</b>.
+            Notis is a simple Notion and Trello alternative for getting your thoughts down and
+            tracking the progress of your initiatives, all through writing. Open source now on{' '}
+            <a href={GITHUB} target="_blank" rel="noreferrer">
+              GitHub
+            </a>
+            .
           </p>
           <div className="home-signin">
             {start}

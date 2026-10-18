@@ -10,10 +10,10 @@ describe('signed-out home page', () => {
       <HomeLanding redirecting={false} error="" onGoogle={onGoogle} onSwegrowth={onSwegrowth} />,
     );
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'Notes that show your progress.',
+      'Write your thoughts. Track your progress.',
     );
-    expect(screen.getByText(/Track your goals with/)).toHaveTextContent(
-      'Track your goals with Board. Write your thoughts with Notes and Pages. Share your story with Blog.',
+    expect(screen.getByText(/Notion and Trello alternative/)).toHaveTextContent(
+      'Notis is a simple Notion and Trello alternative for getting your thoughts down and tracking the progress of your initiatives, all through writing. Open source now on GitHub.',
     );
     expect(
       screen.getByRole('link', { name: 'Software Engineer Growth Community' }),
