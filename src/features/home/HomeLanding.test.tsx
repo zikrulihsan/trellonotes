@@ -10,10 +10,10 @@ describe('signed-out home page', () => {
       <HomeLanding redirecting={false} error="" onGoogle={onGoogle} onSwegrowth={onSwegrowth} />,
     );
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'Notes that show your progress.',
+      'Write your thoughts. Track your progress.',
     );
-    expect(screen.getByText(/Track your goals with/)).toHaveTextContent(
-      'Track your goals with Board. Write your thoughts with Notes and Pages. Share your story with Blog.',
+    expect(screen.getByText(/Notion and Trello alternative/)).toHaveTextContent(
+      'A simple Notion and Trello alternative, built on writing. Open source on GitHub.',
     );
     expect(
       screen.getByRole('link', { name: 'Software Engineer Growth Community' }),

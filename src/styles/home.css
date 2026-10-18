@@ -94,10 +94,12 @@
   font-size: clamp(17px, 2vw, 19px);
   line-height: 1.6;
 }
-/* The feature names in the hero subtitle, in the logo's purple. */
-.home-lead .home-feature {
+/* The GitHub link in the hero subtitle. */
+.home-lead a {
   color: var(--purple);
   font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .home-micro {
   margin: 14px 0 0;
