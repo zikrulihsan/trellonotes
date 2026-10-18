@@ -259,8 +259,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
             </span>
           </h1>
           <p className="home-lead">
-            Notis is a simple Notion and Trello alternative for getting your thoughts down and
-            tracking the progress of your initiatives, all through writing. Open source now on{' '}
+            A simple Notion and Trello alternative, built on writing. Open source on{' '}
             <a href={GITHUB} target="_blank" rel="noreferrer">
               GitHub
             </a>

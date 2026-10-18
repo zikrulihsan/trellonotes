@@ -13,7 +13,7 @@ describe('signed-out home page', () => {
       'Write your thoughts. Track your progress.',
     );
     expect(screen.getByText(/Notion and Trello alternative/)).toHaveTextContent(
-      'Notis is a simple Notion and Trello alternative for getting your thoughts down and tracking the progress of your initiatives, all through writing. Open source now on GitHub.',
+      'A simple Notion and Trello alternative, built on writing. Open source on GitHub.',
     );
     expect(
       screen.getByRole('link', { name: 'Software Engineer Growth Community' }),
