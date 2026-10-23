@@ -10,10 +10,10 @@ describe('signed-out home page', () => {
       <HomeLanding redirecting={false} error="" onGoogle={onGoogle} onSwegrowth={onSwegrowth} />,
     );
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'Notes that show your progress.',
+      'Write notes. Publish the good ones.',
     );
-    expect(screen.getByText(/Track your goals with/)).toHaveTextContent(
-      'Track your goals with Board. Write your thoughts with Notes and Pages. Share your story with Blog.',
+    expect(screen.getByText(/An open source note-taking app/)).toHaveTextContent(
+      'An open source note-taking app where any note can become a public post. Your notes stay private until you choose to share one.',
     );
     expect(
       screen.getByRole('link', { name: 'Software Engineer Growth Community' }),
@@ -22,15 +22,17 @@ describe('signed-out home page', () => {
       screen.getByRole('img', { name: 'Posts plus resume equals your portfolio' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: "Write it down. See how far you've come." }),
+      screen.getByRole('heading', { name: 'Notes for things in progress.' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: 'You did the work. Now tell the story.' }),
+      screen.getByRole('heading', { name: 'A good note deserves readers.' }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('heading', { name: 'Share how you think. Show what you did.' }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'You choose what you share.' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Note anything. You choose what to share.' }),
+    ).toBeInTheDocument();
     expect(screen.getByText(/I walked before opening the laptop/)).toBeInTheDocument();
     expect(
       screen.getByRole('img', { name: 'A sourdough loaf on a wooden board' }),
@@ -40,7 +42,19 @@ describe('signed-out home page', () => {
     expect(screen.getAllByText('Public post')).toHaveLength(3);
     expect(screen.getByText('Learning Go')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Next examples' })).toBeInTheDocument();
-    expect(screen.getByText('Why not Notion or Trello?')).toBeInTheDocument();
+    expect(screen.getByText('Why not Notion or Obsidian?')).toBeInTheDocument();
+    expect(screen.getByText('Open source')).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /Note-taking and public writing in one app/ }),
+    ).toHaveAttribute('href', 'https://github.com/zikrulihsan/trellonotes');
+    expect(
+      screen.getByRole('heading', { name: 'Built in the open. Come build it with us.' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /How to contribute/ })).toHaveAttribute(
+      'href',
+      'https://github.com/zikrulihsan/trellonotes/blob/main/CONTRIBUTING.md',
+    );
+    expect(screen.getByText('Is Notis open source?')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Try it first, no login/ })).toHaveAttribute(
       'href',
       '/playground',
@@ -66,11 +80,11 @@ describe('signed-out home page', () => {
       'href',
       '/playground',
     );
-    expect(screen.getByRole('heading', { name: 'Start your first board.' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Write your first note.' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy');
     expect(screen.queryByRole('button', { name: 'Continue with Google' })).toBeNull();
     const starts = screen.getAllByRole('button', { name: /Start writing/ });
-    expect(starts).toHaveLength(3);
+    expect(starts).toHaveLength(2);
     fireEvent.click(starts[0]);
     expect(screen.getByRole('dialog', { name: 'Start writing in Notis' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Continue with Google' })).toBeDisabled();

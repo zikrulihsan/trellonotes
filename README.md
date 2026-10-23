@@ -1,8 +1,10 @@
 # Notis
 
-**From notes to getting noticed: manage your professional presence.**
+**Open source note-taking where any note can become public writing.**
 
-Notis is a board whose cards open into full-page free-writing notes. Soft gray scrollable lists, white cards, purple accents, and a charcoal sidebar frame the board; Tiptap powers the spacious writing editor.
+Notis keeps your notes private and turns the ones worth sharing into posts on your own blog and portfolio. Notes can live on their own or on a board whose cards open into full-page free-writing notes. Soft gray scrollable lists, white cards, purple accents, and a charcoal sidebar frame the board; Tiptap powers the spacious writing editor.
+
+Notis is open source under the [MIT License](LICENSE). Contributions are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Stack
 
