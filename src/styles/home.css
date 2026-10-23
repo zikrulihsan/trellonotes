@@ -69,6 +69,61 @@
 .home-nav-link:hover {
   border-color: #c9c4d2;
 }
+.home-nav-actions {
+  display: flex;
+  gap: 8px;
+}
+.home-nav-link.is-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+/* On phones the GitHub link shows only its icon, so the nav stays on one line. */
+@media (max-width: 420px) {
+  .home-nav-link.is-icon span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+/* The line above the headline: what Notis is, and that its code is open. */
+.home-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 100%;
+  margin: 0 auto 22px;
+  padding: 5px 14px 5px 5px;
+  border: 1px solid #dedde5;
+  border-radius: 999px;
+  color: var(--home-muted);
+  background: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: left;
+  text-decoration: none;
+}
+.home-tag:hover {
+  border-color: #c9c4d2;
+  color: var(--home-ink);
+}
+.home-tag:focus-visible {
+  outline: 2px solid var(--purple);
+  outline-offset: 2px;
+}
+.home-tag-badge {
+  flex: none;
+  padding: 3px 10px;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--purple);
+  font-size: 12px;
+  font-weight: 650;
+}
 
 .home-hero {
   padding: clamp(32px, 6vw, 64px) 0 clamp(4px, 2vw, 24px);
@@ -766,6 +821,25 @@ p.home-block,
   font-size: 15px;
   font-style: italic;
   line-height: 1.55;
+}
+.home-open {
+  padding: clamp(40px, 6vw, 56px) 24px;
+  border: 1px solid #e3e1ea;
+  border-radius: 20px;
+  background: #fff;
+  text-align: center;
+}
+.home-open .eyebrow {
+  margin: 0 0 12px;
+  color: var(--purple);
+}
+.home-open-lead {
+  max-width: 34rem;
+  text-wrap: balance;
+  margin: 14px auto 0;
+  color: var(--home-muted);
+  font-size: 18px;
+  line-height: 1.6;
 }
 .home-faq-list {
   max-width: 44rem;
