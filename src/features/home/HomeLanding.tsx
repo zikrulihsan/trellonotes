@@ -38,8 +38,8 @@ const FAQ: { q: string; a: string }[] = [
     a: 'No. Your notes are private. Only the posts you publish appear on your page, and you can unpublish them any time.',
   },
   {
-    q: 'Why not Notion or Trello?',
-    a: 'In Trello a task is a few fields. In Notis it is a page you write. And Notis turns that writing into posts, which Notion does not.',
+    q: 'Why not Notion or Obsidian?',
+    a: 'They keep your notes. Notis also helps you share them: any note can become a post on your own blog, without copying it into a separate blogging tool.',
   },
   {
     q: 'Why not LinkedIn or Medium?',
@@ -268,15 +268,14 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
         <section className="home-hero">
           <a className="home-tag" href={REPO} target="_blank" rel="noreferrer">
             <span className="home-tag-badge">Open source</span>
-            Notion + Trello alternative for personal notes and progress
+            Note-taking and public writing in one app
           </a>
           <h1>
-            Notes that <mark>show your progress.</mark>
+            Write notes. <mark>Publish the good ones.</mark>
           </h1>
           <p className="home-lead">
-            Track your goals with <b className="home-feature">Board</b>. Write your thoughts with{' '}
-            <b className="home-feature">Notes</b> and <b className="home-feature">Pages</b>. Share
-            your story with <b className="home-feature">Blog</b>.
+            An open source note-taking app where any note can become a public post. Your notes stay
+            private until you choose to share one.
           </p>
           <div className="home-signin">
             {start}
@@ -294,93 +293,14 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
 
         <HeroShowcase />
 
-        <section id="how" className="home-beat is-board" aria-labelledby="home-beat-write">
-          <div className="home-beat-text">
-            <p className="eyebrow">NOTIS BOARD</p>
-            <h2 id="home-beat-write">
-              Write it down. <mark>See how far you&apos;ve come.</mark>
-            </h2>
-            <p>
-              Each task holds its own notes. No more switching between a task board and a notes app.
-            </p>
-            <BeatLink href={PLAYGROUND}>Try the board</BeatLink>
-          </div>
-          <a
-            className="home-hero-board home-visual-link"
-            href={PLAYGROUND}
-            aria-label="Try the board"
-          >
-            <BoardSketch />
-          </a>
-        </section>
-
-        <section className="home-beat is-wide" aria-labelledby="home-beat-summarize">
-          <div className="home-beat-text">
-            <p className="eyebrow">NOTIS PAGES</p>
-            <h2 id="home-beat-summarize">
-              You did the work. <mark>Now tell the story.</mark>
-            </h2>
-            <p>
-              Write a post yourself or let <AiMark>AI draft</AiMark> it from your notes. Every post
-              you publish shows up on your own blog.
-            </p>
-          </div>
-          <div className="home-publish">
-            <a className="home-visual-link" href={EXAMPLE_WRITING} aria-label="Try writing a post">
-              <WriteSketch />
-            </a>
-            <span className="home-publish-step" aria-hidden="true">
-              <ArrowRight size={18} />
-              Published
-            </span>
-            <a className="home-visual-link" href={EXAMPLE_BLOG} aria-label="See an example blog">
-              <BlogSketch />
-            </a>
-          </div>
-          <BeatLink href={EXAMPLE_WRITING}>Try writing a post</BeatLink>
-        </section>
-
-        <section className="home-beat is-wide" aria-labelledby="home-beat-show">
-          <div className="home-beat-text">
-            <p className="eyebrow">NOTIS PORTFOLIO</p>
-            <h2 id="home-beat-show">
-              Share how you think. <mark>Show what you did.</mark>
-            </h2>
-            <p>
-              Pair your posts with your resume, and <AiMark>AI</AiMark> builds a portfolio you can
-              share with one link.
-            </p>
-          </div>
-          <a
-            className="home-visual-link is-sketch"
-            href={EXAMPLE_LANDING_EDITOR}
-            aria-label="Try the portfolio editor"
-          >
-            <Equation
-              animate
-              label="Posts plus resume equals your portfolio"
-              parts={[
-                { title: 'Posts', caption: 'you choose to publish', art: <PostArt /> },
-                { op: '+', title: 'Resume', caption: 'uploaded once', art: <ResumeArt /> },
-                {
-                  op: '=',
-                  title: 'Your portfolio',
-                  caption: 'one link to share',
-                  art: <SiteArt />,
-                  result: true,
-                },
-              ]}
-            />
-          </a>
-          <BeatLink href={EXAMPLE_LANDING_EDITOR}>Try the portfolio editor</BeatLink>
-        </section>
-
-        <section className="home-uses" aria-labelledby="home-uses">
-          <p className="eyebrow">PRIVATE BY DEFAULT</p>
-          <h2 id="home-uses">You choose what you share.</h2>
+        <section id="how" className="home-uses" aria-labelledby="home-uses">
+          <p className="eyebrow">NOTES</p>
+          <h2 id="home-uses">
+            Note anything. <mark>You choose what to share.</mark>
+          </h2>
           <p className="home-uses-lead">
-            Write about anything. Your notes stay private. When something is worth sharing,{' '}
-            <AiMark>AI</AiMark> helps turn it into a post you can publish.
+            Work, study, ideas, reading, a hobby. Write with headings, checklists, code and photos.
+            Every note is private by default.
           </p>
           <div className="home-uses-nav">
             <button
@@ -424,7 +344,88 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
               </div>
             ))}
           </div>
-          <div className="home-signin">{start}</div>
+        </section>
+
+        <section className="home-beat is-wide" aria-labelledby="home-beat-summarize">
+          <div className="home-beat-text">
+            <p className="eyebrow">FROM NOTE TO POST</p>
+            <h2 id="home-beat-summarize">
+              A good note <mark>deserves readers.</mark>
+            </h2>
+            <p>
+              Turn a note into a post. Write it yourself or let <AiMark>AI draft</AiMark> it from
+              your notes. Every post you publish shows up on your own blog.
+            </p>
+          </div>
+          <div className="home-publish">
+            <a className="home-visual-link" href={EXAMPLE_WRITING} aria-label="Try writing a post">
+              <WriteSketch />
+            </a>
+            <span className="home-publish-step" aria-hidden="true">
+              <ArrowRight size={18} />
+              Published
+            </span>
+            <a className="home-visual-link" href={EXAMPLE_BLOG} aria-label="See an example blog">
+              <BlogSketch />
+            </a>
+          </div>
+          <BeatLink href={EXAMPLE_WRITING}>Try writing a post</BeatLink>
+        </section>
+
+        <section className="home-beat is-wide" aria-labelledby="home-beat-show">
+          <div className="home-beat-text">
+            <p className="eyebrow">NOTIS PORTFOLIO</p>
+            <h2 id="home-beat-show">
+              Share how you think. <mark>Show what you did.</mark>
+            </h2>
+            <p>
+              Pair your blog with your resume, and <AiMark>AI</AiMark> builds a portfolio you can
+              share with one link.
+            </p>
+          </div>
+          <a
+            className="home-visual-link is-sketch"
+            href={EXAMPLE_LANDING_EDITOR}
+            aria-label="Try the portfolio editor"
+          >
+            <Equation
+              animate
+              label="Posts plus resume equals your portfolio"
+              parts={[
+                { title: 'Posts', caption: 'you choose to publish', art: <PostArt /> },
+                { op: '+', title: 'Resume', caption: 'uploaded once', art: <ResumeArt /> },
+                {
+                  op: '=',
+                  title: 'Your portfolio',
+                  caption: 'one link to share',
+                  art: <SiteArt />,
+                  result: true,
+                },
+              ]}
+            />
+          </a>
+          <BeatLink href={EXAMPLE_LANDING_EDITOR}>Try the portfolio editor</BeatLink>
+        </section>
+
+        <section className="home-beat is-board" aria-labelledby="home-beat-write">
+          <div className="home-beat-text">
+            <p className="eyebrow">NOTIS BOARD</p>
+            <h2 id="home-beat-write">
+              Notes for things <mark>in progress.</mark>
+            </h2>
+            <p>
+              Working on a project, a goal or a job hunt? Put its notes on a board. Every card is a
+              full page to write in, and you see how far you&apos;ve come.
+            </p>
+            <BeatLink href={PLAYGROUND}>Try the board</BeatLink>
+          </div>
+          <a
+            className="home-hero-board home-visual-link"
+            href={PLAYGROUND}
+            aria-label="Try the board"
+          >
+            <BoardSketch />
+          </a>
         </section>
 
         <section className="home-open" aria-labelledby="home-open">
@@ -464,7 +465,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
         </section>
 
         <section className="home-start" id="start" aria-labelledby="home-start">
-          <h2 id="home-start">Start your first board.</h2>
+          <h2 id="home-start">Write your first note.</h2>
           <div className="home-signin">{start}</div>
         </section>
       </main>
@@ -475,7 +476,7 @@ export function HomeLanding({ redirecting, error, onGoogle, onSwegrowth }: HomeL
           className="home-signin-dialog"
           onClose={() => !redirecting && setSigningIn(false)}
         >
-          <p>Sign in and your first board is ready. Nothing is public until you publish it.</p>
+          <p>Sign in and start writing. Nothing is public until you publish it.</p>
           <ConsentCheckbox checked={agreed} onChange={setAgreed} />
           <div className="home-signin-options">
             <button
